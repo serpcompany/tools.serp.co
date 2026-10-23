@@ -1,0 +1,820 @@
+{
+  "mp4-to-av1": {
+    "seo": {
+      "title": "Convert MP4 to AV1 Online (Free)",
+      "h1": "MP4 to AV1 Converter",
+      "description": "Re-encode an MP4 as a video-only .av1 stream with your browser's own AV1 encoder. Sound is dropped and nothing is uploaded. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 as a video-only AV1 stream with your browser's own encoder."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MP4 to AV1?",
+        "answer": "Add the MP4 above and wait. FFmpeg in your browser prepares the picture, your browser's AV1 encoder compresses it, and you save a .av1 file. Nothing is uploaded."
+      },
+      {
+        "question": "Does the .av1 file keep the MP4's sound?",
+        "answer": "No. A .av1 file is a raw video stream with no audio, and the page says \"Video only\" for that reason. Keep the MP4 if you need the sound."
+      },
+      {
+        "question": "Is a .av1 file the same as AV1 inside an MP4 or WebM?",
+        "answer": "No. The page writes a bare AV1 stream in an IVF wrapper, with no sound. AV1 video inside MP4, MKV or WebM sits in a full container and can carry audio."
+      },
+      {
+        "question": "What does \"Your browser can't encode AV1 on this device\" mean?",
+        "answer": "The AV1 encoder comes from your browser and device, not from this site, and some machines lack one. Try a recent Chrome or Edge, or a different computer."
+      },
+      {
+        "question": "Why does the AV1 differ in size or frame rate from the MP4?",
+        "answer": "Frames larger than the page's limit are scaled down, and a higher frame rate is thinned by dropping frames. Interlaced footage is deinterlaced first. The guide below gives both limits."
+      },
+      {
+        "question": "Will the AV1 look worse than my MP4?",
+        "answer": "It can. The video is re-encoded twice on the way, once into an intermediate VP8 copy and then to AV1, and both steps are lossy. Start from the least compressed MP4 you have."
+      },
+      {
+        "question": "My player won't open the .av1 file. What can I use?",
+        "answer": "Try VLC or mpv, which open AV1. Many other players expect AV1 inside a container such as MP4 or WebM, rather than as a bare stream."
+      },
+      {
+        "question": "Does the page take several MP4 files?",
+        "answer": "Yes. Pick as many MP4 files as you like; they run one after another and each saves as its own .av1 file."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and AV1",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "AV1",
+        "fullName": "AOMedia Video 1",
+        "description": "An open, royalty-free video codec released by the Alliance for Open Media in 2018. It compresses more efficiently than VP9 and H.264.",
+        "details": [
+          "Lossy compression",
+          "Royalty-free",
+          "Better efficiency than H.264 and VP9",
+          "Supported by major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to AV1",
+      "points": [
+        "The result is a raw .av1 stream in an IVF wrapper. It has no audio, so the page labels it Video only.",
+        "Your browser's own AV1 encoder does the work, so a browser or device without one shows a message instead of a file.",
+        "Large frames are scaled down and a higher frame rate is thinned before encoding.",
+        "The picture is re-encoded twice, so the AV1 is a lossy copy."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP4 for AV1 output",
+      "markdown": "### What is an MP4 file?\n\nThe MP4 container, defined by ISO/IEC 14496-14, stores video, audio, subtitles and metadata together, and its extension does not name the video codec: one MP4 may use H.264, another H.265 or AV1. A phone recording with speech is a typical example, with the picture and the microphone track stored together. It plays on nearly every device, and chapters can travel inside it.\n\n### Programs that open MP4 files\n\nFor AV1 output, open the MP4 in:\n\n- **Windows, Mac and Linux:** ffplay and mpv play MP4 files.\n- **Windows and Mac:** Adobe Premiere takes in MP4 when it can decode what is inside.\n- **Web:** Firefox and Chrome play MP4 in the browser.\n- **Mobile:** On phones, use VLC for Android or VLC for iOS.\n\nOpening the container is not enough, since a decoder must also exist for the video inside.\n\n### MP4 and AV1 compared\n\n- **Kind**: MP4 is a container. AV1 is a codec from the Alliance for Open Media that can sit inside MP4, MKV or WebM.\n- **Efficiency**: AV1 compresses better than H.264 and VP9.\n- **This page's output**: a bare stream of AV1 data in an IVF wrapper, with no audio.\n\nFFmpeg first decodes your MP4 to an intermediate copy, deinterlacing it, scaling anything over 1920 pixels on the long side down and dropping frames above 30 per second. Your browser's AV1 encoder then compresses that copy, and FFmpeg writes the stream out as a .av1 file. The encoder is the browser's, so whether it works depends on your device.\n\n### Other ways to convert MP4 to AV1\n\n- **FFmpeg with SVT-AV1:** run `ffmpeg -i camera.mp4 -an -c:v libsvtav1 -crf 35 -preset 8 -f ivf camera.av1`. `-an` leaves the sound out, `-crf` sets the quality, and a higher preset number encodes faster at lower quality.\n\n### Problems with MP4 files\n\n- **The MP4 won't convert**: a recording interrupted while it was being written can leave an unfinished, unplayable file. Re-export it.\n- **It plays in one program but not another**: the container does not guarantee a decoder, so an MP4 with an unusual video codec needs software that carries it.\n- **The MP4 has sound you need**: the sound stays in the MP4, since a .av1 stream cannot hold it.\n"
+    }
+  },
+  "nef-to-tiff": {
+    "seo": {
+      "title": "Convert NEF to TIFF Online (Free)",
+      "h1": "NEF to TIFF Converter",
+      "description": "Develop a Nikon NEF raw file into a TIFF in your browser with LibRaw and ImageMagick. Nikon High Efficiency RAW is not supported. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Develop a Nikon NEF raw file into a TIFF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a NEF to a TIFF?",
+        "answer": "Add the NEF above and save the TIFF it produces. Nothing is uploaded: the raw development happens in your browser."
+      },
+      {
+        "question": "Can I choose the TIFF's bit depth or compression?",
+        "answer": "No. Neither a bit depth nor a compression method is passed to the writer. Nikon NX Studio offers both 8-bit and 16-bit TIFF export."
+      },
+      {
+        "question": "Can I still change white balance or exposure afterward?",
+        "answer": "Not as raw settings. White balance and the like stay with the NEF, and the TIFF holds finished pixels, so hold on to the NEF if you might want to redo the development."
+      },
+      {
+        "question": "Why does the page say the RAW file's compression can't be decoded?",
+        "answer": "The raw reader built into this page cannot decode Nikon's High Efficiency RAW. A damaged file gets the same message. Keep the NEF and open it in software that supports that compression."
+      },
+      {
+        "question": "Why does the TIFF look different from my NEF in Nikon software?",
+        "answer": "Raw development depends on white balance, tone and sharpening choices applied by the processing software. This page uses LibRaw's rendering, not Nikon's, so colors and highlights can differ."
+      },
+      {
+        "question": "Why does the page say my NEF is too large to convert?",
+        "answer": "The page has a size limit for a single picture, and the file's header declares more. A NEF from a camera should not reach it, so check whether the file is damaged."
+      },
+      {
+        "question": "My new camera's NEF won't open. Why?",
+        "answer": "LibRaw needs to recognize the camera model. A very recent body, or a damaged or cut-off NEF, produces a read error rather than a TIFF."
+      },
+      {
+        "question": "Can I convert a folder of NEF files?",
+        "answer": "Yes. Each NEF you select is converted in turn into a separate TIFF, and each downloads on its own."
+      }
+    ],
+    "aboutSection": {
+      "title": "NEF and TIFF",
+      "fromFormat": {
+        "name": "NEF",
+        "fullName": "Nikon Electronic Format",
+        "description": "The raw image format of Nikon digital cameras. It stores unprocessed sensor data in a TIFF-based file, with an embedded JPEG preview.",
+        "details": [
+          "Unprocessed sensor data",
+          "TIFF-based structure",
+          "Embedded JPEG preview",
+          "Proprietary Nikon format"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting NEF to TIFF",
+      "points": [
+        "The TIFF is a developed picture. The NEF's raw editing latitude stays in the NEF.",
+        "LibRaw develops the file, so colors can differ from Nikon NX Studio's rendering.",
+        "Nikon High Efficiency RAW files are refused with a message, not converted.",
+        "The page reads one picture from the file, and a picture beyond its size limit is refused."
+      ]
+    },
+    "guide": {
+      "title": "Understanding NEF for TIFF output",
+      "markdown": "### What is a NEF file?\n\nNEF stands for Nikon Electronic Format, the raw format of Nikon cameras. Sensor data arrives unprocessed, together with camera and lens metadata, inside a TIFF-based structure that also carries a JPEG preview. Depending on the camera the data has 12 or 14 bits, and Nikon stores it uncompressed or losslessly compressed. White balance, tone and sharpening can be kept as instructions to apply later, which is why a NEF can look different once it is developed. Nikon's software can turn a NEF into a JPEG or TIFF and leave the raw original untouched.\n\n### Programs that open NEF files\n\nFor TIFF output, open the NEF in:\n\n- **Windows and Mac:** NX Studio, Nikon's own software, views and develops NEF files.\n- **Windows, Mac and Linux:** ImageMagick reads the format.\n- **Linux:** XnView MP can browse NEF, and it is free only for private and educational use.\n\n### NEF and TIFF compared\n\n- **Content**: a NEF holds raw sensor data. A TIFF holds finished pixels.\n- **Compression**: TIFF supports lossless and lossy methods. The page sets none.\n- **Pages**: a TIFF can hold several images. This page reads one picture.\n- **Preview**: a NEF carries a JPEG preview, which can look different from the developed TIFF.\n- **Origin**: TIFF was published by Aldus and is now maintained by Adobe.\n\nLibRaw, built into ImageMagick for WebAssembly, develops the NEF in your browser. ImageMagick then writes the TIFF. A NEF whose picture needs Nikon's High Efficiency RAW compression fails with a message saying so, and a picture over about 537 megapixels is refused.\n\n### Other ways to convert NEF to TIFF\n\n- **Nikon NX Studio:** select the photograph, click Export, and under Export as choose TIFF (8 Bit) or TIFF (16 Bit). LZW compression is optional. Check the remaining settings and export.\n- **ImageMagick:** run `magick portrait.nef portrait.tiff`. ImageMagick lists NEF among its readable formats.\n\n### Problems with NEF files\n\n- **The TIFF looks different from the preview**: raw rendering differs between programs. Compare in your editor.\n- **A new camera's NEF fails**: use software that supports the model, such as Nikon NX Studio.\n- **The NEF is damaged**: the page cannot read a cut-off file.\n- **The raw settings are gone**: the TIFF holds finished pixels, so keep the NEF to redo the development.\n"
+    }
+  },
+  "ogv-to-mp3": {
+    "seo": {
+      "title": "Convert OGV to MP3 Online (Free)",
+      "h1": "OGV to MP3 Converter",
+      "description": "Pull the soundtrack out of an Ogg video (OGV) as an MP3 in your browser. The picture is dropped and nothing is uploaded. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Pull the soundtrack out of an Ogg video as an MP3, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I get just the sound out of an OGV?",
+        "answer": "Add the OGV above and download the MP3. FFmpeg works inside your browser tab, skips the video and encodes the sound, so nothing leaves your device."
+      },
+      {
+        "question": "Does the MP3 keep any of the video?",
+        "answer": "No. An MP3 holds sound only, and the page tells FFmpeg to discard the video."
+      },
+      {
+        "question": "What quality is the MP3?",
+        "answer": "The page encodes with LAME at one fixed bitrate and has no bitrate setting. The sound is decoded and compressed again, not copied from the Ogg stream."
+      },
+      {
+        "question": "Why does it say \"FFmpeg failed with exit code\"?",
+        "answer": "The usual cause is an OGV with no audio track, such as a silent screen recording. Play the OGV in VLC to check it has sound."
+      },
+      {
+        "question": "Will it sound worse than the OGV?",
+        "answer": "It can. Vorbis and Opus are lossy, and MP3 is lossy again, so the second pass cannot restore detail the first one removed."
+      },
+      {
+        "question": "Does an OGV always contain Vorbis audio?",
+        "answer": "No. The extension doesn't promise a codec, and the sound may be Vorbis or Opus. FFmpeg decodes whichever audio it finds, if it supports the type."
+      },
+      {
+        "question": "Can I cut a section of the OGV before converting?",
+        "answer": "No. The page converts the whole sound track and has no trim control."
+      },
+      {
+        "question": "Can I convert several OGV files at once?",
+        "answer": "Yes. Add several OGV files and each yields a separate MP3 download."
+      }
+    ],
+    "aboutSection": {
+      "title": "OGV and MP3",
+      "fromFormat": {
+        "name": "OGV",
+        "fullName": "Ogg video",
+        "description": "The Ogg container extension for video files. It usually holds Theora video with Vorbis or Opus audio.",
+        "details": [
+          "Ogg container",
+          "Theora video",
+          "Vorbis or Opus audio",
+          "Royalty-free"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting OGV to MP3",
+      "points": [
+        "The picture is dropped, and the sound is encoded again as MP3, a second lossy step.",
+        "An OGV with no audio track ends in an \"FFmpeg failed\" error.",
+        "The page converts the whole file, with no trimming.",
+        "Tags such as title and artist are copied where MP3 has fields for them, and FFmpeg's defaults pick the audio track."
+      ]
+    },
+    "guide": {
+      "title": "Understanding OGV for MP3 output",
+      "markdown": "### What is an OGV file?\n\nOGV is the Ogg container used for video, maintained by the Xiph.Org Foundation. It usually holds Theora video with Vorbis or Opus audio, and its media type is video/ogg. Ogg streams begin with the bytes OggS. Xiph recommends .ogv for video, though the older .ogg ending also turns up on video files. An OGV can contain audio, video and timed text, but the extension does not promise that a soundtrack exists.\n\n### Programs that open OGV files\n\n- **Windows, Mac and Linux:** VLC media player plays Ogg containers with Theora and Vorbis, and FFmpeg can open Ogg streams to inspect or convert them.\n\nOne documented pairing for Ogg video is Theora pictures with Vorbis sound, which VLC plays. Even so, a player can understand Ogg yet lack the decoder for one of its streams.\n\n### OGV and MP3 compared\n\n- **Content**: an OGV carries picture and sound. An MP3 carries sound only.\n- **Compression**: Vorbis and Opus are lossy, and so is MP3.\n- **Metadata**: MP3 uses ID3 tags.\n- **Media type**: video/ogg and audio/mpeg.\n- **Playback**: MP3 plays on nearly every device.\n\nFFmpeg runs in your browser as WebAssembly. It decodes the sound and encodes it with libmp3lame, asking for 192 kbps, with the video disabled. LAME cannot reach 192 kbit/s below 32 kHz, so a source recorded at a lower sample rate gets a lower bitrate. The command sets no sample rate, channel layout or tag mapping, so FFmpeg's defaults decide.\n\n### Other ways to convert OGV to MP3\n\n- **FFmpeg:** run `ffmpeg -i seminar.ogv -vn -c:a libmp3lame -b:a 192k seminar.mp3`. `-vn` leaves the picture out, and `-b:a` sets the audio bitrate. The OGV needs a sound track.\n\n### Problems with OGV files\n\n- **No MP3 appears**: the OGV may have no audio track, so FFmpeg reports an error.\n- **A player opens the file but misses a stream**: Ogg support does not include every codec, so the sound or picture may need a different decoder.\n- **Timed text only**: an OGV can carry timed text and other visually presented content, so a file with no audio track gives no MP3.\n- **The MP3 sounds rough**: the source was already compressed, and MP3 compresses again.\n"
+    }
+  },
+  "png-to-ppm": {
+    "seo": {
+      "title": "Convert PNG to PPM Online (Free)",
+      "h1": "PNG to PPM Converter",
+      "description": "Turn a PNG into a Netpbm PPM file in your browser, ready for image-processing tools. PPM has no alpha, so transparency is lost. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a PNG into a Netpbm PPM file in your browser; transparency is dropped."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to a PPM?",
+        "answer": "Add the PNG above and save the PPM when it finishes. Decoding and writing both happen on your device, so the file never leaves it."
+      },
+      {
+        "question": "What becomes of transparent areas?",
+        "answer": "PPM stores red, green and blue only, with no alpha channel, so the transparency does not carry over. To pick the background yourself, flatten the PNG in an editor first, or use Netpbm's pngtopam with -mix."
+      },
+      {
+        "question": "Does a deep-color PNG stay deep?",
+        "answer": "No. The page passes pixels through at eight bits per channel, so a 16-bit PNG loses depth, even though the PPM format could hold sixteen."
+      },
+      {
+        "question": "Are the ICC profile and EXIF data copied?",
+        "answer": "Neither survives. Only pixel values are passed along, and PPM has nowhere to store a profile or camera tags."
+      },
+      {
+        "question": "Why is the PPM so much bigger than my PNG?",
+        "answer": "PNG compresses its pixels without loss, while PPM stores red, green and blue values for every pixel with little compression. The extra size adds no detail."
+      },
+      {
+        "question": "What is the difference between PPM, PGM and PBM?",
+        "answer": "They are members of the Netpbm family: PPM is color, PGM is grayscale and PBM is black and white. This page writes PPM."
+      },
+      {
+        "question": "What if the PNG is animated?",
+        "answer": "You get one still from the first frame; the later frames are ignored."
+      },
+      {
+        "question": "Can I convert several PNG files at once?",
+        "answer": "Yes. Every PNG you add is converted and saved as its own PPM."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and PPM",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "PPM",
+        "fullName": "Portable Pixmap",
+        "description": "The color member of the Netpbm family of formats. Each pixel stores red, green and blue values, in a plain text or binary encoding.",
+        "details": [
+          "RGB only, no alpha",
+          "8-bit or 16-bit samples",
+          "Plain text or binary encoding",
+          "Part of Netpbm"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to PPM",
+      "points": [
+        "PPM has no alpha channel, so a PNG's transparency is not kept.",
+        "The picture passes through 8 bits per channel, so a 16-bit PNG loses depth.",
+        "EXIF, ICC and XMP data are dropped.",
+        "An animated PNG gives its first frame only."
+      ]
+    },
+    "guide": {
+      "title": "Understanding PNG for PPM output",
+      "markdown": "### What is a PNG file?\n\nPNG stands for Portable Network Graphics. It came out of the 1990s effort to replace GIF without patent worries, and today it is both a W3C Recommendation and ISO/IEC 15948. The format is lossless, can carry an alpha channel and allows either 8 or 16 bits for each color channel.\n\n### Programs that open PNG files\n\nFor PPM output, open the PNG in:\n\n- **Windows, Mac and Linux:** GIMP opens PNG files for editing, and ImageMagick reads PNG as well.\n- **Web:** Chrome and Firefox display PNG in a page.\n- **Mobile:** Safari and Chrome display PNG on phones.\n\nPPM has a narrower audience, so use an imaging tool rather than expecting a phone gallery to show it.\n\n### PNG and PPM compared\n\n- **Compression**: PNG is lossless and compact. PPM stores samples with little compression, so files can be large.\n- **Transparency**: PNG has alpha. PPM has none.\n- **Depth**: PNG allows 8 and 16 bits per channel. PPM allows 8 or 16, and this page writes 8.\n- **Encoding**: a binary PPM begins with P6, and the rarer plain-text form with P3.\n- **Family**: PPM is the color member of Netpbm, next to grayscale PGM and black-and-white PBM.\n- **Samples**: each PPM pixel carries red, green and blue samples, and the maximum sample value can range from 1 to 65535.\n\nThe PNG is read into 8-bit RGBA pixels by the browser, then ImageMagick compiled to WebAssembly writes the PPM. Metadata stays behind.\n\n### Other ways to convert PNG to PPM\n\n- **ImageMagick:** run `magick diagram.png diagram.ppm`. The output ending selects the format.\n- **Netpbm:** run `pngtopam -mix -background=white diagram.png > diagram.ppm` to compose transparency onto white. A grayscale PNG produces PGM instead and a black-and-white one PBM, so check the file header.\n\n### Problems with PNG files\n\n- **A logo gained a background**: the PNG's alpha channel cannot be stored in PPM, so flatten onto a chosen color first.\n- **A 16-bit PNG lost depth**: the page writes eight bits per channel.\n- **An animated PNG became a still**: the page uses the first frame and ignores the rest.\n- **Colors changed**: the embedded profile is dropped.\n- **You worry about the PNG's compression level**: PNG compression is lossless, so lowering the setting never costs pixel fidelity.\n"
+    }
+  },
+  "wav-to-wma": {
+    "seo": {
+      "title": "Convert WAV to WMA Online (Free)",
+      "h1": "WAV to WMA Converter",
+      "description": "Turn a WAV recording into a lossy WMA file (WMA version 2) in your browser. It is not WMA Lossless. Free, with no sign-up, nothing uploaded."
+    },
+    "tool": {
+      "subtitle": "Turn a WAV recording into a lossy WMA 2 file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the WMA lossless?",
+        "answer": "No. The page uses the wmav2 encoder, which is lossy. WMA Lossless is a different codec this page doesn't write."
+      },
+      {
+        "question": "Can I choose the WMA bitrate?",
+        "answer": "No. The page uses one fixed bitrate and has no setting for it. The sample rate and channel count are not set by the page, so FFmpeg's defaults apply."
+      },
+      {
+        "question": "Will the WMA be smaller than my WAV?",
+        "answer": "Usually. A PCM WAV stores every sample, while WMA compresses with loss."
+      },
+      {
+        "question": "Can I get my original WAV back from the WMA?",
+        "answer": "No. The compression discards detail, so keep the WAV if it is your master."
+      },
+      {
+        "question": "Why does Audacity not list WMA?",
+        "answer": "Audacity exports WMA only through its optional FFmpeg library. Once the library is installed, the format list offers WMA (version 2) Files (FFmpeg)."
+      },
+      {
+        "question": "Which kind of WMA does the page write?",
+        "answer": "WMA version 2, the lossy standard codec, inside Microsoft's ASF container. WMA also has Professional, Lossless and Voice variants, and the page writes none of those."
+      },
+      {
+        "question": "Does the WMA keep titles and markers from the WAV?",
+        "answer": "That is up to FFmpeg's defaults, because the page sets no metadata mapping. Open the WMA in a player to see what came across."
+      },
+      {
+        "question": "Can I convert several WAV files at once?",
+        "answer": "Yes. Select several WAV files and each gives you its own WMA."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and WMA",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Lossless",
+          "Large files",
+          "4 GB file size limit"
+        ]
+      },
+      "toFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+        "details": [
+          "Lossy (and lossless) variants",
+          "ASF container",
+          "Proprietary Microsoft format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WAV to WMA",
+      "points": [
+        "The encoder is wmav2. It is lossy, and it is not WMA Lossless.",
+        "Keep the WAV if it is your master, since the WMA cannot give the samples back.",
+        "The page sets no sample rate, channel count or tag mapping, so FFmpeg's defaults apply."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WAV for WMA output",
+      "markdown": "### What is a WAV file?\n\nWAV, or Waveform Audio File Format, is a RIFF-based wrapper for sound that Microsoft and IBM documented in their multimedia specification. Linear PCM is the usual payload, which makes files large but exact, though compressed encodings can appear too. Broadcast WAVE extends it with production metadata. Archives such as the Library of Congress recommend WAVE for collections. The usual media types are audio/wav and audio/x-wav.\n\n### Programs that open WAV files\n\n- **Windows, Mac and Linux:** Audacity opens most WAV files, PCM variants among them, and ffplay plays them as well.\n- **Web:** Firefox plays WAV directly, and so does Firefox for Android.\n- **Mobile:** Phones can use mpv for Android or VLC for Android.\n\nAudacity recommends its FFmpeg library when a recorder used proprietary compression inside the WAV.\n\n### WAV and WMA compared\n\n- **Container**: WAV is RIFF. WMA uses Microsoft's ASF container.\n- **Compression**: WAV is usually uncompressed PCM. This page writes lossy WMA version 2.\n- **Variants**: WMA has standard, Professional, Lossless and Voice codecs.\n- **Size**: a WMA is usually much smaller than the WAV.\n- **Media type**: WMA is commonly audio/x-ms-wma.\n\nFFmpeg runs in your browser as WebAssembly and encodes the WAV with wmav2 at 192 kbps. The command sets no sample rate or channel layout.\n\n### Other ways to convert WAV to WMA\n\n- **FFmpeg:** run `ffmpeg -i rehearsal.wav -c:a wmav2 -b:a 192k rehearsal.wma`. This writes lossy WMA version 2.\n- **Audacity:** open the WAV, then choose File > Export Audio and select WMA (version 2) Files (FFmpeg) from the format list. The FFmpeg library must be installed.\n\n### Problems with WAV files\n\n- **A very large recording**: past the 4 GB limit of RIFF's size fields it needs RF64, which not every tool reads.\n- **A WAV that uses compression**: a recorder may have used proprietary compression inside the file, and Audacity needs its FFmpeg library to import it.\n- **Metadata differs between WAVs**: the INFO chunks and the Broadcast WAVE extensions carry unlike information, so check which your file has.\n- **The WAV is your only copy**: the WMA discards detail and cannot give the samples back, so keep the WAV.\n"
+    }
+  },
+  "webm-to-mkv": {
+    "seo": {
+      "title": "Convert WebM to MKV Online (Free)",
+      "h1": "WebM to MKV Converter",
+      "description": "Re-encode a WebM video as an H.264 MKV with AAC sound in your browser. It is not a lossless remux. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode a WebM as an H.264 MKV with AAC sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is this a lossless WebM to MKV conversion?",
+        "answer": "No. The page re-encodes the picture to H.264 and the sound to AAC, so the MKV is a second lossy generation. For a lossless wrapper change, copy the streams with FFmpeg, as the guide below shows."
+      },
+      {
+        "question": "What happens to a very large WebM?",
+        "answer": "Its long side is scaled down to the page's limit, so this page is not a full-resolution 4K route. The guide below gives the limit."
+      },
+      {
+        "question": "Will a high frame rate recording keep its frame rate?",
+        "answer": "No. Output tops out at a lower frame rate, so extra frames from a faster source are dropped."
+      },
+      {
+        "question": "Why is my video slightly narrower?",
+        "answer": "H.264 encoding wants even dimensions, so a clip with an odd size in either direction loses one pixel."
+      },
+      {
+        "question": "Do the title and other tags survive?",
+        "answer": "Where the MKV has fields for them, yes. FFmpeg copies the WebM's global tags, such as the title, because this page sets no -map_metadata option."
+      },
+      {
+        "question": "How is MKV different from WebM?",
+        "answer": "WebM is a restricted subset of Matroska that allows only a short list of codecs. MKV is the general Matroska container and can hold almost any codec."
+      },
+      {
+        "question": "Why does the MKV look softer than the WebM?",
+        "answer": "The picture is encoded a second time at a modest quality target with the ultrafast preset, which trades quality for speed. For the original picture, remux with FFmpeg instead."
+      },
+      {
+        "question": "Can I queue more than one WebM?",
+        "answer": "Yes. Queue as many as you need and each WebM comes back as a separate MKV."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebM and MKV",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. Pictures use VP8, VP9 or AV1; sound uses Vorbis or Opus.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "Open standard",
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebM to MKV",
+      "points": [
+        "The streams are not copied. Video becomes H.264 and audio becomes AAC.",
+        "Large frames are scaled down and a high frame rate is limited.",
+        "Odd dimensions are trimmed by one pixel.",
+        "For a lossless wrapper change, remux with FFmpeg."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WebM for MKV output",
+      "markdown": "### What is a WebM file?\n\nWebM is a royalty-free web video format, defined as a subset of Matroska. A typical file holds VP8, VP9 or AV1 pictures with Vorbis or Opus sound. Because WebM is a restricted flavor of Matroska, the jump to MKV is a change of container rules more than of family. Matroska itself can hold chapters, tags and many video, audio and subtitle streams.\n\n### Programs that open WebM files\n\n- **Windows, Mac and Linux:** FFplay plays WebM through FFmpeg's decoders, and VLC reads Matroska-family media too.\n- **Web:** Safari on macOS handles WebM that holds VP8 or VP9 video with Vorbis sound. Chrome and Firefox play it directly.\n- **Mobile:** The VLC apps on Android and iOS open WebM straight from the device.\n\nWhat actually decides playback is the codec inside, not the file extension.\n\n### WebM and MKV compared\n\n- **Codecs**: WebM allows a short list of video and audio codecs. MKV does not prescribe a codec.\n- **Tracks**: MKV holds many audio and subtitle tracks, plus chapters.\n- **Media types**: video/webm for WebM, video/matroska for MKV.\n- **This page's output**: H.264 pictures with AAC sound at 96 kbps.\n\nFFmpeg running in your browser decodes the WebM and writes fresh H.264 with libx264, using CRF 32 and the ultrafast preset. It deinterlaces, limits the long side to 1920 pixels, holds output to 30 fps and trims odd dimensions to the next even number down.\n\n### Other ways to convert WebM to MKV\n\n- **FFmpeg remux:** run `ffmpeg -i browser.webm -map 0 -c copy wrapped.mkv`. `-map 0` takes every stream from the input and `-c copy` copies them without re-encoding.\n\n### Problems with WebM files\n\n- **A second audio or language track is missing**: no -map option is set, so FFmpeg's defaults choose the streams. Remux with -map 0 to carry every track.\n- **A fast clip looks different**: the page limits the frame rate, so a faster source loses frames.\n- **A very sharp source softens**: the page re-encodes and may resize, so remux if you need the original streams.\n- **Seeking is slow**: if the cue index is missing, the player has less to go on and seeks less efficiently.\n- **The WebM has an odd width or height**: H.264 needs even dimensions, so the page trims it.\n"
+    }
+  },
+  "xlsx-to-png": {
+    "seo": {
+      "title": "Convert XLSX to PNG Online (Free)",
+      "h1": "XLSX to PNG Converter",
+      "description": "Draw each visible sheet of an Excel workbook as a PNG table, with values formatted as Excel shows them. Charts and colors are not drawn. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Draw each visible sheet of an Excel workbook as a PNG table, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the PNG look like my Excel sheet?",
+        "answer": "No. The page draws a fresh table with a shaded header row, a grid and left-aligned text, built from the cell values. Fonts, fills, borders and column widths from the workbook are not reproduced."
+      },
+      {
+        "question": "Are formulas recalculated?",
+        "answer": "No. A formula cell shows the result saved in the file when it was last stored. If the workbook was never calculated before saving, open it in Excel first and save it again."
+      },
+      {
+        "question": "Do charts and pictures show up?",
+        "answer": "Not at all. The renderer draws cell values only, so charts, pictures, comments and fills are absent."
+      },
+      {
+        "question": "Are hidden sheets, rows and columns drawn?",
+        "answer": "They are left out, the way Excel leaves them out of a printout, and the page counts the hidden sheets it skipped. Unhide what you want before converting."
+      },
+      {
+        "question": "How many PNG files do I get?",
+        "answer": "Each visible sheet that contains values becomes its own image, named after the file and the sheet. A sheet with no values makes no image."
+      },
+      {
+        "question": "What if my sheet has thousands of rows?",
+        "answer": "Only the first rows with values are kept. When rows or columns do not fit the image, it carries a note saying how many were shown."
+      },
+      {
+        "question": "Which cell is the header?",
+        "answer": "Row one of every sheet becomes the shaded heading band. For a merged range, the value appears only in the range's top-left cell."
+      },
+      {
+        "question": "Why was my workbook refused?",
+        "answer": "An older .xls file or a password-protected workbook cannot be read here. Open it in a spreadsheet program and save an unprotected .xlsx, then add that file instead."
+      }
+    ],
+    "aboutSection": {
+      "title": "XLSX and PNG",
+      "fromFormat": {
+        "name": "XLSX",
+        "fullName": "Excel workbook",
+        "description": "The default workbook format of Microsoft Excel since Excel 2007, a ZIP package of XML files standardized as Office Open XML (ECMA-376, ISO/IEC 29500).",
+        "details": [
+          "ZIP package of XML",
+          "Formulas and charts",
+          "Multiple sheets",
+          "Over one million rows per sheet"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation. Here it holds a still picture of a table.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XLSX to PNG",
+      "points": [
+        "Each visible sheet with values becomes one image, drawn as a new table with the first row as the header.",
+        "Cells show what Excel shows, including number, date and percentage formats.",
+        "Charts, pictures, comments and colors are not drawn, and hidden sheets, rows and columns are left out.",
+        "Only the first rows with values are kept."
+      ]
+    },
+    "guide": {
+      "title": "Understanding XLSX for PNG output",
+      "markdown": "### What is an XLSX workbook?\n\nMicrosoft Excel saves workbooks as XLSX. Inside the file is a ZIP archive of Open Packaging Conventions parts, many written in XML, and the registered media type is application/vnd.openxmlformats-officedocument.spreadsheetml.sheet. It cannot store VBA code, so macro workbooks use a different format. A PNG, by contrast, freezes a view into pixels you can paste into a slide or an email.\n\n### Programs that open XLSX files\n\n- **Windows, Mac and Linux:** LibreOffice Calc opens XLSX.\n- **Windows and Mac:** Microsoft Excel opens it as well.\n- **Mac:** Apple Numbers imports .xlsx spreadsheets for editing.\n- **Linux:** Gnumeric reads it as well.\n- **Web:** Google Sheets and Excel for the web open it in a browser.\n- **Mobile:** Numbers for iPhone and Excel for Android and iOS cover phones.\n\n### XLSX and PNG compared\n\n- **Content**: XLSX holds cells, formulas and charts. PNG holds only pixels.\n- **Editing**: you can sort and recalculate a workbook. You cannot edit a PNG cell.\n- **Here**: the PNG is a table drawn from values, with Excel's number, date and percentage formatting applied.\n- **Left out**: charts, pictures, comments and colors.\n\nThe workbook is read in your browser, and each visible sheet becomes an image on a canvas of up to 4096 pixels per side. At most 100 sheets are drawn, and only the first 500 rows with values are kept. Nothing is uploaded.\n\n### Other ways to convert XLSX to PNG\n\n- **LibreOffice Calc:** open the workbook in Calc and use ScriptForge's Calc service, whose `ExportRangeToFile` accepts png as the image type. For example: `doc.ExportRangeToFile(\"Sheet1.A1:F20\", \"/tmp/range.png\", \"png\")`. Hidden rows and columns are not exported.\n- **Numbers and Preview:** open the workbook in Numbers, choose File > Export To > PDF, open the PDF in Preview, then use File > Export and pick PNG from the Format pop-up.\n\n### Problems with XLSX files\n\n- **A number looks different**: the image shows the cell's format, such as a percentage or date, not the raw stored value.\n- **Rows are missing**: the note on the image says how many rows were shown.\n- **A sheet is absent**: it was hidden or held no values.\n- **An old or protected file is refused**: save it as an unprotected .xlsx first.\n"
+    }
+  },
+  "aiff-to-flac": {
+    "seo": {
+      "title": "Convert AIFF to FLAC Online (Free)",
+      "h1": "AIFF to FLAC Converter",
+      "description": "Convert an AIFF recording to lossless FLAC in your browser to cut file size without discarding samples. Free, with no upload and no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert an AIFF recording to lossless FLAC in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does converting AIFF to FLAC lose quality?",
+        "answer": "No audio samples are discarded. FLAC compresses integer PCM without loss, and AIFF usually stores uncompressed PCM, so decoding the FLAC returns the same samples."
+      },
+      {
+        "question": "Will the FLAC be smaller than the AIFF?",
+        "answer": "Usually. FLAC compresses the samples without loss, while an AIFF with PCM stores them uncompressed. How much it saves depends on the material, since quiet or simple recordings compress more."
+      },
+      {
+        "question": "Is my AIFF uploaded anywhere?",
+        "answer": "No. FFmpeg compiled to WebAssembly runs in a worker inside your browser, so the recording stays on your device."
+      },
+      {
+        "question": "Why do I get \"FFmpeg failed with exit code\"?",
+        "answer": "FFmpeg could not decode the file as audio. An AIFF-C file with a compression type FFmpeg cannot read is one cause."
+      },
+      {
+        "question": "What is the difference between AIFF and AIFF-C?",
+        "answer": "AIFF-C extends the AIFF family to compressed audio. A decoder has to support the actual encoding, so the family name alone does not guarantee a file will convert."
+      },
+      {
+        "question": "Will the FLAC contain video?",
+        "answer": "No. Neither format is meant for video, and the page tells FFmpeg to drop any video stream."
+      },
+      {
+        "question": "Is FLAC better than AIFF for archiving?",
+        "answer": "FLAC saves space and carries Vorbis comment tags, pictures and seek points. AIFF is simpler and widely accepted in studio software, so many people keep both."
+      },
+      {
+        "question": "Can I process a whole folder of AIFFs?",
+        "answer": "Yes. Drop in several recordings and you receive one FLAC for every AIFF."
+      }
+    ],
+    "aboutSection": {
+      "title": "AIFF and FLAC",
+      "fromFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "A format developed by Apple in 1988, based on Electronic Arts' IFF container. It usually stores uncompressed PCM audio.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Metadata chunks",
+          "Large files",
+          "AIFF-C adds compression"
+        ]
+      },
+      "toFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open, royalty-free lossless audio codec from Xiph.Org, described in RFC 9639. It keeps every sample while reducing size.",
+        "details": [
+          "Lossless compression",
+          "Open source",
+          "Metadata tags",
+          "Four to 32 bits per sample"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AIFF to FLAC",
+      "points": [
+        "FLAC is lossless, so the samples are preserved while the file shrinks.",
+        "The output is audio only; any video stream is dropped.",
+        "AIFF-C files need a decoder for their actual encoding.",
+        "A source that was lossy before becoming AIFF does not regain detail."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AIFF for FLAC output",
+      "markdown": "### What is an AIFF file?\n\nAudio Interchange File Format came from Apple and descends from the IFF wrapper created at Electronic Arts. In its common form the file holds uncompressed linear PCM plus optional chunks naming the author, copyright and annotations, and studios often keep masters in it. A compressed variant, AIFF-C, extends the family to other encodings. Common media-type labels are audio/aiff and audio/x-aiff.\n\n### Programs that open AIFF files\n\n- **Windows, Mac and Linux:** Audacity brings in nearly any AIFF, PCM variants included, and FFmpeg both reads and writes the format.\n- **Windows and Mac:** Adobe Audition handles uncompressed AIFF plus the common compressed kinds.\n\n### AIFF and FLAC compared\n\n- **Size**: AIFF is large, since PCM is uncompressed. FLAC compresses the same samples without loss.\n- **Fidelity**: both keep every sample when the AIFF holds PCM.\n- **Video**: neither is meant for it, and the page discards any video stream.\n- **Metadata**: AIFF uses chunks. FLAC relies on Vorbis comments and may embed cover art.\n- **Openness**: FLAC's specification is open, and its reference encoder comes from Xiph.\n\nThe page runs `-acodec flac -vn` in FFmpeg, so the audio is encoded as FLAC and any video is dropped. Stream choice and tags follow FFmpeg's defaults.\n\n### Other ways to convert AIFF to FLAC\n\n- **flac:** run `flac session.aiff` with the Xiph reference encoder. It reads linear PCM AIFF with 4 to 32 bits per sample, not A-law or mu-law, and writes session.flac in place of the .aiff ending.\n- **FFmpeg:** run `ffmpeg -i take.aiff -c:a flac take.flac` on the command line.\n- **Audacity:** open the AIFF, choose File > Export Audio, pick FLAC, and set 16-bit or 24-bit and a compression level from 0 to 8.\n\n### Problems with AIFF files\n\n- **The conversion fails**: the file may be an AIFF-C that uses a compression type FFmpeg cannot decode.\n- **You expected better sound**: FLAC cannot restore detail that a lossy step removed before the recording became an AIFF.\n- **The author looks misplaced**: Audition may list an AIFF's author under Dublin Core: Creator rather than Author.\n- **A file over 4 GB**: AIFF stores its length in 32 bits, so very large files are malformed.\n"
+    }
+  },
+  "bmp-to-tiff": {
+    "seo": {
+      "title": "Convert BMP to TIFF Online (Free)",
+      "h1": "BMP to TIFF Converter",
+      "description": "Convert a Windows BMP to a TIFF in your browser for archiving or print workflows. Free, no upload, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a Windows BMP to a TIFF in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn a BMP into a TIFF?",
+        "answer": "Add your bitmap above and save the TIFF once it is ready. The reading and writing both happen on your device."
+      },
+      {
+        "question": "Does the TIFF gain extra bit depth?",
+        "answer": "No, it is 8-bit. Samples are held to eight bits per channel on the way through, although TIFF itself can store more."
+      },
+      {
+        "question": "Does the TIFF keep an ICC profile or other metadata?",
+        "answer": "No profile or tag data comes along, because only pixel values are passed through. If print work needs a profile, assign one in an editor afterward."
+      },
+      {
+        "question": "Is the TIFF compressed?",
+        "answer": "The page sets no compression or quality option, so the choice is left to ImageMagick's defaults."
+      },
+      {
+        "question": "Why would I want TIFF instead of BMP?",
+        "answer": "Scans, print jobs and preservation masters are classic TIFF territory, and the format supports several compression schemes and color models. BMP is mostly a simple Windows format."
+      },
+      {
+        "question": "Why is my bitmap rejected?",
+        "answer": "An \"Image decode failed\" error means the browser could not parse the bitmap. Re-save the BMP from an editor and add it again."
+      },
+      {
+        "question": "Will the TIFF have several pages?",
+        "answer": "No. Each BMP becomes one single-image TIFF. To combine pictures into one multi-image TIFF, use ImageMagick or similar software."
+      },
+      {
+        "question": "Can I batch BMP files?",
+        "answer": "Yes. Select a group of bitmaps and each comes back as its own TIFF."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and TIFF",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format introduced with Microsoft Windows that stores pixel data, usually uncompressed. It is simple to read and write but produces large files.",
+        "details": [
+          "Usually uncompressed",
+          "1 to 32 bits per pixel",
+          "Optional run-length compression",
+          "Large files"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster format first published by Aldus in 1986 and now maintained by Adobe. It stores images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple images per file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to TIFF",
+      "points": [
+        "The TIFF is 8 bits per channel because pixels pass through 8-bit RGBA.",
+        "ICC profiles, EXIF and XMP are not carried over.",
+        "The page sets no compression option, so size depends on ImageMagick's defaults.",
+        "The result is a single-image TIFF."
+      ]
+    },
+    "guide": {
+      "title": "Understanding BMP for TIFF output",
+      "markdown": "### What is a BMP file?\n\nBMP is Windows Bitmap, a raster format introduced with Microsoft Windows and later used on OS/2 too, registered as image/bmp. Microsoft controls the family. Pixels are usually stored uncompressed, from 1 to 32 bits per pixel, which makes files large and keeps them from being a good choice for sending pictures around. BMP mostly appears in screen captures and system graphics. Its fifth version can store an ICC profile and an alpha channel, and lossless compression is available, although uncompressed pixels are the common case.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** ImageMagick reads BMP, and XnView MP lists BMP among its formats, though XnView MP asks company users for a license.\n- **Web:** Firefox and Chrome show BMP inline in a page.\n\n### BMP and TIFF compared\n\n- **Compression**: BMP is mostly raw. TIFF offers lossless and lossy schemes.\n- **Structure**: TIFF is tag-based and can hold several images in one file.\n- **Depth**: TIFF supports high bit depth. This page writes 8 bits per channel.\n- **Use**: TIFF is common for scans and preservation masters.\n- **Media types**: image/bmp for BMP and image/tiff for TIFF.\n- **Origin**: Aldus and Microsoft developed TIFF, and Adobe holds the specification today.\n\nThe browser's own decoder reads the BMP into pixels, and ImageMagick compiled to WebAssembly writes the TIFF. No quality or compression value is set by the page.\n\n### Other ways to convert BMP to TIFF\n\n- **ImageMagick:** run `magick drawing.bmp drawing.tiff`. The ending of the output name selects TIFF. ImageMagick's format list marks both BMP and TIFF as readable and writable.\n\n### Problems with BMP files\n\n- **The file is large**: BMP usually stores pixels uncompressed, and the page sets no compression for the TIFF, so the size does not shrink on its own. For sharing, PNG or JPEG may suit better.\n- **Shapes or text are not editable**: a BMP keeps no editable vector shapes or live typography.\n- **Colors shifted**: the source's embedded profile is not carried over, so assign one to the TIFF afterward.\n- **Decoding failed**: re-save the bitmap in an editor, then try again.\n- **Several bitmaps to convert**: select them together and each converts separately.\n"
+    }
+  },
+  "cr2-to-tiff": {
+    "seo": {
+      "title": "Convert CR2 to TIFF Online (Free)",
+      "h1": "CR2 to TIFF Converter",
+      "description": "Develop a Canon CR2 raw photo into a TIFF right in your browser, using LibRaw and ImageMagick. Free, with no sign-up and nothing uploaded."
+    },
+    "tool": {
+      "subtitle": "Develop a Canon CR2 raw photo into a TIFF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a CR2 to a TIFF?",
+        "answer": "Pick the CR2 above and download the TIFF. A copy of LibRaw inside this page's ImageMagick develops the photo on your own machine."
+      },
+      {
+        "question": "Can I set a depth or compression for the TIFF?",
+        "answer": "No setting for either is passed, and the same goes for quality. Canon Digital Photo Professional lets you choose the image type when you convert and save."
+      },
+      {
+        "question": "Can I change white balance or exposure after converting?",
+        "answer": "Only as ordinary pixel edits. Raw settings such as white balance belong to the CR2, so hold on to it if you may want a different rendering."
+      },
+      {
+        "question": "Why does the TIFF not match my camera's preview?",
+        "answer": "A CR2 is rendered by whichever software opens it. LibRaw's rendering is what you get here, and it can differ in tone and color from the camera's embedded preview and from Canon's own software."
+      },
+      {
+        "question": "Why does the page say it can't read my CR2?",
+        "answer": "LibRaw has to know the camera that made the file. When it doesn't, or the file is truncated or damaged, you get an error about the RAW file instead of a TIFF."
+      },
+      {
+        "question": "Does the page convert CR3 files too?",
+        "answer": "CR3 is the newer Canon format that replaced CR2, and it has its own converter. This page is for CR2 files."
+      },
+      {
+        "question": "What does the too-large message mean for a CR2?",
+        "answer": "The page has a size limit for one picture, and the file's header claims more. Suspect a damaged file."
+      },
+      {
+        "question": "Can I do a whole shoot in one go?",
+        "answer": "Yes. Choose all the CR2 files and the page works through them one by one, giving a TIFF for each."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR2 and TIFF",
+      "fromFormat": {
+        "name": "CR2",
+        "fullName": "Canon RAW version 2",
+        "description": "The raw image format used by many Canon EOS cameras from the mid-2000s until CR3 replaced it. It stores unprocessed sensor data in a TIFF-based file.",
+        "details": [
+          "Unprocessed sensor data",
+          "TIFF-based structure",
+          "Embedded JPEG preview",
+          "Proprietary Canon format"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CR2 to TIFF",
+      "points": [
+        "The TIFF is a developed picture. The raw editing latitude stays in the CR2, so keep it.",
+        "LibRaw develops the file here, so tone and color can differ from Canon's software.",
+        "A camera LibRaw can't read ends in a message, not a TIFF.",
+        "The page reads one picture from the file, and a picture beyond its size limit is refused."
+      ]
+    },
+    "guide": {
+      "title": "Understanding CR2 for TIFF output",
+      "markdown": "### What is a CR2 file?\n\nCR2, or Canon RAW version 2, was the raw format of many Canon EOS cameras until CR3 took over. Inside is unprocessed sensor data in a TIFF-based layout. Those measurements need processing to become a viewable photograph, and choices such as white balance and tone can be made after the shot. That is why a CR2 and its small preview can look different. Canon's DPP names .CR2 in its list of supported raw extensions, and a CR2 differs from a finished JPEG because the interpretation is left to processing software.\n\n### Programs that open CR2 files\n\n- **Windows, Mac and Linux:** darktable imports CR2 for the cameras its raw decoder supports.\n- **Windows and Mac:** Canon's Digital Photo Professional reads CR2 files from supported Canon cameras, and Adobe Camera Raw opens them with its own camera support list.\n- **Linux:** The dcraw_emu sample that ships with LibRaw develops raw files from the command line.\n\nEach of these keeps its own list of supported camera models.\n\n### CR2 and TIFF compared\n\n- **Content**: a CR2 holds raw sensor data to be processed. A TIFF holds finished pixels.\n- **Compression**: TIFF allows several methods, and the page sets none.\n- **Pages**: a TIFF may hold several images. The page reads one picture.\n- **Origin**: Aldus published TIFF, and Adobe now maintains it.\n\nEverything runs locally. LibRaw, compiled into ImageMagick for WebAssembly, develops the CR2, and ImageMagick then writes the TIFF. Pictures larger than about 537 megapixels are not accepted.\n\n### Other ways to convert CR2 to TIFF\n\n- **Canon Digital Photo Professional:** select the CR2, choose File > Convert and save, pick TIFF as the image type, set a destination and save.\n- **ImageMagick:** run `magick cr2:exposure.cr2 exposure.tiff`. The `cr2:` prefix names the format explicitly.\n\n### Problems with CR2 files\n\n- **The TIFF differs from the preview**: raw rendering varies between programs. Compare in your editor.\n- **The page can't read the file**: the camera may be too new for LibRaw, or the file is cut off. Try Canon Digital Photo Professional.\n- **A CR2 suffix does not guarantee support**: check the decoder's model list for the camera that made the file.\n- **Long-term access**: the proprietary camera format depends on continued software support, which is a preservation concern.\n- **You want to edit the exposure later**: raw settings stay with the CR2, so keep the original.\n"
+    }
+  }
+}

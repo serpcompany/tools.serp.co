@@ -1,0 +1,802 @@
+{
+  "mov-to-hevc": {
+    "seo": {
+      "title": "MOV to HEVC (H.265) Video Converter",
+      "h1": "MOV to HEVC Converter",
+      "description": "Turn a MOV into a raw .hevc video stream with your browser's own HEVC encoder. The result has no sound, and the file stays on your device.",
+      "howToHeading": "How to convert MOV to HEVC"
+    },
+    "tool": {
+      "subtitle": "Re-encode a MOV as a raw, video-only HEVC stream"
+    },
+    "faqs": [
+      {
+        "question": "Does the HEVC file have sound?",
+        "answer": "No. The .hevc output holds picture data only, and the page shows \"Video only\" for it. Keep the MOV if you need the soundtrack."
+      },
+      {
+        "question": "How does the page encode HEVC?",
+        "answer": "FFmpeg decodes the MOV and scales it, your browser's own HEVC encoder then encodes the pictures, and the output goes out as an Annex B stream with no container around it. FFmpeg's libx265 is not used here."
+      },
+      {
+        "question": "Why does the conversion say my browser can't encode?",
+        "answer": "HEVC encoding comes from the browser and the device, and not every one has it. The page then suggests Chrome or Edge, a recent one, on another computer. You can also use FFmpeg with libx265 on a desktop."
+      },
+      {
+        "question": "Is the picture resized or is the frame rate changed?",
+        "answer": "Only when needed. A long side beyond 1920 pixels is reduced, and a smaller frame is never enlarged. A rate above 30 fps is capped by dropping frames. Interlaced frames are deinterlaced before that."
+      },
+      {
+        "question": "Is the MOV's HEVC track copied unchanged?",
+        "answer": "No. Every conversion here decodes and re-encodes the pictures, even when the MOV already holds HEVC. To copy the track as it is, use FFmpeg with -c:v copy on your own machine."
+      },
+      {
+        "question": "Is a raw .hevc file the same as an HEVC MP4?",
+        "answer": "No. A raw stream is only the coded pictures, with no container for audio, timing tracks or an index. Many players and editors expect HEVC inside an MP4 or MOV instead."
+      },
+      {
+        "question": "Which track of my MOV is used?",
+        "answer": "The first video track. The page maps only that stream and leaves out every sound track, so a MOV with several video tracks gives you the first."
+      },
+      {
+        "question": "How does a raw stream know its frame rate?",
+        "answer": "A raw HEVC stream carries no timestamps, so the page writes the frame rate into the stream's timing information instead."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and HEVC",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime movie",
+        "description": "An Apple container format that organizes encoded video, audio, and other media as tracks.",
+        "details": [
+          "Structured media atoms",
+          "Multiple codec possibilities",
+          "Not inherently lossless"
+        ]
+      },
+      "toFormat": {
+        "name": "HEVC",
+        "fullName": "High Efficiency Video Coding",
+        "description": "H.265 video compression, which can be carried inside a container or delivered as a raw picture stream.",
+        "details": [
+          "Video codec",
+          "Raw stream has no sound",
+          "Also carried inside containers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MOV to HEVC",
+      "points": [
+        "The .hevc output is a raw stream with no audio.",
+        "HEVC encoding comes from your browser, so it depends on the device.",
+        "Video is capped at 1920 px on the long side and 30 fps."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MOV and HEVC",
+      "markdown": "### What is a MOV file?\n\nApple's QuickTime format stores media as tracks inside one container. A MOV can hold several kinds of compressed picture and sound, so two files that both end in .mov may need different decoders. A camera recording and an editing export are examples.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** to inspect the source clip first, mpv gives a choice of audio and subtitle streams, and ffplay opens MOV.\n- **Windows and Mac:** Premiere imports a MOV once it has the decoder for the clip's codec.\n- **Mobile:** MOV opens in VLC for Android and VLC for iOS once their decoders cover the codec inside.\n\n### MOV and HEVC compared\n\nMOV is a wrapper; HEVC, also called H.265, is a video codec. A MOV can already hold HEVC. The .hevc output holds pictures alone: no audio track, no container.\n\nHere the video is always re-encoded. FFmpeg decodes the first video stream of the MOV, shrinks a picture whose long side tops 1920 pixels and holds the rate to 30 fps. Your browser's HEVC encoder produces the new pictures, and FFmpeg writes them as an Annex B stream. A new encode can lose detail. Copying an existing HEVC track avoids that, and the FFmpeg extraction method below does it.\n\n### Other ways to convert MOV to HEVC\n\n- **FFmpeg encoding:** `ffmpeg -i camera.mov -an -c:v libx265 encoded.hevc` creates new HEVC pictures: `-an` leaves out the audio and `-c:v libx265` selects the x265 encoder. The result is a new lossy encode.\n- **FFmpeg extraction:** if the MOV already contains HEVC, `ffmpeg -i camera.mov -c:v copy -an extracted.hevc` copies the video stream without re-encoding it, which works only when that stream is already HEVC. `-an` again leaves out the audio.\n\n### Problems with MOV files\n\n**A decoder is missing:** a MOV may hold a codec that the destination editor lacks, so check the codec inside rather than the ending.\n\n**Renaming is not converting:** a new filename ending leaves the video as it was and installs no decoder.\n\n**A broken save:** a MOV whose write was cut off can be unusable, although fragmented output recovers in a different way.\n"
+    }
+  },
+  "mov-to-m4v": {
+    "seo": {
+      "title": "MOV to M4V Converter (H.264 and AAC)",
+      "h1": "MOV to M4V Converter",
+      "description": "Convert a MOV to an M4V with H.264 video and AAC sound. It runs in your browser, so the file stays on your device.",
+      "howToHeading": "How to convert MOV to M4V"
+    },
+    "tool": {
+      "subtitle": "Re-encode a MOV as an M4V with H.264 video and AAC audio"
+    },
+    "faqs": [
+      {
+        "question": "What is inside the M4V this page makes?",
+        "answer": "The video is H.264 from x264, and the sound is AAC at a rate of 96 kbps, in an MPEG-4 container named with the .m4v ending."
+      },
+      {
+        "question": "Does the M4V keep the sound?",
+        "answer": "Yes. The audio is converted to AAC at 96 kbps and stays with the video in the same file."
+      },
+      {
+        "question": "Is the MOV copied or re-encoded?",
+        "answer": "Re-encoded, every time. The video goes through x264 with CRF 30 and the ultrafast preset."
+      },
+      {
+        "question": "Why is the M4V smaller in dimensions than my MOV?",
+        "answer": "A longer side past 1920 pixels is scaled down, so a 3840 by 2160 clip comes out at 1920 by 1080, and an odd-sized edge loses one pixel to stay even."
+      },
+      {
+        "question": "Does the frame rate change?",
+        "answer": "Only above 30 fps. A 60 fps clip is thinned to 30 fps by discarding frames, and deinterlacing runs first on frames flagged interlaced. Slower clips keep their rate."
+      },
+      {
+        "question": "Is an M4V different from an MP4?",
+        "answer": "In HandBrake's documentation they are the same file apart from the extension. QuickTime-based apps need the .m4v ending to play an MP4 with AC3 audio, SRT subtitles or chapters."
+      },
+      {
+        "question": "Can I copy the tracks without re-encoding?",
+        "answer": "Not on this page. On your machine, FFmpeg with -c copy -f mp4 repackages the streams the MP4 muxer accepts, without re-encoding."
+      },
+      {
+        "question": "What does faststart do in the M4V?",
+        "answer": "The command adds faststart, which moves the file's index, the moov atom, to the beginning of the file."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and M4V",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime movie",
+        "description": "An Apple container format that organizes encoded video, audio, and other media as tracks.",
+        "details": [
+          "Structured media atoms",
+          "Multiple codec possibilities",
+          "Not inherently lossless"
+        ]
+      },
+      "toFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video convention",
+        "description": "A file extension for MPEG-4 container files. HandBrake treats its .m4v and .mp4 outputs as the same container.",
+        "details": [
+          "Same container as MP4 in HandBrake",
+          "H.264 video and AAC audio here",
+          "Index moved to the front here"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MOV to M4V",
+      "points": [
+        "The video is re-encoded as H.264 with AAC sound at 96 kbps.",
+        "Output is limited to 1920 px and 30 fps.",
+        "Odd edges lose a pixel."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MOV and M4V",
+      "markdown": "### What is a MOV file?\n\nA MOV packages media using Apple's QuickTime structure. It can hold video, sound and other tracks, with different codecs permitted inside. A professional camera export and a small shared clip need not have similar sizes or decoding requirements just because both end in .mov.\n\n### Programs that open MOV files\n\n- **Windows and Mac:** Premiere Pro can import MOV when it has the decoder the clip needs.\n- **Windows, Mac and Linux:** ffplay, with the right decoders built in, and mpv both play MOV.\n- **Mobile:** On Android and iOS, the VLC apps handle MOV, depending on the media it contains.\n\n### MOV and M4V compared\n\nM4V is an extension for MPEG-4 container files. HandBrake's documentation says an M4V and an MP4 differ only in the extension. FFmpeg also has a separate raw MPEG-4 video muxer named m4v, which is not what this page makes.\n\nThe page runs one FFmpeg command: x264 at CRF 30 with the ultrafast preset, AAC at 96 kbps, and faststart. Both the video and the audio are encoded again, and nothing is copied from the MOV. A larger or faster clip comes out with a smaller frame or fewer frames per second than it went in, so keep the MOV when you need the full frame for editing.\n\nA frame already under the cap is left unchanged. A test run showed the file written with the ipod muxer and an M4V brand.\n\n### Other ways to convert MOV to M4V\n\n- **FFmpeg explicit MP4:** `ffmpeg -i edit.mov -f mp4 -c:a aac -c:v libx264 movie.m4v` names the MP4 wrapper outright and encodes H.264 and AAC.\n- **FFmpeg repackaging:** `ffmpeg -i edit.mov -c copy -f mp4 repacked.m4v` copies the streams without re-encoding, which works when the MP4 muxer accepts their codecs.\n\n### Problems with MOV files\n\n**No decoder in the editor:** QuickTime containers can use codecs that a destination editor does not have, and an M4V ending does not change that.\n\n**A new ending is not a conversion:** swapping .mov for .m4v changes the name only.\n\n**A cut-off save:** a regular MOV that stopped mid-write may not play at all, whereas fragmented output recovers in its own way.\n"
+    }
+  },
+  "mp3-to-oga": {
+    "seo": {
+      "title": "MP3 to OGA Converter (Ogg Vorbis)",
+      "h1": "MP3 to OGA Converter",
+      "description": "Convert an MP3 to an OGA file of Ogg Vorbis audio at quality level 5. It runs in your browser, so the file stays on your device.",
+      "howToHeading": "How to convert MP3 to OGA"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP3 as Ogg Vorbis audio in an .oga file"
+    },
+    "faqs": [
+      {
+        "question": "What codec is inside the OGA file?",
+        "answer": "Vorbis, encoded by libvorbis at quality level 5 and wrapped in Ogg. The .oga ending names general Ogg audio, not one codec."
+      },
+      {
+        "question": "Is MP3 to OGA lossless?",
+        "answer": "No. The MP3 is decoded and encoded again with lossy Vorbis, which adds a second lossy step to the first. Keep the MP3 or a lossless master."
+      },
+      {
+        "question": "What is the difference between OGA and OGG?",
+        "answer": "RFC 5334 reserves .ogg for Ogg containing only Vorbis and uses .oga for general Ogg audio, which can carry Vorbis, FLAC or Speex. This page writes Vorbis in either case."
+      },
+      {
+        "question": "Will the OGA be smaller than the MP3?",
+        "answer": "Not reliably. The encoder is set by a quality level rather than a bitrate, so the size follows how complex the music is."
+      },
+      {
+        "question": "Do my ID3 tags and cover art carry over?",
+        "answer": "Tags do: a test with a title and an artist showed both in the OGA as Vorbis comments. Cover art does not, because the command passes -vn, which drops any video stream, and an embedded picture counts as one."
+      },
+      {
+        "question": "Does renaming an OGG to OGA change the audio?",
+        "answer": "No. Renaming changes only the name. The Ogg container and the Vorbis data inside stay as they were."
+      },
+      {
+        "question": "Can Audacity make the same file?",
+        "answer": "Yes. Import the MP3, go to File > Export Audio and select Ogg Vorbis from the Format dropdown."
+      },
+      {
+        "question": "Can I pick another quality level?",
+        "answer": "Not on this page, which always uses level 5. Audacity's Ogg Vorbis export has a quality slider from 0 to 10 with 5 as the default."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and OGA",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG Audio Layer III",
+        "description": "A perceptually compressed audio format used for music and spoken recordings.",
+        "details": [
+          "Lossy sound coding",
+          "Audio delivery",
+          "Metadata stored separately from sound"
+        ]
+      },
+      "toFormat": {
+        "name": "OGA",
+        "fullName": "Ogg audio",
+        "description": "A general filename convention for audio in an Ogg container, rather than a unique codec name.",
+        "details": [
+          "Audio container convention",
+          "Can carry different codecs",
+          "Receiver needs the contained decoder"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP3 to OGA",
+      "points": [
+        "The audio is re-encoded as lossy Vorbis at quality level 5.",
+        "OGA means general Ogg audio, not a codec.",
+        "Tags are copied, but cover art is dropped."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP3 and OGA",
+      "markdown": "### What is an MP3 file?\n\nMP3 uses MPEG Audio Layer III perceptual coding. It is common in downloaded music and spoken recordings because its lossy compression reduces storage. Earlier encoding losses remain part of the decoded sound; putting it into another file cannot reconstruct the original samples. Its metadata is stored separately from the sound, so tags travel as their own data.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** Audacity brings an MP3 into an editable project, and ffplay plays one.\n- **Web:** Firefox and Chrome can play MP3 straight from a page, though the codec inside the file still counts.\n- **Mobile:** MP3 opens in VLC for Android and in mpv for Android.\n\n### MP3 and OGA compared\n\nOGA names general audio in the Ogg container, not one codec. RFC 5334 keeps .ogg for Vorbis-only Ogg and gives .oga to the broader case, so a receiving application still has to decode whatever audio is inside. The same RFC gives .oga as the default extension for the audio/ogg media type.\n\nThis page runs FFmpeg with libvorbis at quality 5 and writes Ogg. The title and artist tags are copied as Vorbis comments, and any embedded cover picture is left behind. The result is a second lossy encoding with a quality-based variable bitrate, not a promised file size. The page never uses FLAC, though Ogg can carry that codec.\n\n### Other ways to convert MP3 to OGA\n\n- **FFmpeg:** `ffmpeg -i song.mp3 -c:a libvorbis -q:a 5 -f ogg song.oga` explicitly requests Ogg and Vorbis.\n- **Audacity:** import the MP3 into a project and choose Ogg Vorbis as the Format in the File > Export Audio dialog. Its quality slider runs from 0 to 10.\n\n### Problems with MP3 files\n\n**The import errors out:** Audacity may refuse a damaged MP3 file even when a different player handles it.\n\n**Tags get overwritten:** if you load more than one file into a single project, Audacity can replace the earlier tags with those of the newest file.\n\n**A second lossy pass:** editing an MP3 and then saving another MP3 puts the sound through a second lossy encode, so keep the original.\n"
+    }
+  },
+  "mp4-to-ts": {
+    "seo": {
+      "title": "MP4 to TS Converter Without Re-encoding",
+      "h1": "MP4 to TS Converter",
+      "description": "Repackage an MP4 as an MPEG transport stream (.ts) by copying its video and audio, with no re-encoding. It runs in your browser.",
+      "howToHeading": "How to convert MP4 to TS"
+    },
+    "tool": {
+      "subtitle": "Repackage an MP4 as an MPEG-TS file without re-encoding"
+    },
+    "faqs": [
+      {
+        "question": "Does MP4 to TS re-encode the video?",
+        "answer": "No. FFmpeg runs in copy mode, so the video and audio streams move into a transport stream without being decoded or encoded again."
+      },
+      {
+        "question": "Does the TS keep the video's size and frame rate?",
+        "answer": "Yes. Nothing is decoded, so the picture keeps its dimensions and frame rate. The 1920 pixel and 30 fps limits of the page's other video conversions do not apply."
+      },
+      {
+        "question": "Does a TS file need MPEG-2 video?",
+        "answer": "No. A transport stream multiplexes separately coded video and sound and does not define a picture codec. The codecs in the MP4 are copied as they are."
+      },
+      {
+        "question": "What if the MP4's codecs don't suit a transport stream?",
+        "answer": "A stream copy does not convert codecs, so check the result where it will be used. To change the codecs, re-encode with FFmpeg's -f mpegts and libx264 on your own machine."
+      },
+      {
+        "question": "Which tracks does the TS get?",
+        "answer": "The page names no tracks, so FFmpeg's defaults choose the streams. For an alternate soundtrack, pick the track with -map in a desktop FFmpeg."
+      },
+      {
+        "question": "Is a TS file a ready-to-play DVD?",
+        "answer": "No. A transport stream is a single file. A DVD has a directory structure and menus that this page does not create."
+      },
+      {
+        "question": "When is TS worth using?",
+        "answer": "When the receiver asks for a transport stream, as broadcast and HLS workflows do. Check the receiver's accepted codecs before sending."
+      },
+      {
+        "question": "Is my MP4 uploaded anywhere?",
+        "answer": "No. The copy runs in this browser tab, so the MP4 stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and TS",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A structured media container that can carry compressed picture and sound streams. Its extension does not select one required codec.",
+        "details": [
+          "Timed media tracks",
+          "Several supported codecs",
+          "Separate container metadata"
+        ]
+      },
+      "toFormat": {
+        "name": "TS",
+        "fullName": "MPEG transport stream",
+        "description": "A packet-based systems container used to carry coded media in transport-oriented workflows.",
+        "details": [
+          "Can carry several programs",
+          "Container distinct from codec",
+          "Receiver profiles vary"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to TS",
+      "points": [
+        "The streams are copied as they are, with no re-encoding.",
+        "Size and frame rate stay as they are.",
+        "Stream selection follows FFmpeg's defaults."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP4 and TS",
+      "markdown": "### What is an MP4 file?\n\nMP4 stores timed media in a structured container. A file can hold different compressed audio and video codecs, so its suffix is not a complete description of playback requirements. It is common in camera exports and video sharing, where a self-contained movie is convenient.\n\n### Programs that open MP4 files\n\n- **Web:** Firefox and Chrome play MP4 files in a page, though AAC and H.264 can rely on codecs from the system.\n- **Windows and Mac:** Adobe Premiere takes MP4 in, provided the decoder for the clip is present.\n- **Windows, Mac and Linux:** to look at the source MP4, ffplay and mpv read it, and mpv can switch between the audio and subtitle streams.\n- **Mobile:** both VLC apps, for Android and for iOS, play MP4.\n\n### MP4 and TS compared\n\nTS is the MPEG transport stream, a system format from ISO/IEC 13818-1 that multiplexes separately coded video and sound. It splits them into 188-byte packets, can carry several programs, and does not set a picture codec. Its packets are built so that streams survive transmission errors, and it is used for digital television, HLS streaming segments and camcorder recordings.\n\nThis page uses copy mode, so the pictures are never decoded and rebuilt and the source keeps its size and frame rate. A transport stream also does not make a broadcast package. The receiver sets the codecs and profile it accepts, so test the finished .ts in the receiver that needs it.\n\n### Other ways to convert MP4 to TS\n\n- **FFmpeg copy:** `ffmpeg -i recording.mp4 -c copy transport.ts` repackages the streams with no new lossy encode, the same operation this page performs.\n- **FFmpeg transcode:** `ffmpeg -i recording.mp4 -c:a aac -c:v libx264 -f mpegts recoded.ts` creates new streams when the receiver needs those codecs. This changes the media instead of merely its wrapper.\n\n### Problems with MP4 files\n\n**The decoder is missing:** an MP4 can be perfectly valid and still contain video or sound that your player has no decoder for.\n\n**There is no audio:** an MP4 with no audio track cannot supply one to an audio editor.\n\n**The file is unfinished:** if the write that created an MP4 was interrupted, the unfinished file can be unplayable.\n"
+    }
+  },
+  "mpg-to-wmv": {
+    "seo": {
+      "title": "MPG to WMV Converter in Your Browser",
+      "h1": "MPG to WMV Converter",
+      "description": "Convert an MPG to a WMV file in your browser. FFmpeg writes MS-MPEG4 video and WMA audio, and the file stays on your device.",
+      "howToHeading": "How to convert MPG to WMV"
+    },
+    "tool": {
+      "subtitle": "Convert an MPG to a WMV in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How does the page convert MPG to WMV?",
+        "answer": "FFmpeg decodes the MPG and writes a WMV with the picture scaled and deinterlaced as needed. The page gives FFmpeg no codec names, so its defaults pick the video and audio codecs."
+      },
+      {
+        "question": "What codecs does this WMV hold?",
+        "answer": "FFmpeg's defaults for WMV apply: MS-MPEG4 video with its bitrate left at 200 kbit/s, and WMA audio at 128 kbit/s. A media-info tool confirms it. For other encoders, run FFmpeg locally and name them."
+      },
+      {
+        "question": "Is the MPG copied unchanged into the WMV?",
+        "answer": "No. MPEG and MS-MPEG4 are different compression systems, so the video is decoded and encoded again, which adds a lossy generation."
+      },
+      {
+        "question": "Does the frame size or rate change?",
+        "answer": "A longer side past 1920 pixels is brought down to 1920 and odd edges lose a pixel. A rate above 30 fps is reduced by dropping frames. A smaller, slower MPG keeps its size and rate."
+      },
+      {
+        "question": "Why do moving edges look striped?",
+        "answer": "The MPG is probably interlaced. The page deinterlaces frames flagged as interlaced, but wrongly flagged footage keeps its combing and needs a field-aware tool."
+      },
+      {
+        "question": "Is my MPG uploaded anywhere?",
+        "answer": "No. Everything happens in this browser tab, so the MPG never leaves your device."
+      },
+      {
+        "question": "Why is the WMV blurrier than the MPG?",
+        "answer": "The video bitrate stays at FFmpeg's default of 200 kbit/s, which is low for busy footage, and the page offers no way to raise it. A re-encode cannot restore detail the MPG lacked."
+      },
+      {
+        "question": "Does the WMV keep the sound?",
+        "answer": "Yes. The audio is encoded again as WMA. The page names no track, so FFmpeg's defaults choose the one used."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPG and WMV",
+      "fromFormat": {
+        "name": "MPG",
+        "fullName": "MPEG media",
+        "description": "A filename convention commonly used for MPEG video and associated audio streams.",
+        "details": [
+          "Related to .mpeg",
+          "Streams for picture and sound",
+          "Can contain synchronized sound"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "Windows Media coded content commonly packaged in an ASF container for synchronized playback.",
+        "details": [
+          "Windows Media codecs",
+          "May contain audio",
+          "ASF-based container"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MPG to WMV",
+      "points": [
+        "The video is re-encoded as MS-MPEG4 with WMA audio.",
+        "A side over 1920 px is scaled down, and a rate above 30 fps is reduced.",
+        "Interlaced frames are deinterlaced first."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MPG and WMV",
+      "markdown": "### What is an MPG file?\n\nMPG and MPEG are two suffixes for MPEG video, filed under the media type video/mpeg. Inside, picture, sound and data are organized as streams. MPEG-2, which many MPG files carry, began life as a broadcast format that DVDs later adopted. On disk it usually means MPEG-1 or MPEG-2 pictures plus sound arranged as a program stream, the old standard for Video CD and DVD discs.\n\n### Programs that open MPG files\n\n- **Windows, Mac and Linux:** to preview the MPG first, VLC media player takes elementary, program and transport streams as MPEG input, and FFplay, which ships with FFmpeg, plays them.\n- **Mobile:** an MPEG file can be opened with VLC for Android or VLC for iOS.\n\n### MPG and WMV compared\n\nA WMV is an ASF file with Windows Media coded content, a container commonly used so that picture and sound play back in sync. MPEG and Windows Media are different compression systems, so renaming does not translate the pictures. A larger WMV does not restore detail the MPG lost.\n\nThe page runs FFmpeg with a video filter and a rate cap and no codec options. Frames flagged interlaced are deinterlaced, anything over 1920 pixels is scaled down, and odd edges lose a pixel. FFmpeg's defaults then write MS-MPEG4 video at 200 kbit/s, which leaves detail soft.\n\n### Other ways to convert MPG to WMV\n\n- **FFmpeg defaults:** `ffmpeg -i source.mpg legacy.wmv` lets FFmpeg choose the encoders for WMV, as this page does, without the size and rate caps.\n- **FFmpeg explicit encode:** `ffmpeg -i source.mpg -c:v wmv2 -c:a wmav2 specified.wmv` names the encoders. This is a new lossy generation.\n\n### Problems with MPG files\n\n**It won't open as expected:** an MPEG file may hold a system stream or bare video, and finding out which tells you the demuxer to use.\n\n**There is no sound:** a player needs a decoder for the audio as well as the video, because multiplexing the two does not make their codecs interchangeable.\n\n**Detail is already gone:** lossy MPEG encoding cannot hold every detail of the uncompressed picture, so no converter brings it back.\n"
+    }
+  },
+  "otf-to-png": {
+    "seo": {
+      "title": "OTF to PNG Font Specimen Converter",
+      "h1": "OTF to PNG Specimen Converter",
+      "description": "Turn an OTF font into a PNG specimen sheet with the font's name, letters, digits and a sample sentence. Made in your browser, not an installable font.",
+      "howToHeading": "How to convert OTF to PNG"
+    },
+    "tool": {
+      "subtitle": "Make a PNG specimen sheet of an OTF font in your browser"
+    },
+    "faqs": [
+      {
+        "question": "What does the PNG show?",
+        "answer": "A specimen sheet in black on white: the font's name, A to Z, a to z, digits, and a pangram repeated at five sizes."
+      },
+      {
+        "question": "Can I type a phrase of my own?",
+        "answer": "No. The converter draws its fixed specimen. For your own text, use ImageMagick's label option with the font file, or set the text in GIMP or Inkscape and export it."
+      },
+      {
+        "question": "Is the PNG a font I can install?",
+        "answer": "No. It is a picture of the font with no outlines, layout tables or character mapping. Keep the OTF to install or type with it."
+      },
+      {
+        "question": "Does the specimen prove the font covers my language?",
+        "answer": "No. It shows only the Latin letters and digits of the sheet. Check other scripts or alternate glyphs in a font-aware application such as FontForge."
+      },
+      {
+        "question": "Why does the PNG get soft when I enlarge it?",
+        "answer": "It is a fixed grid of pixels, 400 to 2400 pixels wide plus margins. Enlarging it stretches those pixels, so render the font again at the size you need."
+      },
+      {
+        "question": "What happens with a broken or empty font file?",
+        "answer": "The page shows a message that the file is not a font the converter can read, or that the font has no letters it can draw."
+      },
+      {
+        "question": "What does the PNG look like inside?",
+        "answer": "It is grayscale, black text on white, with no transparency."
+      },
+      {
+        "question": "Can I change the sizes or colors?",
+        "answer": "No. The line sizes and the black-on-white colors are fixed, and only the image width follows the longest line."
+      }
+    ],
+    "aboutSection": {
+      "title": "OTF and PNG",
+      "fromFormat": {
+        "name": "OTF",
+        "fullName": "OpenType font",
+        "description": "Font data containing glyph descriptions and typographic information used when composing text.",
+        "details": [
+          "Font data rather than pixels",
+          "Glyph coverage varies",
+          "Layout tables"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A raster image format with lossless compression and optional alpha transparency.",
+        "details": [
+          "Lossless sample storage",
+          "Transparency support",
+          "Structured optional information"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting OTF to PNG",
+      "points": [
+        "The PNG is a fixed specimen sheet, not your own text.",
+        "It is grayscale, black on white, with no transparency.",
+        "It cannot be installed or typed with; keep the OTF."
+      ]
+    },
+    "guide": {
+      "title": "Understanding OTF and PNG",
+      "markdown": "### What is an OTF file?\n\nOTF identifies an OpenType font. Microsoft and Adobe developed OpenType from the TrueType structure, adding capabilities for glyph descriptions and typographic layout. A font contains information used to draw text; it is not simply a ready-made picture of the alphabet. Its available characters and shaping features vary between typefaces.\n\n### Programs that open OTF files\n\n- **Mac:** Font Book installs and validates OpenType and OpenType-SVG fonts.\n- **Windows, Mac and Linux:** FontForge opens .otf fonts for inspecting and editing, and fontTools TTX dumps a font's binary tables as XML.\n\n### OTF and PNG compared\n\nOpenType stores glyphs and text-layout data in tables, and its outlines may be TrueType, CFF, bitmaps or SVG. PNG stores lossless raster samples. A PNG of a font is a picture, not a replacement for it.\n\nThis page makes a specimen sheet: the font's name at 40 pixels, the alphabets and digits at 28, and the pangram at five sizes. ImageMagick draws it in black on white and converts it to grayscale, and the image is as wide as the longest line needs. A specimen is also a selection: it does not show every script, alternate or feature in the font.\n\nKeep the OTF for typing and scalable rendering.\n\n### Other ways to convert OTF to PNG\n\n- **ImageMagick:** `magick -font typeface.otf -pointsize 48 label:'Sample ABC 123' preview.png` draws any text you choose in the font. It sizes the canvas to the text.\n- **GIMP:** choose Tools > Text, choose the typeface from the selector of installed fonts, and type your sample. Export the image as PNG with File > Export As.\n- **Inkscape:** use the Text tool, choose the installed family in Text > Text and Font, then use File > Export PNG Image. The export dialog lets you pick the page, drawing or selection and set the image size in pixels.\n\n### Problems with OTF files\n\n**An older renderer fails:** a rendering engine of older vintage may not support the font's outline representation.\n\n**A corrupt font:** it can stop text from displaying correctly, and Font Book offers validation.\n\n**Duplicate copies:** two installed copies of one font can conflict, and Font Book can resolve duplicates.\n"
+    }
+  },
+  "ppt-to-jpeg": {
+    "seo": {
+      "title": "PPT to JPEG Slide Converter (PPTX First)",
+      "h1": "PPT to JPEG Converter",
+      "description": "This page has no slide renderer for the older PowerPoint format. Export the slides as JPEG from PowerPoint or Impress, or use the PPTX to JPEG converter.",
+      "howToHeading": "How to convert PPT to JPEG"
+    },
+    "tool": {
+      "subtitle": "Export PPT slides as JPEG with PowerPoint or Impress"
+    },
+    "faqs": [
+      {
+        "question": "Can this page draw the slides of a .ppt file?",
+        "answer": "Not by a path the code shows. The slide renderer runs only for PPTX files, so this page makes no promise that a PPT converts."
+      },
+      {
+        "question": "How do I get JPEGs from a PPT?",
+        "answer": "Use PowerPoint's own export: File > Save As with JPEG on Windows, or File > Export with JPEG on a Mac. Or export a PDF from LibreOffice Impress and render its pages with ImageMagick."
+      },
+      {
+        "question": "Is there a converter that draws slides?",
+        "answer": "Yes, the PPTX to JPEG converter. It draws each visible slide and saves one JPEG per slide, named like name_slide3 with the slide's own number, hidden slides counted."
+      },
+      {
+        "question": "How big are the images from the PPTX converter?",
+        "answer": "Double the slide's dimensions in points: 1440 by 810 pixels for a 720 by 405 point slide. No side passes 4096 pixels, and at most 100 slides become images."
+      },
+      {
+        "question": "What does the PPTX converter leave out?",
+        "answer": "Hidden slides, speaker notes, comments, video, and pictures the slide links to instead of holding. Animation and transitions cannot appear in a still."
+      },
+      {
+        "question": "How do I get a PPTX from my PPT?",
+        "answer": "Open the PPT in PowerPoint or LibreOffice Impress and save a copy as .pptx. Renaming does not work, because the PPTX converter checks the file's contents and refuses an older PowerPoint file or a password-protected one with a message to save it as an unprotected .pptx."
+      },
+      {
+        "question": "Can I choose several files at once?",
+        "answer": "Yes, the file picker accepts several. Each file is converted in turn and downloaded separately, with no ZIP."
+      },
+      {
+        "question": "Is my original PPT changed?",
+        "answer": "No. Converting makes a new file for you to download, and your PPT stays untouched."
+      }
+    ],
+    "aboutSection": {
+      "title": "PPT and JPEG",
+      "fromFormat": {
+        "name": "PPT",
+        "fullName": "PowerPoint binary presentation",
+        "description": "A legacy presentation structure that stores slides and their separate objects, plus additional presentation information.",
+        "details": [
+          "Different from PPTX",
+          "Editable slide objects",
+          "Can include notes and animation"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image delivery format, also commonly named with the .jpg extension.",
+        "details": [
+          "Finished image pixels",
+          "No raw sensor model",
+          "No alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PPT to JPEG",
+      "points": [
+        "This page has no slide renderer for a binary .ppt.",
+        "The PPTX to JPEG converter draws each visible slide, up to 100.",
+        "PowerPoint's own export gives a JPEG of a slide."
+      ]
+    },
+    "guide": {
+      "title": "Understanding PPT and JPG",
+      "markdown": "### What is a PPT file?\n\nPPT is the binary presentation format used by PowerPoint 97 through Office 2003. It differs from the later XML-based PPTX. A presentation holds slides with text, graphics, transitions and animations, plus notes, handouts and comments.\n\n### Programs that open PPT files\n\n- **Web:** in a browser, PowerPoint for the web shows a PPT and needs a .pptx copy for editing, and Google Slides imports Microsoft PowerPoint files.\n- **Windows, Mac and Linux:** for re-saving a PPT as PPTX, LibreOffice Impress opens .ppt and .pps from File > Open, and Apache OpenOffice Impress imports PPT and can save back in PowerPoint format.\n- **Windows and Mac:** PowerPoint itself reads legacy 97-2003 presentations, though newer features may need PPTX.\n\n### PPT and JPEG compared\n\nA presentation keeps separate objects, notes and playback instructions. JPEG is a flat lossy image with no editable text, transitions or animation states.\n\nThe slide renderer on this site serves PPTX files: it draws each visible slide as SVG in a worker and saves a JPEG at 2x the slide's dimensions in points. Nothing sends a .ppt file there. To get a PPTX from a PPT, open the older file in PowerPoint or Impress and save a copy in the newer format.\n\nKeep the presentation for editing, notes and media.\n\n### Other ways to convert PPT to JPEG\n\n- **PowerPoint on Windows:** select the slide, choose File > Save As, pick JPEG File Interchange Format as the type, click Save, and choose Just This One.\n- **PowerPoint on Mac:** open the slide, use File > Export, choose JPEG, select Save Current Slide Only, set the width and height if you like, then Export.\n- **Impress plus ImageMagick:** open the PPT in Impress and use File > Export as > Export as PDF. Then run `magick -density 150 slides.pdf slide.jpeg`, which writes one JPEG per PDF page. ImageMagick needs Ghostscript to read PDF.\n\n### Problems with PPT files\n\n**Features are lost:** saving newer presentation features into PPT can drop functions that the old format cannot store.\n\n**The web editor wants PPTX:** PowerPoint for the web reads .ppt but requires a .pptx copy for editing.\n\n**Office blocks the file:** an internet download may be blocked by Office security, which then says it cannot open the file.\n"
+    }
+  },
+  "rm-to-mp3": {
+    "seo": {
+      "title": "RM to MP3 Converter for RealMedia Audio",
+      "h1": "RM to MP3 Converter",
+      "description": "Extract the sound from a RealMedia (RM) file as an MP3. The picture is dropped, and it all runs in your browser on your device.",
+      "howToHeading": "How to convert RM to MP3"
+    },
+    "tool": {
+      "subtitle": "Extract the audio of a RealMedia file as an MP3"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert RM to MP3?",
+        "answer": "Add the RM file and run the conversion. Your browser runs FFmpeg, which discards any picture, encodes the audio as MP3 with LAME, and hands you the .mp3 to download."
+      },
+      {
+        "question": "What happens to the video in the RM?",
+        "answer": "It is discarded. MP3 holds sound only. Keep the RM if you need the pictures."
+      },
+      {
+        "question": "What if my RM has no sound or an unsupported codec?",
+        "answer": "Then the page has nothing to encode. An RM with no audio has none to give, and a RealAudio codec the page's FFmpeg build lacks cannot be decoded."
+      },
+      {
+        "question": "Does MP3 improve the old RealAudio sound?",
+        "answer": "No. Detail dropped by RealAudio's lossy compression is gone, and encoding to MP3 adds a second lossy step. Treat the MP3 as a listening copy."
+      },
+      {
+        "question": "What bitrate does the MP3 use?",
+        "answer": "LAME asks for 192 kbit/s, and there is no control for changing it. Sources at 32 kHz and above get 192 kbit/s; a source between 16 and 24 kHz is limited to 160 kbit/s, and one between 8 and 12 kHz gets 64 kbit/s."
+      },
+      {
+        "question": "Which track is used when the RM has several?",
+        "answer": "FFmpeg's defaults choose it, since the page names no track. The sample rate and channel layout come from FFmpeg's defaults too."
+      },
+      {
+        "question": "Will titles and artist tags carry over?",
+        "answer": "FFmpeg copies the source's global tags into the MP3's own fields for them. What an RM holds varies, so fill in anything missing in a tag editor."
+      },
+      {
+        "question": "Can I trim the recording before it becomes an MP3?",
+        "answer": "Not here, since the entire file is converted. Edit the MP3 afterward in Audacity, which imports MP3, and remember that exporting another MP3 adds a second lossy encoding."
+      }
+    ],
+    "aboutSection": {
+      "title": "RM and MP3",
+      "fromFormat": {
+        "name": "RM",
+        "fullName": "RealMedia",
+        "description": "A RealNetworks media container associated with older streaming and local-playback workflows.",
+        "details": [
+          "Contains coded media streams",
+          "Codec support varies",
+          "Can include more than sound"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG Audio Layer III",
+        "description": "A perceptually compressed audio format used for music and spoken recordings.",
+        "details": [
+          "Lossy sound coding",
+          "Audio delivery",
+          "Metadata stored separately from sound"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting RM to MP3",
+      "points": [
+        "Any picture is discarded, and the sound is encoded at up to 192 kbit/s.",
+        "The RM's audio codec must be one the page's FFmpeg can decode.",
+        "The first listen should check length and track."
+      ]
+    },
+    "guide": {
+      "title": "Understanding RM and MP3",
+      "markdown": "### What is an RM file?\n\nRM identifies RealMedia, a container associated with RealNetworks' streaming ecosystem. A historical RealNetworks Internet-Draft describes its chunk-based structure and separate stream headers. It can carry more than one kind of encoded media, so a RealMedia filename is not itself a guarantee of an audible soundtrack. RealNetworks introduced it in 1997 for streaming audio and video over the internet, and it is now a legacy format.\n\n### Programs that open RM files\n\n- **Windows, Mac and Linux:** FFplay, the free playback utility from FFmpeg, plays RealMedia, and FFmpeg demuxes and muxes it, though each codec inside has its own support entry.\n\n### RM and MP3 compared\n\nRealMedia is a streaming container with tagged chunks and separate headers for the file and each stream. MP3 is an audio coding format.\n\nThis page runs FFmpeg with `-vn` and LAME asked for 192 kbit/s, a rate only a 32 kHz or higher source reaches, so any picture is discarded and the sound is encoded a second time. Detail lost to the original RealAudio compression does not come back. Which track is used, and the sample rate and channels, are left to FFmpeg's defaults.\n\nKeep the RM if it has archival value beyond a listening copy, and compare the length of the MP3 with the original.\n\n### Other ways to convert RM to MP3\n\n- **FFmpeg:** `ffmpeg -i archive.rm -vn -c:a libmp3lame -b:a 192k realmedia-audio.mp3` writes sound only, the same request this page makes. The `-vn` option drops the video, `-c:a libmp3lame` selects the LAME encoder, and `-b:a 192k` asks for 192 kbit/s.\n\n### Problems with RM files\n\n**A codec fails:** knowing a file is RealMedia says nothing about whether each codec in it can be decoded.\n\n**The file is not recognized:** a damaged or missing initial .RMF header stops normal identification.\n\n**The MP3 sounds no cleaner:** old compression artifacts are part of the decoded sound.\n\n**The specification is old:** the RealMedia specification is a work in progress, so version-specific structures are no current universal guarantee.\n\n**The soundtrack is missing:** check whether the RM holds audio at all, or only video.\n"
+    }
+  },
+  "swf-to-flv": {
+    "seo": {
+      "title": "SWF to FLV Converter for Embedded Video",
+      "h1": "SWF to FLV Converter",
+      "description": "Convert an SWF to FLV in your browser. FFmpeg re-encodes it as H.264 video and AAC sound. Free, with no sign-up.",
+      "howToHeading": "How to convert SWF to FLV"
+    },
+    "tool": {
+      "subtitle": "Re-encode an SWF as FLV with H.264 video and AAC sound"
+    },
+    "faqs": [
+      {
+        "question": "Does the FLV keep the SWF's buttons and ActionScript?",
+        "answer": "No. The FLV is plain video. Buttons, menus and scripts are not run or recorded, so nothing interactive carries over."
+      },
+      {
+        "question": "What happens to my SWF when I convert it?",
+        "answer": "The page passes it to FFmpeg, which re-encodes the media embedded in it as H.264 video and AAC audio in an FLV container."
+      },
+      {
+        "question": "Which codecs does the FLV use?",
+        "answer": "H.264 video from x264 at CRF 32 with the ultrafast preset, and AAC audio at 96 kbps, in an FLV container."
+      },
+      {
+        "question": "Is the video resized or its frame rate changed?",
+        "answer": "Only past a limit. A longer side beyond 1920 pixels is scaled down, an odd edge loses one pixel, and a rate past 30 fps is capped by dropping frames."
+      },
+      {
+        "question": "Why are parts of my SWF missing?",
+        "answer": "FFmpeg reads only the media embedded in an SWF, meaning video frames, sound and bitmaps, and not its vector shapes. An SWF can also point to media outside its own file, and a conversion cannot add what the file does not hold."
+      },
+      {
+        "question": "Can the streams be copied into FLV without re-encoding?",
+        "answer": "Not on this page, which always re-encodes. With FFmpeg, -c copy -f flv works only when the SWF's codecs fit FLV."
+      },
+      {
+        "question": "Should I keep the SWF?",
+        "answer": "Yes. It is the richer source for artwork and behavior. For playing it, Ruffle emulates Flash in a browser or on the desktop."
+      },
+      {
+        "question": "Is the original SWF changed?",
+        "answer": "No. The page never edits your file. It builds a new FLV in your browser and you download that copy, so the SWF stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "SWF and FLV",
+      "fromFormat": {
+        "name": "SWF",
+        "fullName": "Small Web Format",
+        "description": "A legacy Flash multimedia representation that can combine timeline content, vectors, and interactive behavior.",
+        "details": [
+          "Can contain embedded media",
+          "ActionScript interaction",
+          "Different from a video-only delivery"
+        ]
+      },
+      "toFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A container for coded video and sound associated with the Flash delivery ecosystem.",
+        "details": [
+          "Timed media",
+          "Codec compatibility matters",
+          "Does not preserve SWF interaction"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SWF to FLV",
+      "points": [
+        "FFmpeg re-encodes the SWF's embedded media; the FLV holds no buttons or scripts.",
+        "The output is H.264 and AAC at 96 kbps in FLV.",
+        "Output is limited to 1920 px and 30 fps."
+      ]
+    },
+    "guide": {
+      "title": "Understanding SWF and FLV",
+      "markdown": "### What is a SWF file?\n\nSWF is the legacy Flash multimedia format associated with Macromedia and Adobe. It can combine vectors, bitmap media, timelines, and ActionScript-driven interaction. An animation, a video wrapper, and an interactive game can therefore share the extension while requiring different ways to interpret their contents.\n\n### Programs that open SWF files\n\n- **Web:** the Ruffle web player emulates Flash inside a browser with WebAssembly, leaving some APIs incomplete.\n- **Windows, Mac and Linux:** to watch the SWF before converting, Ruffle emulates Flash, with results that depend on the ActionScript in use.\n- **Windows and Linux:** Lightspark implements Flash only in part.\n- **Mac:** Adobe Audition can pull the audio out of an SWF, though it is no interactive Flash runtime.\n\n### SWF and FLV compared\n\nFLV is a container from the Flash delivery ecosystem, usually holding H.263 or H.264 video with MP3 or AAC audio. An SWF can be an interactive program, and its ActionScript can even point to an external FLV.\n\nThis page runs FFmpeg to re-encode the SWF as H.264 video and AAC sound. Frames wider than 1920 pixels shrink, 30 fps is the ceiling for the rate, and odd edges lose a pixel.\n\n### Other ways to convert SWF to FLV\n\n- **FFmpeg direct encode:** `ffmpeg -i media.swf -c:v libx264 -crf 27 -f flv -c:a aac direct.flv` re-encodes the embedded media with CRF 27 where this page uses CRF 32, and with no size or rate cap.\n- **FFmpeg compatible copy:** `ffmpeg -i media.swf -c copy -f flv copied.flv` skips the new encode when the extracted streams fit FLV.\n- **FFmpeg lossless intermediate:** decode with `ffmpeg -i media.swf -c:v ffv1 -c:a pcm_s16le intermediate.mkv`, check that file, then encode it to FLV. The review stage costs disk space but no extra loss before the final encode.\n\n### Problems with SWF files\n\n**Flash Player is retired:** Adobe's end-of-life block stopped Flash Player from running Flash content.\n\n**Ruffle differs:** Ruffle leaves some Flash APIs unimplemented, so an SWF may look or act differently.\n\n**Assets are absent:** an intact SWF can misbehave when the external assets it needs are missing.\n\n**Interaction cannot stay:** ActionScript controls do not survive conversion to video.\n"
+    }
+  },
+  "txt-to-jpeg": {
+    "seo": {
+      "title": "TXT to JPEG Text-as-Image Converter",
+      "h1": "TXT to JPEG Converter",
+      "description": "Draw a plain text file as a JPEG image in your browser: black text on white in DejaVu Sans, with long lines wrapped. The file stays on your device.",
+      "howToHeading": "How to convert TXT to JPEG"
+    },
+    "tool": {
+      "subtitle": "Draw a TXT file as a JPEG: black text on white, wrapped"
+    },
+    "faqs": [
+      {
+        "question": "How does the page turn text into a JPEG?",
+        "answer": "It draws the text on a canvas, black on white, in 16 pixel DejaVu Sans on 24 pixel lines with 32 pixel margins, then saves the picture as a JPEG. The words become pixels."
+      },
+      {
+        "question": "Which character encoding does it read?",
+        "answer": "UTF-8 first, or UTF-16 when the file has a byte order mark, and Windows-1252 otherwise. If accents look wrong, save the file as UTF-8 and try again."
+      },
+      {
+        "question": "How are long lines handled?",
+        "answer": "Lines wrap between words at 800 pixels, about 90 characters, and inside a word too long for a line."
+      },
+      {
+        "question": "Is there a limit on length?",
+        "answer": "Yes, 168 lines. A longer text stops there, the last line of the image says at which line, and the page tells you. Split a long file into parts."
+      },
+      {
+        "question": "How big is the image?",
+        "answer": "As wide as the longest line, drawn at twice its size for sharpness, or less when the text would be taller than 2048 pixels, but never smaller than actual size."
+      },
+      {
+        "question": "Which scripts render correctly?",
+        "answer": "The bundled font handles Latin, Greek, Cyrillic, Hebrew and Arabic, and a line that opens with a Hebrew or Arabic letter runs right to left. Other scripts, such as CJK, and emoji use the browser's sans-serif font."
+      },
+      {
+        "question": "Is the text in the JPEG editable or searchable?",
+        "answer": "No. The JPEG holds pixels, so you cannot select, copy or search the words. Send the TXT along with the image."
+      },
+      {
+        "question": "What happens to tabs and terminal color codes?",
+        "answer": "Tabs stop every 4 characters, and terminal color codes and other control characters are removed before the text is drawn."
+      }
+    ],
+    "aboutSection": {
+      "title": "TXT and JPG",
+      "fromFormat": {
+        "name": "TXT",
+        "fullName": "Plain text",
+        "description": "Character data interpreted using a text encoding, without an intrinsic page-layout model.",
+        "details": [
+          "Editable characters",
+          "Encoding matters",
+          "No fixed font appearance"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image delivery format, also commonly named with the .jpg extension.",
+        "details": [
+          "Finished image pixels",
+          "No raw sensor model",
+          "No alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting TXT to JPEG",
+      "points": [
+        "The text is drawn black on white in DejaVu Sans, 16 px.",
+        "Text beyond 168 lines is cut, and the last line says where.",
+        "The JPEG holds pixels, so the words cannot be selected."
+      ]
+    },
+    "guide": {
+      "title": "Understanding TXT and JPG",
+      "markdown": "### What is a TXT file?\n\nTXT commonly identifies plain text: character data without a page-layout model or rich typographic instructions. The encoding determines how bytes become letters. A text editor supplies the font and display arrangement, so the same document can look different when opened with another editor or window width.\n\n### Programs that open TXT files\n\n- **Mac:** TextEdit creates, opens and saves plain text documents.\n- **Windows, Mac and Linux:** to read the text before drawing it, Visual Studio Code and Vim both open plain text.\n\n### TXT and JPEG compared\n\nTXT records characters without layout, and the font and wrapping come from whatever opens it. JPEG records pixels with lossy compression. Rendering fixes the look of the text, including wrapping and font choice, and does not make it editable.\n\nThis page reads the file in the encoding it detects and draws it black on white in DejaVu Sans. It shows a limited number of lines, and a longer file stops with a note on the last line, so check the ending before sharing instructions or a transcript.\n\n### Other ways to convert TXT to JPEG\n\n- **ImageMagick:** `magick -background white -fill black -pointsize 20 -size 800x caption:@notes.txt notes.jpeg` wraps the file's text to 800 pixels. It needs an installed font, and some systems disable the `@file` form through a security policy. A trailing newline in the file adds a blank line.\n- **GIMP:** choose Tools > Text, then pick the font from the list of installed fonts, and load the TXT with the folder icon in the Text Editor window and arrange it on the canvas. Export a .jpeg copy with File > Export As.\n- **Inkscape plus GIMP:** type the text with the Text tool, set the font in Text > Text and Font, and export with File > Export PNG Image. Then open that PNG in GIMP and export a JPEG with File > Export As.\n\n### Problems with TXT files\n\n**Characters look wrong:** the wrong encoding can turn valid text into incorrect characters.\n\n**Styling is gone:** a styled document loses its formatting once it is saved as TXT.\n\n**No pictures or tables:** plain text cannot hold an image or table the way a word processor does.\n"
+    }
+  }
+}

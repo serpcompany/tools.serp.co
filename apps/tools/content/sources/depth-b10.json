@@ -1,0 +1,256 @@
+{
+  "tools": {
+    "pgm-to-png": {
+      "methods": [
+        {
+          "app": "Netpbm",
+          "steps": "pnmtopng measurement.pgm > measurement.png",
+          "limits": "Maps input maximum values to PNG depths; scaling can change numerical representation.",
+          "source": "https://netpbm.sourceforge.net/doc/pnmtopng.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick measurement.pgm review.png",
+          "limits": "Check installed PGM/PNG support and output sample depth.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the PGM; File > Export As; type a name ending in .png; click Export and review the PNG options.",
+          "limits": "Editing/export is a visual workflow; numerical identity must be verified.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportingSources": [
+            "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-pnm.c"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://netpbm.sourceforge.net/doc/pgm.html"
+      ]
+    },
+    "swf-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i clip.swf -c:v mpeg4 -c:a libmp3lame decoded.avi",
+          "limits": "Only decodable embedded media; SWF demuxing does not execute ActionScript.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html",
+            "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/swfdec.c"
+          ]
+        },
+        {
+          "app": "JPEXS Free Flash Decompiler with FFmpeg",
+          "steps": "Linux: ffdec -export movie extracted presentation.swf; then ffmpeg -i extracted-movie.flv -c:v mpeg4 extracted-movie.avi using the actual extracted filename.",
+          "limits": "JPEXS movie export is FLV without sound; not complete SWF rendering.",
+          "source": "https://github.com/jindrapetrik/jpexs-decompiler/wiki/Commandline-arguments",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "Ruffle with OBS Studio and FFmpeg",
+          "steps": "Play a supported SWF in Ruffle; in OBS Studio add a Window Capture or Display Capture source; check audio settings; Start Recording; then transcode the actual recording file with ffmpeg -i <recording> -c:v mpeg4 -c:a libmp3lame performance.avi.",
+          "limits": "Composite playback-capture workflow, one interaction path; Ruffle compatibility and capture/audio setup required.",
+          "source": "https://obsproject.com/kb/quick-start-guide",
+          "supportingSources": [
+            "https://ruffle.rs/downloads",
+            "https://ruffle.rs/compatibility",
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "tiff-to-webp": {
+      "methods": [
+        {
+          "app": "Google cwebp",
+          "steps": "Run cwebp -q 80 scan.tiff -o article.webp.",
+          "limits": "Check the quality value against the image type.",
+          "source": "https://developers.google.com/speed/webp/docs/cwebp"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick scan.tiff scan.webp.",
+          "limits": "WebP output needs the WebP delegate library.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "formatSources": [
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+      ]
+    },
+    "vob-to-avi": {
+      "methods": [
+        {
+          "app": "Avidemux",
+          "steps": "Open the VOB, choose MPEG-4 ASP video encoding, MP3 audio and the AVI container, then save the .avi.",
+          "limits": "Inspect interlacing and aspect ratio afterward.",
+          "source": "https://www.avidemux.org/admWiki/doku.php?id=tutorial:dvd_to_avi"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i segment.vob -c:a libmp3lame -c:v mpeg4 segment-copy.avi.",
+          "limits": "Encodes both streams again.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+      ]
+    },
+    "wmv-to-mpg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i legacy.wmv -c:a mp2 -c:v mpeg2video legacy-review.mpg.",
+          "limits": "Encodes the video again.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml"
+      ]
+    },
+    "au-to-mp3": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Open the AU with File > Open or File > Import > Audio, check playback, then choose File > Export Audio and select MP3.",
+          "limits": "The export dialog has range and quality choices.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/play.html"
+          ]
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i interview.au -c:a libmp3lame -b:a 128k interview-listen.mp3.",
+          "limits": "Another lossy encode.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://pubs.opengroup.org/external/auformat.html",
+        "https://www.iana.org/assignments/media-types/audio/basic",
+        "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/au.c",
+        "https://manual.audacityteam.org/man/audacity_2.html",
+        "https://www.fon.hum.uva.nl/praat/manual/Sound_files_2_4__NeXT_Sun___au__files.html"
+      ]
+    },
+    "avif-to-tiff": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the AVIF; File > Export As; name the file with a .tiff ending; click Export; review the TIFF compression and metadata options.",
+          "limits": "A GIMP release with the AVIF importer is required; choose explicit options for the target workflow.",
+          "source": "https://docs.gimp.org/3.0/en/file-tiff-export.html",
+          "supportingSources": [
+            "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/",
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ]
+        },
+        {
+          "app": "libheif",
+          "steps": "heif-dec artwork.avif artwork.tiff",
+          "limits": "TIFF output depends on build support; inspect installed utility help.",
+          "source": "https://raw.githubusercontent.com/strukturag/libheif/master/examples/heif_dec.cc",
+          "supportingSources": [
+            "https://github.com/strukturag/libheif"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick artwork.avif working-copy.tiff",
+          "limits": "Required AVIF/TIFF delegates must be present; verify image selection and precision.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "formatSources": [
+        "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types",
+        "https://developer.android.com/media/platform/supported-formats",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
+      ]
+    },
+    "bmp-to-gif": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick diagram.bmp diagram-share.gif.",
+          "limits": "Check the colors afterward.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "formatSources": [
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml",
+        "https://www.iana.org/assignments/media-types/image/bmp"
+      ]
+    },
+    "dds-to-jpeg": {
+      "methods": [
+        {
+          "app": "Microsoft DirectXTex texconv",
+          "steps": "texconv -ft jpg review-texture.dds",
+          "limits": "Texture processing and supported layouts require review; JPEG lacks alpha.",
+          "source": "https://github.com/microsoft/DirectXTex/wiki/Texconv"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the DDS; inspect the imported surface; File > Export As; use a .jpeg ending; review the JPEG quality options.",
+          "limits": "No alpha in JPEG; GIMP release with DDS support required.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "supportingSources": [
+            "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/",
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick review-texture.dds texture-report.jpeg",
+          "limits": "Check decoder support and the selected surface; do not assume all faces or levels.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "formatSources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+      ]
+    },
+    "dng-to-tiff": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Import the DNG; develop; in the export module choose file on disk and TIFF; select depth, compression, profile and size; start the export.",
+          "limits": "Raw sensor compatibility restrictions apply.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportingSources": [
+            "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick dng:negative.dng developed.tiff",
+          "limits": "Explicit DNG prefix; installed raw delegate required; validate rendering and precision.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "formatSources": [
+        "https://helpx.adobe.com/camera-raw/digital-negative.html",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000188.shtml"
+      ]
+    }
+  }
+}

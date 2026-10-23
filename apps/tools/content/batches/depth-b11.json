@@ -1,0 +1,828 @@
+{
+  "dot-to-png": {
+    "seo": {
+      "title": "Convert DOT to PNG: Graphviz Graph to Image",
+      "h1": "DOT to PNG Converter",
+      "description": "Convert DOT to PNG in your browser. Graphviz lays out the first graph in the file and draws it on white, up to 4096 px a side. Free, no sign-up.",
+      "howToHeading": "How to convert DOT to PNG"
+    },
+    "tool": {
+      "subtitle": "Draw a Graphviz DOT graph as a PNG on a white background, right in your browser."
+    },
+    "aboutSection": {
+      "title": "DOT and PNG",
+      "fromFormat": {
+        "name": "DOT",
+        "fullName": "Graphviz DOT graph",
+        "description": "A plain-text graph description language from the Graphviz project, also saved as .gv. A file lists nodes, edges and their attributes, and Graphviz tools such as dot lay out and render the graph.",
+        "details": [
+          "plain text",
+          "nodes, edges and attributes",
+          "directed and undirected graphs",
+          "rendered by Graphviz"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DOT to PNG",
+      "points": [
+        "Only the first graph in the file is drawn; later graphs are ignored.",
+        "The PNG is drawn on white at twice the graph's size in points, and shrunk to fit 4096 px on a side when that is larger.",
+        "Images and shape files named in the graph are not loaded, and nothing is fetched.",
+        "A file over 2 MB is refused, and a layout still running after 60 seconds is stopped."
+      ]
+    },
+    "guide": {
+      "title": "About DOT and PNG files",
+      "markdown": "### What is a DOT file?\n\nA DOT file is a plain-text graph description from the Graphviz project, also saved as .gv. It lists nodes, edges and their attributes. A graph can be directed or undirected. The file holds relationships rather than a finished picture, so Graphviz tools such as dot decide where each shape and label goes. People use it for dependency and flow diagrams and for diagrams of networks.\n\n### Programs that open DOT files\n\n- **Windows, Mac and Linux:** Graphviz lays out and renders DOT files. Its download page lists Windows installers, Linux packages and, for Mac, MacPorts and Homebrew.\n\nGephi opens DOT files too. Any text editor shows the source, though an editor does not draw the graph.\n\n### DOT and PNG compared\n\nPNG, a lossless raster format from the mid-1990s, was designed to replace GIF without patent worries; it is an ISO/IEC 15948 standard and a W3C Recommendation. Every browser shows it, so a diagram sent as a PNG needs no Graphviz at the other end. The trade is that the result is pixels. The nodes and edges become pixels, so keep the DOT file for later edits.\n\nHere, Graphviz 16.1.0 compiled to WebAssembly lays out the first graph in your file inside the browser. The picture is drawn on white at twice the graph's size in points, and it is fitted to 4096 px on each side when it would be larger. There is no quality setting. Pictures and shape files the graph names are not loaded.\n\n### Other ways to convert DOT to PNG\n\n- **Graphviz:** run `dot -Tpng input.dot -o diagram.png`.\n- **PyGraphviz:** call `g = pgv.AGraph(\"input.dot\")`, then `g.draw(\"diagram.png\", format=\"png\", prog=\"dot\")`. It draws through Graphviz's layout programs, here `dot`.\n- **pydot:** call `graphs = pydot.graph_from_dot_file(\"input.dot\")`, then `graphs[0].write_png(\"diagram.png\")`. The example takes the first graph with `graphs[0]`. Graphviz is installed separately.\n\n### Problems with DOT files\n\nA DOT file with a syntax error is not drawn: Graphviz's own error message is shown instead, so test a small graph before adding the whole network. An empty file is refused. A graph with more than 1,000 edges is laid out with Graphviz speed limits unless it sets its own. A very large graph is drawn smaller to fit 4096 px, and its small text can become hard to read."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a DOT file to PNG?",
+        "answer": "Choose the .dot file. Graphviz lays the graph out in your browser, and the PNG is ready to download a moment later. Nothing is uploaded. Choose several files and they run one by one, with every PNG downloading separately."
+      },
+      {
+        "question": "Is this the same Graphviz as the dot command?",
+        "answer": "It is Graphviz compiled to WebAssembly and run in a worker in your browser, so the layout comes from Graphviz itself. Nothing is fetched from the web while it runs."
+      },
+      {
+        "question": "What happens when the file holds more than one graph?",
+        "answer": "Only the first graph is drawn. To get the others, put each graph in its own file and convert them separately."
+      },
+      {
+        "question": "Is the PNG background transparent?",
+        "answer": "No. The graph is drawn on a white background, and the PNG has no quality setting."
+      },
+      {
+        "question": "How large is the PNG?",
+        "answer": "The graph is drawn at twice its size in points. If that would pass 4096 px on either side, it is drawn smaller to fit, and the page tells you so. In that case small text may be hard to read."
+      },
+      {
+        "question": "Why was my DOT file refused or stopped?",
+        "answer": "Files over 2 MB are refused. A layout still running after 60 seconds is stopped. Graphs with more than 1,000 edges get Graphviz speed limits on their slowest steps unless the graph sets its own."
+      },
+      {
+        "question": "Are the pictures, shape files and fonts my graph names included?",
+        "answer": "No. Graphviz here can read none of your files, so pictures named by the image attribute and files named by shapefile or epsf find nothing, and nothing is fetched from the web. The page says so when a graph uses one of those three attributes."
+      },
+      {
+        "question": "What if my DOT file has an error or is empty?",
+        "answer": "An empty file is refused with a message saying so. For a file Graphviz cannot lay out, the page shows Graphviz's own error message, and you can fix the file and convert again."
+      }
+    ]
+  },
+  "dst-to-png": {
+    "seo": {
+      "title": "DST to PNG: Programs That Can Convert DST",
+      "h1": "DST to PNG Converter",
+      "description": "DST to PNG: this page cannot read Tajima DST embroidery files and ends with an error. Ink/Stitch, Embrilliance and Wilcom can open them.",
+      "howToHeading": "How to convert DST to PNG"
+    },
+    "tool": {
+      "subtitle": "This page cannot read DST stitch files; the embroidery programs below can."
+    },
+    "aboutSection": {
+      "title": "DST and PNG",
+      "fromFormat": {
+        "name": "DST",
+        "fullName": "Tajima embroidery",
+        "description": "A Tajima machine embroidery stitch file. It stores stitch coordinates that tell an embroidery machine how to move and sew, including thread changes and other machine actions, rather than a picture.",
+        "details": [
+          "stitch coordinates",
+          "thread changes and machine actions",
+          "no thread palette in ordinary files",
+          "read by embroidery software"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DST to PNG",
+      "points": [
+        "This page cannot convert DST: it decodes images, and a stitch file is not one, so you get \"Image decode failed.\"",
+        "A DST holds needle positions and machine commands, not pixels, so a PNG has to be drawn by embroidery software.",
+        "Ordinary DST files carry no thread palette, so a preview needs colors chosen separately."
+      ]
+    },
+    "guide": {
+      "title": "About DST and PNG files",
+      "markdown": "### What is a DST file?\n\nDST is a Tajima machine embroidery stitch file. Instead of a picture, it records stitch coordinates, plus changes in thread and other machine actions, for the machine to carry out. The file says how to sew a design, not how it looks. Ordinary DST files do not preserve a thread palette, though the pyembroidery project documents an extended-header variant that carries colors.\n\n### Programs that open DST files\n\n- **Windows, Mac and Linux:** Ink/Stitch, an extension for Inkscape, reads and writes DST.\n- **Windows and Mac:** Embrilliance Essentials displays and recolors DST designs.\n- **Windows:** Wilcom EmbroideryStudio opens stitch files and can try to turn them back into embroidery objects.\n- **Linux:** pyembroidery is a Python library and not a viewer; scripts call its read_dst function to load the stitch data.\n- **Web:** a browser preview of a DST design is offered by Wilcom Library, with an account.\n\n### DST and PNG compared\n\nPNG is a lossless raster format with optional transparency, and every browser shows it. A PNG preview suits a catalog, an email or a last look at a design before sewing, but a machine cannot sew from it. A DST has no pixels at all. To make a PNG, software has to draw each stitch and pick thread colors, because ordinary DST files keep no thread palette.\n\nThis page cannot do that. It decodes pictures, and a DST is not one, so every attempt ends with \"Image decode failed.\" For a PNG preview, use one of the programs above.\n\n### Other ways to convert DST to PNG\n\n- **Ink/Stitch and Inkscape:** with Ink/Stitch installed, choose File > Open in Inkscape then select the DST; it loads in Manual Stitch Mode. Then choose File > Export PNG Image, pick the area (Page, Drawing, Selection or Custom) and the size in pixels, and click Export.\n- **pyembroidery:** with the library installed, call `pattern = pyembroidery.read(\"input.dst\")`, then `pyembroidery.write(pattern, \"preview.png\")`.\n\n### Problems with DST files\n\nA design shown in odd colors usually means the palette is missing, since an external thread list is needed. Enlarging a basic DST spreads its existing stitches without adding any, and shrinking the coordinates tightens stitch spacing and stitch length. Objects rebuilt from stitches miss some of the original editing properties, so keep an SVG design beside the machine file as your editable Ink/Stitch source."
+    },
+    "faqs": [
+      {
+        "question": "Can a DST file become a PNG on this page?",
+        "answer": "No. The page reads image files, and a DST is a list of stitches, so the conversion stops with \"Image decode failed.\" Open the file in embroidery software and export a picture from there."
+      },
+      {
+        "question": "Which programs can turn a DST file into a PNG?",
+        "answer": "Ink/Stitch for Inkscape reads and writes DST, and Inkscape exports a PNG from File > Export PNG Image. The pyembroidery Python library reads DST and can write PNG. Wilcom EmbroideryStudio and Embrilliance Essentials open DST files for viewing."
+      },
+      {
+        "question": "What is inside a DST file?",
+        "answer": "Stitch coordinates plus machine actions such as thread changes. It describes how an embroidery machine should move, not how the finished design looks."
+      },
+      {
+        "question": "Why are the thread colors wrong in my DST preview?",
+        "answer": "Ordinary DST files do not carry a thread palette, so software picks colors itself. An external thread list is needed to get the right ones."
+      },
+      {
+        "question": "Is there a browser tool that previews DST?",
+        "answer": "Wilcom Library accepts DST files and shows a design preview in a browser, but it needs an account. This page has no DST reader."
+      },
+      {
+        "question": "Can I resize a DST before making the PNG?",
+        "answer": "Rescaling changes the stitch layout itself, so choose the PNG size when you export instead of resizing the design in embroidery software."
+      },
+      {
+        "question": "Does a PNG replace my DST for sewing?",
+        "answer": "No. A PNG is only a picture, and a machine needs the stitch data in the DST. Keep the DST, and the editable source design if you have one, such as an Ink/Stitch SVG."
+      },
+      {
+        "question": "Why does this page say \"Image decode failed\" for a DST?",
+        "answer": "This page's image decoder has no reader for stitch data, so it gives up with that message. Open the DST in embroidery software to get a picture."
+      }
+    ]
+  },
+  "gif-to-cur": {
+    "seo": {
+      "title": "Convert GIF to CUR: Still Cursor Image",
+      "h1": "GIF to CUR Converter",
+      "description": "Convert GIF to CUR in your browser. The first frame becomes a still Windows cursor image, fitted within 256 px. Free, no sign-up.",
+      "howToHeading": "How to convert GIF to CUR"
+    },
+    "tool": {
+      "subtitle": "Turn the first frame of a GIF into a .cur cursor file, right in your browser."
+    },
+    "aboutSection": {
+      "title": "GIF and CUR",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "CUR",
+        "fullName": "Windows cursor",
+        "description": "A cursor file format on Microsoft Windows that uses the same structure as ICO, with an added hotspot position that marks the point the pointer clicks.",
+        "details": [
+          "same layout as ICO",
+          "stores a hotspot coordinate",
+          "alpha transparency",
+          "multiple sizes per file"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to CUR",
+      "points": [
+        "Only the first frame of the GIF is used; the animation is not kept, and animated cursors use ANI.",
+        "CUR stores each side in one byte, so a larger image is shrunk to fit.",
+        "The page has no hotspot setting, so open the .cur in a cursor editor to set or check the active pixel.",
+        "Only the picture is carried over, not the GIF's other data."
+      ]
+    },
+    "guide": {
+      "title": "About GIF and CUR files",
+      "markdown": "### What is a GIF file?\n\nCompuServe brought out GIF in 1987. Every frame is LZW-compressed, each limited to 256 palette colors at most, and simple animation is allowed. Its transparency is 1-bit. People reach for it for short loops, reaction images, stickers, simple graphics and icons.\n\n### Programs that open GIF files\n\n- **Linux, Windows and Mac:** GIMP can export GIF stills or multilayer animations, and ImageMagick reads GIF.\n- **Mobile and Web:** GIF display is covered by Chrome, Firefox and Safari.\n\n### GIF and CUR compared\n\nCUR is the Windows cursor format. It is related to ICO but adds a hotspot, the coordinate of the pixel that registers a click. One CUR file can hold several sizes, and every size carries a hotspot of its own, while animated cursors use ANI instead of the ordinary CUR workflow. CUR suits pointer assets; a conventional image format fits better when no hotspot is needed.\n\nIn this converter your browser decodes the GIF to 8-bit RGBA and keeps the first frame, and ImageMagick writes the cursor file. A side over 256 px is shrunk to fit, because a CUR records each side in one byte, and a 256 px icon is stored as PNG. You cannot set a hotspot here, and EXIF, XMP and color profiles are dropped.\n\n### Other ways to convert GIF to CUR\n\n- **RealWorld Cursor Editor:** its page says it makes cursors from GIF images and has a wizard for quick conversions.\n- **Axialis CursorWorkshop:** choose File > Open and pick the GIF, select the part you want, then choose Image > Create Static Cursor from Selection and click OK in the New Cursor From Image dialog. Choose Draw > Set Cursor Hot Spot and click the new location to move the hotspot.\n- **IcoFX:** choose File > Open, which imports a GIF as an image, then Image > Create Cursor From Image. Use File > Save As; cursor images are saved as Windows cursor files.\n\n### Problems with GIF files\n\nA GIF cannot retain partial opacity at soft transparent edges. GIMP caps a GIF export at 256 colors, which can change gradients, and frame disposal changes how later frames cover earlier ones."
+    },
+    "faqs": [
+      {
+        "question": "How can I make a CUR cursor from a GIF?",
+        "answer": "Pick the GIF. Your browser decodes it, ImageMagick writes the cursor file, and the .cur downloads. Nothing is uploaded. Choose several GIFs and each is processed in turn, giving its own .cur."
+      },
+      {
+        "question": "What happens to a GIF animation?",
+        "answer": "The first frame is all that is used, so the cursor is a still. Animated cursors on Windows use ANI, which this page does not write."
+      },
+      {
+        "question": "Can I set the cursor hotspot here?",
+        "answer": "No. The page has no hotspot control. The hotspot is the pixel that does the clicking, and a misplaced one makes clicks land away from where the pointer looks. A cursor editor such as Axialis CursorWorkshop has a Draw > Set Cursor Hot Spot command."
+      },
+      {
+        "question": "What size is the cursor?",
+        "answer": "A GIF up to 256 px on both sides keeps its size. A larger one is shrunk to fit, since the format stores each side in one byte."
+      },
+      {
+        "question": "What is the difference between CUR and ICO?",
+        "answer": "A CUR has the same structure as an ICO plus a hotspot, the pixel that registers a click. An ICO is for icons and has no hotspot."
+      },
+      {
+        "question": "Can one CUR hold several sizes?",
+        "answer": "The format can, with a hotspot for each size. This page writes one image per file, at your GIF's size."
+      },
+      {
+        "question": "Does converting keep the GIF's metadata?",
+        "answer": "No. The image goes through raw pixels, so none of the GIF's embedded data comes along."
+      },
+      {
+        "question": "Which programs open a CUR file?",
+        "answer": "Windows Mouse settings, GIMP and IrfanView open CUR files. ImageMagick and XnView MP read them too, and Visual Studio's image editor views and edits cursor resources."
+      }
+    ]
+  },
+  "gif-to-tiff": {
+    "seo": {
+      "title": "Convert GIF to TIFF: First Frame as a TIFF",
+      "h1": "GIF to TIFF Converter",
+      "description": "Convert GIF to TIFF in your browser. The first frame is saved as an uncompressed 8-bit RGBA TIFF; the animation is not kept. Free, no sign-up.",
+      "howToHeading": "How to convert GIF to TIFF"
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as an uncompressed TIFF, right in your browser."
+    },
+    "aboutSection": {
+      "title": "GIF and TIFF",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to TIFF",
+      "points": [
+        "Only the first frame of the GIF is used, so an animation becomes one still TIFF.",
+        "The TIFF is written uncompressed as 8-bit RGBA, so it can be much larger than the GIF.",
+        "The GIF's transparent color becomes the TIFF's alpha channel.",
+        "Each GIF gives its own single-image TIFF; a multi-page TIFF is not built."
+      ]
+    },
+    "guide": {
+      "title": "About GIF and TIFF files",
+      "markdown": "### What is a GIF file?\n\nGIF came from CompuServe in 1987. LZW compression, at most 256 palette colors per frame and basic animation define it. Transparency is all or nothing, since a color is either clear or solid. Looping clips, simple graphics, reaction images and stickers are typical jobs.\n\n### Programs that open GIF files\n\n- **Mac, Windows and Linux:** GIMP exports stills or multilayer animations as GIF, and ImageMagick reads GIF.\n- **Web and Mobile:** Chrome and Firefox display GIFs on the web, and Chrome and Safari do on mobile.\n\n### GIF and TIFF compared\n\nAldus first published TIFF in 1986, and Adobe maintains it today. It stores one or more images in a tag-based structure, with lossless or lossy compression, high bit depth and even CMYK. It serves scanning and archiving, print and professional photography, and fax or document imaging. Because a TIFF can contain several images, scanned document sequences fit well, and preservation masters are another established use. Either .tif or .tiff marks a TIFF file.\n\nHere your browser decodes the GIF and keeps its first frame as 8-bit RGBA, then ImageMagick writes an uncompressed TIFF with an alpha channel. A transparent GIF pixel stays transparent. Expect a file larger than the GIF and no animation. EXIF, XMP and color profiles are dropped. The result opens in Preview on a Mac, in Windows Photos, in GIMP and in Photoshop.\n\n### Other ways to convert GIF to TIFF\n\n- **ImageMagick:** run `magick \"input.gif[0]\" still.tiff`. Index 0 is the first image in the file, and `[1]` would pick the second.\n- **Pillow:** call `Image.open(\"input.gif\").save(\"still.tiff\")`; save picks the format from the extension. Call `seek` first to move to a later frame.\n- **GIMP:** use File > Open on the GIF, then File > Export As and choose TIFF. The TIFF export dialog offers None, LZW, Pack Bits, Deflate and JPEG compression.\n\n### Problems with GIF files\n\nPartial opacity at soft edges is lost in a GIF. A GIF exported from GIMP is held to 256 colors, which can change gradients. How later images cover earlier ones depends on the disposal setting, so one frame pulled out alone can look incomplete. GIMP also omits a GIF comment with characters outside the seven-bit ASCII range."
+    },
+    "faqs": [
+      {
+        "question": "How can I save a GIF as a TIFF?",
+        "answer": "Pick the GIF. The browser decodes it, then ImageMagick turns the pixels into a TIFF for download. Nothing is uploaded. Add several GIFs and each is converted in turn to a separate TIFF."
+      },
+      {
+        "question": "What happens to an animated GIF?",
+        "answer": "The first frame is the only one kept, so the TIFF is a single still. To keep a different frame, export that frame from an editor such as GIMP first, or select it with ImageMagick."
+      },
+      {
+        "question": "Can I make a multi-page TIFF from the frames?",
+        "answer": "Not here. TIFF can hold several images, but this page writes one image per file. Pillow's TIFF saving accepts save_all and append_images for multi-frame TIFFs."
+      },
+      {
+        "question": "Why does the TIFF come out so large next to the GIF?",
+        "answer": "A GIF stores up to 256 colors with LZW compression. This page writes the TIFF uncompressed, with four 8-bit channels for every pixel, and it has no compression setting. GIMP's TIFF export offers LZW and other compression methods if you need a smaller file."
+      },
+      {
+        "question": "Is GIF transparency kept in the TIFF?",
+        "answer": "Yes. The GIF's transparent color becomes a fully transparent pixel in the TIFF's alpha channel. A GIF has no partial transparency, so edges stay hard."
+      },
+      {
+        "question": "Do I get more colors than the GIF had?",
+        "answer": "No. The TIFF holds the same pixels the GIF showed, now with full color channels, so detail lost when the GIF was reduced to 256 colors does not come back."
+      },
+      {
+        "question": "Does the TIFF keep the GIF's comment or frame timing?",
+        "answer": "No. Only pixels go through, so frame delays and the file's embedded data, including EXIF, XMP and color profiles, are left behind."
+      },
+      {
+        "question": "Does the TIFF open in print and scanning software?",
+        "answer": "TIFF is used for scanning and archiving, and Preview, Windows Photos, GIMP and Photoshop open it. If the recipient names a compression, bit depth or color space, export from an editor that offers those settings."
+      }
+    ]
+  },
+  "gif-to-wmv": {
+    "seo": {
+      "title": "Convert GIF to WMV: Animation to Video",
+      "h1": "GIF to WMV Converter",
+      "description": "Convert GIF to WMV in your browser with FFmpeg. The animation becomes a silent video that keeps the GIF's size and rate, up to 1920 px and 30 fps. Free.",
+      "howToHeading": "How to convert GIF to WMV"
+    },
+    "tool": {
+      "subtitle": "Turn an animated GIF into a silent WMV video, right inside your browser tab."
+    },
+    "aboutSection": {
+      "title": "GIF and WMV",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming. This page's WMV holds MS-MPEG4 v3 video.",
+        "details": [
+          "ASF container",
+          "proprietary Microsoft codec",
+          "lossy compression",
+          "legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to WMV",
+      "points": [
+        "A GIF has no sound, so the WMV is video only.",
+        "The video keeps the GIF's frame size and rate, up to 1920 px on a side and 30 fps.",
+        "Both sides are rounded down to an even number, so an odd width or height loses 1 px.",
+        "FFmpeg's defaults decide the codec and bitrate: MS-MPEG4 video at 200 kbit/s. The page has no setting for either."
+      ]
+    },
+    "guide": {
+      "title": "About GIF and WMV files",
+      "markdown": "### What is a GIF file?\n\nFrom CompuServe in 1987 comes GIF, a raster image format. Each frame uses LZW compression and a palette limited to 256 colors at most, and simple animation is supported. Short looping animations, reaction images and stickers are common uses.\n\n### Programs that open GIF files\n\n- **Windows, Linux and Mac:** GIMP exports GIF as stills or multilayer animations, and ImageMagick reads GIF files.\n- **Web and Mobile:** Chrome, Firefox and Safari handle GIF display.\n\n### GIF and WMV compared\n\nWMV, short for Windows Media Video, is a family of Microsoft video codecs usually kept in the ASF container. It was widely used for Windows video and streaming, and today it is a lossy legacy format. A WMV may hold Windows Media Video 7, 8 or 9 content, and ASF itself was designed for storing synchronized media and sending it across networks. Windows Media Player and VLC media player open WMV, which people mostly meet in older Windows video, screen recordings and Windows Media streaming.\n\nIn this converter FFmpeg, built for WebAssembly, re-encodes the GIF inside your browser. A GIF side beyond 1920 px shrinks to fit, a smaller GIF stays at its own size, and a rate above 30 fps sheds frames without shortening the clip. Because both sides are made even, an odd one loses a pixel. A GIF has no audio, so the WMV has none either. FFmpeg's defaults write MS-MPEG4 v3 video at 200 kbit/s, and the page offers no codec, bitrate or quality setting. Several GIFs convert as a batch, but each yields a separate video and they are not joined.\n\n### Other ways to convert GIF to WMV\n\n- **FFmpeg:** run `ffmpeg -i input.gif -an output.wmv` on your computer. The output format is guessed from the extension, and `-an` leaves audio out.\n\n### Problems with GIF files\n\nA GIF cannot keep partial opacity along soft transparent edges, and a GIMP export caps its palette at 256 colors, which can change gradients. Frame disposal decides how later images cover earlier ones, so a lone frame can look incomplete. GIMP drops a GIF comment holding characters beyond seven-bit ASCII."
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a GIF into a WMV video?",
+        "answer": "Choose the GIF and FFmpeg, running as WebAssembly in your browser, re-encodes it as a WMV that you can download. Nothing is uploaded."
+      },
+      {
+        "question": "Does the WMV have sound?",
+        "answer": "No. A GIF carries no audio, so the WMV is video only."
+      },
+      {
+        "question": "Will the video be the same size as my GIF?",
+        "answer": "Nearly. A GIF with a side over 1920 px is scaled down to fit that limit, while a smaller one keeps its size, apart from rounding. Each side is then rounded down to an even number, which costs an odd width or height 1 px."
+      },
+      {
+        "question": "What frame rate does the WMV have?",
+        "answer": "The GIF's own rate carries over up to 30 fps. A faster GIF loses frames to reach 30, yet the video runs as long as the GIF did."
+      },
+      {
+        "question": "Can I join several GIFs into one WMV?",
+        "answer": "No. Select several GIFs and they are encoded one at a time, each into its own WMV; they are not joined."
+      },
+      {
+        "question": "Why does the WMV look different from the GIF?",
+        "answer": "The GIF's frames are re-encoded as lossy MS-MPEG4 video at FFmpeg's default 200 kbit/s, and the page has no quality setting, so the picture is not a copy of the GIF."
+      },
+      {
+        "question": "Will it play in Windows Media Player?",
+        "answer": "Windows Media Player is a common WMV player, but this file's video is MS-MPEG4 rather than Windows Media Video. Reading the ASF container and decoding its video are separate abilities, so a player that opens the file might not have the codec."
+      },
+      {
+        "question": "Why would I use WMV instead of MP4?",
+        "answer": "WMV is a lossy legacy format. Choose it when a program or recipient asks for WMV by name."
+      }
+    ]
+  },
+  "html-to-webp": {
+    "seo": {
+      "title": "Convert HTML to WebP: Page to Image",
+      "h1": "HTML to WebP Converter",
+      "description": "Convert HTML to WebP in your browser. The page is drawn 1280 px wide without running scripts or loading links. Free, no sign-up.",
+      "howToHeading": "How to convert HTML to WebP"
+    },
+    "tool": {
+      "subtitle": "Draw an HTML file as a WebP picture, with no scripts run and nothing loaded."
+    },
+    "aboutSection": {
+      "title": "HTML and WebP",
+      "fromFormat": {
+        "name": "HTML",
+        "fullName": "HyperText Markup Language",
+        "description": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+        "details": [
+          "text-based markup",
+          "elements and attributes",
+          "styled with CSS",
+          "rendered by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "animation",
+          "supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting HTML to WebP",
+      "points": [
+        "The page is laid out 1280 px wide and the image is as tall as the page, up to 4096 px.",
+        "A taller page is cut at 4096 px, and the page tells you so.",
+        "Scripts, linked stylesheets, frames and outside images are not run or loaded; only data: images and fonts in the file are used.",
+        "The page has no WebP quality setting."
+      ]
+    },
+    "guide": {
+      "title": "About HTML and WebP files",
+      "markdown": "### What is an HTML file?\n\nWeb pages and applications are written in HTML, a markup language. The WHATWG now keeps it as a Living Standard; its early revisions date from 1990 to 1995 and were worked on at CERN, then at the IETF. Elements and attributes mark up a page's structure, while stylesheets set its look and scripts add behavior. The media type is text/html. Links can point to separate resources, so a file need not hold every asset itself.\n\n### Programs that open HTML files\n\n- **Mac, Linux and Windows:** Visual Studio Code is an editor with HTML highlighting, completion and formatting, and Firefox renders local HTML documents; it opens a file with Ctrl+O, or Command+O on a Mac.\n\n### HTML and WebP compared\n\nWebP is an image format from Google, first released in 2010, whose lossy mode builds on the VP8 video codec. It also supports lossless compression, transparency and animation. Every current major browser displays it. An HTML file stays editable and searchable, while a WebP is a fixed picture of how the page looked.\n\nHere the file is parsed without running anything, then laid out 1280 px wide in an off-screen sandbox and drawn as an image. Scripts, links and frames are removed, and only data: images and fonts in the file are used. Height follows the page with a ceiling of 4096 px, and there is no quality setting.\n\n### Other ways to convert HTML to WebP\n\n- **Playwright and Pillow:** with a Playwright page showing your document, call `page.screenshot(path=\"page.png\", full_page=True)`, then `Image.open(\"page.png\").save(\"page.webp\")` in Pillow. Pillow picks the format from the extension.\n- **Chrome DevTools and GIMP:** in DevTools, open the Device Toolbar, choose More options, then Capture full size screenshot. Open the screenshot in GIMP, choose File > Export As, pick WebP, and tick Lossless if you want no quality loss.\n- **Chrome DevTools and cwebp:** take the same full size screenshot, then run `cwebp screenshot.png -o page.webp`. cwebp accepts PNG, JPEG, TIFF, WebP or raw Y'CbCr input.\n\n### Problems with HTML files\n\nMissing linked files can leave an offline HTML document without its pictures or styling, and an incorrect character encoding can make its text render incorrectly. Content that a script would build is not drawn here, because nothing is run. Embed what the page needs inside the file before converting."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an HTML file to WebP?",
+        "answer": "Choose the .html file. Your browser parses it, lays it out in a sandbox and draws it as a picture, then encodes a WebP for download. Nothing is uploaded. Choose several files and each is drawn in turn and saved as its own WebP."
+      },
+      {
+        "question": "Does it run my page's JavaScript?",
+        "answer": "No. Scripts, event attributes, frames and objects are removed before the page is drawn, so the picture shows the page as its HTML and inline CSS describe it."
+      },
+      {
+        "question": "Why are my images and styles missing?",
+        "answer": "Nothing is fetched from this site or any other. A linked stylesheet or an image URL stays blank, and only data: images and fonts inside the file are drawn. Inline the styles and embed images as data: URLs to keep them."
+      },
+      {
+        "question": "How wide is the image?",
+        "answer": "The viewport for vh units is 800 px, and the page itself is laid out 1280 px wide. Height follows the page, topping out at 4096 px."
+      },
+      {
+        "question": "What happens to a very long page?",
+        "answer": "It is cut at 4096 px, and the page says so. To capture the rest, split the content into several HTML files and convert each."
+      },
+      {
+        "question": "Can I choose the WebP quality?",
+        "answer": "No. The page has no quality setting. To control it, take a screenshot in a browser and export it from GIMP, whose WebP dialog has a Lossless checkbox and quality settings."
+      },
+      {
+        "question": "What about video and audio on the page?",
+        "answer": "Audio is removed. A video is replaced by its poster image when the file holds one."
+      },
+      {
+        "question": "Will it look exactly like Chrome or Firefox?",
+        "answer": "Not always. Removed scripts and links change what shows, and a web font has to be embedded in the file as a data: font to appear. For pixel-exact results, capture the page in a real browser instead."
+      }
+    ]
+  },
+  "jif-to-jpeg": {
+    "seo": {
+      "title": "Convert JIF to JPEG: Rare JIF to Common JPEG",
+      "h1": "JIF to JPEG Converter",
+      "description": "Convert JIF to JPEG in your browser. Your browser decodes the picture and saves a new JPEG at quality 0.85, with metadata left out. Free, no sign-up.",
+      "howToHeading": "How to convert JIF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a rare .jif picture into a standard JPEG, decoded right in your browser."
+    },
+    "aboutSection": {
+      "title": "JIF and JPEG",
+      "fromFormat": {
+        "name": "JIF",
+        "fullName": "JPEG Interchange Format",
+        "description": "The original file layout described in the JPEG standard for storing JPEG-compressed images. It was largely superseded by JFIF and Exif, and .jif files are rarely seen.",
+        "details": [
+          "lossy JPEG compression",
+          "no alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JIF to JPEG",
+      "points": [
+        "The JIF is decoded and saved again as a JPEG at quality 0.85, so it is a new lossy encode.",
+        "Metadata such as EXIF, XMP and the ICC profile is not carried over.",
+        "Each file becomes its own JPEG; the page does not resize the picture.",
+        "If the browser's image decoder cannot read the file, the page says \"Image decode failed.\""
+      ]
+    },
+    "guide": {
+      "title": "About JIF and JPEG files",
+      "markdown": "### What is a JIF file?\n\nJIF stands for JPEG Interchange Format. It is the original file layout described in the JPEG standard for storing JPEG-compressed images, and JFIF and Exif largely replaced it, so .jif files are rare now. The pictures use ordinary lossy JPEG compression and carry no alpha transparency. The later JFIF convention allows .jif among its extensions, yet a .jif is far less common than the .jpg that most JFIF files carry. JFIF can carry a small embedded thumbnail, and it was standardized as ITU-T T.871 in May 2011.\n\n### Programs that open JIF files\n\n- **Linux, Windows and Mac:** GIMP, which imports JPEG for editing, is listed among the programs that open JIF files, and ImageMagick reads JPG.\n- **Mobile and Web:** Chrome, Firefox and Safari can display JPEG.\n\nXnView and IrfanView are listed as openers for JIF as well.\n\n### JIF and JPEG compared\n\nJPEG is named for the committee behind it, the Joint Photographic Experts Group. ISO/IEC 10918-1 defines it, and it is the usual format for digital camera output. The .jpg and .jpeg extensions mean one and the same format. Editors scale quality from 0 to 100, and the same number in two editors need not give the same compression or appearance. Baseline JPEG compresses 8x8 pixel blocks, using a discrete cosine transform plus Huffman coding, and stores 8 bits per color channel. Because JPEG is lossy, keep the JIF if you may want the first pass later.\n\nHere your browser decodes the JIF to 8-bit pixels and saves a JPEG at quality 0.85, so the lossy step runs a second time.\n\n### Other ways to convert JIF to JPEG\n\n- **ImageMagick:** run `magick input.jif compatible.jpeg`; its command-line page shows this `magick in out` form for changing formats.\n- **Pillow:** call `Image.open(\"input.jif\").save(\"compatible.jpeg\")`. Pillow reads and writes JPEG, and its quality option defaults to 75.\n- **GIMP:** choose File > Open on the JIF, then File > Export As, give the file a .jpeg name and click Export. The JPEG export dialog has a Quality setting.\n\n### Problems with JIF files\n\nA picture that needs transparency has to start in another format, because a JIF has no alpha channel."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JIF to a JPEG?",
+        "answer": "Choose the .jif file. Your browser decodes it and saves a JPEG for download. Nothing is uploaded. Add several files and each is processed on its own turn, giving separate JPEGs."
+      },
+      {
+        "question": "Is JIF the same as JPEG?",
+        "answer": "Not exactly. JPEG names the compression and the image format; a JIF is one older way of packaging a JPEG picture, which JFIF and Exif mostly replaced. The result of this page is a regular JPEG."
+      },
+      {
+        "question": "Is JIF the same as JFIF?",
+        "answer": "No, but .jif is one of the extensions a JFIF file may use. That makes JFIF the common wrapper, and its media type, image/jpeg, matches any JPEG."
+      },
+      {
+        "question": "Will quality drop?",
+        "answer": "Yes. The picture is decoded, then written as a fresh JPEG at quality 0.85, which means the lossy step happens again. Keep the original JIF if you need the first pass untouched."
+      },
+      {
+        "question": "Why does my JIF give an \"Image decode failed\" message?",
+        "answer": "The page decodes the picture with your browser's own image decoder, and that message appears when the decoder cannot read the file. Try opening the JIF in GIMP, XnView or IrfanView to see whether the picture itself opens."
+      },
+      {
+        "question": "Is metadata kept?",
+        "answer": "No. Only pixels carry over, because the picture passes through raw pixels on its way to the JPEG."
+      },
+      {
+        "question": "Which programs open JIF files?",
+        "answer": "GIMP, XnView and IrfanView are listed as opening JIF files."
+      },
+      {
+        "question": "Is the JPEG the same size as the JIF?",
+        "answer": "The page does not resize the picture. File size can change, because the picture is compressed again at quality 0.85."
+      }
+    ]
+  },
+  "jpeg-to-tif": {
+    "seo": {
+      "title": "Convert JPEG to TIF: Photo to Uncompressed TIFF",
+      "h1": "JPEG to TIF Converter",
+      "description": "Convert JPEG to TIF in your browser. The TIF is an uncompressed 8-bit file, so it comes out larger than the JPEG. Free, no sign-up.",
+      "howToHeading": "How to convert JPEG to TIF"
+    },
+    "tool": {
+      "subtitle": "Convert a JPEG photo to an uncompressed TIF, with nothing leaving your browser."
+    },
+    "aboutSection": {
+      "title": "JPEG and TIF",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPEG to TIF",
+      "points": [
+        "The TIF is written uncompressed, so it is larger than the JPEG it came from.",
+        "Converting does not bring back detail the JPEG already lost.",
+        "The file is 8-bit RGBA; the alpha channel is fully opaque because JPEG has no transparency.",
+        "EXIF, XMP and color profile data are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and TIF files",
+      "markdown": "### What is a JPEG file?\n\nThe format is named for the Joint Photographic Experts Group, which started work on it in 1986 and saw the core specification appear as ITU-T T.81 in 1992. Baseline JPEG works lossily, applying a discrete cosine transform to 8x8 pixel blocks and then Huffman coding. Its progressive mode first shows a coarse picture, then refines it while more data arrives. Each channel holds 8 bits and there is no alpha. GIMP's default quality is 85 on the usual 0 to 100 scale. The registered media type is image/jpeg.\n\n### Programs that open JPEG files\n\n- **Linux, Mac and Windows:** GIMP imports JPEG so you can edit it, and ImageMagick reads JPG files.\n- **Web and Mobile:** Chrome renders JPG on both, with Firefox on the web and Safari on mobile.\n\n### JPEG and TIF compared\n\nAldus and Microsoft developed TIFF as a tag-based raster wrapper. Revision 6.0 dates from 1992, and Adobe now holds the specification. A file can use various compression methods and color representations and can hold several images. Archival master copies and high-bit-depth work are well-established uses. The names .tif and .tiff both mean TIFF, whose media type is image/tiff.\n\nHere your browser decodes the JPEG to 8-bit RGBA and ImageMagick writes the .tif without any compression. The result is larger than the JPEG and holds no more detail. Camera EXIF, XMP and the ICC profile stay behind.\n\n### Other ways to convert JPEG to TIF\n\n- **Preview on a Mac:** open the JPEG, choose File > Export, pick TIFF in the Format pop-up menu, and click Save.\n- **GIMP:** open the photograph, choose File > Export As, export it as a TIFF image, and pick the Compression in the TIFF dialog. JPEG is the one lossy choice there.\n- **Pillow:** call `Image.open(\"input.jpeg\").save(\"delivery.tif\", compression=\"tiff_lzw\")`. Without libtiff, Pillow writes only uncompressed TIFF files.\n\n### Problems with JPEG files\n\n- A JPEG holds no transparent pixels, so artwork that needs them has to start in another format.\n- JPEG has no layer stack; keep the project file if you may edit the artwork again.\n- Quality numbers differ between editors, so equal settings do not promise equal compression or appearance."
+    },
+    "faqs": [
+      {
+        "question": "How can I save a JPEG as a TIF?",
+        "answer": "Pick the JPEG. It is decoded by your browser and written as a TIF by ImageMagick, ready to download. Nothing is uploaded. Select several and each becomes a separate TIF."
+      },
+      {
+        "question": "Does JPEG to TIF improve quality?",
+        "answer": "No. A JPEG is lossy, and the detail it discarded cannot come back. The TIF stores the decoded pixels as they are, with no new loss added."
+      },
+      {
+        "question": "Why is the TIF bigger than the JPEG?",
+        "answer": "A JPEG compresses the photo, but this page writes the TIF with no compression, so every pixel is stored in full. It has no compression setting. To use LZW or another method, re-save the TIF in GIMP, whose TIFF dialog lists them."
+      },
+      {
+        "question": "Is .tif different from .tiff?",
+        "answer": "No. Both extensions name the same format, image/tiff. This page names the output with .tif."
+      },
+      {
+        "question": "Does the TIF have an alpha channel?",
+        "answer": "Yes, but it is fully opaque. The file is RGBA, and a JPEG has no transparency, so every pixel is solid."
+      },
+      {
+        "question": "Do EXIF tags and the ICC profile survive?",
+        "answer": "No. Only pixels pass through, so the tags and the profile stay in the original JPEG."
+      },
+      {
+        "question": "Can I make a multi-page TIF from several JPEGs?",
+        "answer": "Not here. Each JPEG becomes its own single-image TIF, even though the TIFF format can hold multiple images."
+      },
+      {
+        "question": "Which programs open the TIF?",
+        "answer": "Preview on a Mac, Windows Photos, GIMP and Adobe Photoshop open TIFF files. ImageMagick reads and writes them as well."
+      }
+    ]
+  },
+  "jpg-to-jfif": {
+    "seo": {
+      "title": "Convert JPG to JFIF: Save a Photo as .jfif",
+      "h1": "JPG to JFIF Converter",
+      "description": "Convert JPG to JFIF in your browser. The .jfif file holds ordinary JPEG data, saved again at quality 0.85. Free, no sign-up.",
+      "howToHeading": "How to convert JPG to JFIF"
+    },
+    "tool": {
+      "subtitle": "Re-save a JPG as a .jfif file, encoded in your browser with nothing uploaded."
+    },
+    "aboutSection": {
+      "title": "JPG and JFIF",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A container convention for JPEG-compressed images that specifies color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+        "details": [
+          "lossy JPEG compression",
+          "no alpha transparency",
+          "readable as a regular JPEG"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPG to JFIF",
+      "points": [
+        "A .jfif file holds ordinary JPEG image data, so the result opens like a .jpg.",
+        "The picture is decoded and saved again at quality 0.85, which is a new lossy pass.",
+        "JPEG data cannot store transparency.",
+        "EXIF, XMP and the ICC profile are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and JFIF files",
+      "markdown": "### What is a JPG file?\n\nBegan in 1986, JPEG was the work of the Joint Photographic Experts Group committee. ISO/IEC 10918-1 followed in 1994, after ITU-T T.81 in 1992. Each color channel takes 8 bits, and no alpha channel exists. The .jpg and .jpeg extensions name one and the same format, and digital cameras and scanners build it in. Inside, baseline JPEG splits the picture into 8x8 pixel blocks and compresses them lossily.\n\n### Programs that open JPG files\n\n- **Windows, Linux and Mac:** GIMP imports JPEG for editing, while ImageMagick can read JPG.\n- **Web and Mobile:** Chrome is a JPG viewer on both web and mobile; Firefox covers the web and Safari covers mobile.\n\n### JPG and JFIF compared\n\nJFIF (JPEG File Interchange Format) is a minimal wrapper that lets JPEG data move between programs and platforms, and it pins down the color space and pixel aspect ratio. JFIF began with C-Cube Microsystems' Eric Hamilton; version 1.02 is from 1992, and it was approved as ITU-T T.871 in May 2011. A JFIF file begins with the JPEG start-of-image marker and then an APP0 segment labeled JFIF. Most files people call JPEGs are JFIF files, so anything that opens a regular JPEG reads one.\n\nThe extensions .jpg, .jpeg, .jpe, .jfi, .jfif and .jif are all allowed for JFIF files, sharing the media type image/jpeg. Some browsers and Windows tools save pictures under the .jfif name.\n\nYour browser decodes the JPG into 8-bit pixels and saves a new JPEG named .jfif, at quality 0.85. This is a second lossy pass, and camera tags, XMP and the color profile are not kept.\n\n### Other ways to convert JPG to JFIF\n\n- **Pillow:** call `Image.open(\"input.jpg\").save(\"output.jfif\", format=\"JPEG\")`. Pillow writes standard and progressive JFIF files.\n- **ImageMagick:** run `magick input.jpg output.jfif`. Its JPEG format, listed as read and write, is described as the JFIF format.\n- **libjpeg-turbo:** run `djpeg -outfile pixels.ppm input.jpg`, then `cjpeg -outfile output.jfif pixels.ppm`.\n\n### Problems with JPG files\n\n- Progressive JPEG is refused by some older photo frames, so export without it for such a target.\n- Editors do not map one quality number to the same compression or appearance.\n- Transparency cannot survive JPEG export; pick a format with alpha instead.\n- Any editable layer stack is gone in a JPEG, so retain the project file."
+    },
+    "faqs": [
+      {
+        "question": "How do I get a JFIF file from a JPG?",
+        "answer": "Pick the JPG and your browser decodes it, then saves it again as a JPEG named .jfif for download. Nothing is uploaded. Add more files and they are done one by one, each saved as its own .jfif."
+      },
+      {
+        "question": "Is a JFIF different from a JPG?",
+        "answer": "Mostly in name. JFIF is a convention for laying out JPEG data, and a .jfif file carries the same media type, image/jpeg, as any JPG."
+      },
+      {
+        "question": "Does the picture lose quality?",
+        "answer": "Yes. It is decoded and encoded afresh at quality 0.85 rather than renamed, so the lossy step runs again. Keep your original JPG."
+      },
+      {
+        "question": "Why would I want a .jfif file?",
+        "answer": "A program or form may list .jfif by name, and converting gives you the extension it asks for. The JPG is re-encoded on the way."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "No. JPEG data cannot represent alpha transparency, so the .jfif file has none."
+      },
+      {
+        "question": "Is metadata kept?",
+        "answer": "No. EXIF, XMP and the ICC profile are dropped, because the image goes through raw pixels."
+      },
+      {
+        "question": "Can I just rename the file?",
+        "answer": "Often yes, because a .jfif file contains ordinary JPEG data. Renaming keeps the exact bytes, while converting here re-encodes, so rename first and convert only if a program still refuses it."
+      },
+      {
+        "question": "Which programs open a .jfif file?",
+        "answer": "Any web browser, Windows Photos and GIMP open .jfif files. ImageMagick reads them with its JPEG reader."
+      }
+    ]
+  },
+  "jpg-to-jxl": {
+    "seo": {
+      "title": "Convert JPG to JXL: Photo to JPEG XL",
+      "h1": "JPG to JXL Converter",
+      "description": "Convert JPG to JXL in your browser. ImageMagick encodes the decoded pixels as a lossy JPEG XL file. Free, with no sign-up.",
+      "howToHeading": "How to convert JPG to JXL"
+    },
+    "tool": {
+      "subtitle": "Encode a JPG as a JPEG XL file with ImageMagick, right in your browser."
+    },
+    "aboutSection": {
+      "title": "JPG and JPEG XL",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG XL",
+        "fullName": "JPEG XL image",
+        "description": "An image format standardized as ISO/IEC 18181 by the Joint Photographic Experts Group. It supports lossy and lossless compression and can losslessly recompress existing JPEG files.",
+        "details": [
+          "lossy and lossless compression",
+          "lossless JPEG recompression",
+          "alpha transparency",
+          "animation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPG to JPEG XL",
+      "points": [
+        "The JPG is decoded to 8-bit pixels and encoded as a lossy JXL; it is not a bit-exact recompression.",
+        "The page has no quality or lossless setting.",
+        "EXIF, XMP and the ICC profile are not copied.",
+        "Safari, GIMP, XnView MP and IrfanView open JXL files."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and JPEG XL files",
+      "markdown": "### What is a JPG file?\n\nJPG, or JPEG, is the lossy photo format from the Joint Photographic Experts Group; work started in 1986, and its US patents lapsed on 27 October 2006. The baseline method, covered by ITU-T T.81 (1992) and ISO/IEC 10918-1 (1994), cuts the image into 8x8 pixel blocks and applies a discrete cosine transform and Huffman coding to each. A typical setting leaves 1/10 to 1/20 of the uncompressed size. Each channel holds 8 bits, there is no alpha, and .jpg and .jpeg mean the same thing. Cameras and scanners write it widely, and its media type is image/jpeg.\n\n### Programs that open JPG files\n\n- **Mac, Windows and Linux:** GIMP can import JPEG for editing, and ImageMagick opens JPG.\n- **Mobile and Web:** Chrome displays JPG on web and mobile, Safari does so on mobile, and Firefox on the web.\n\n### JPG and JXL compared\n\nJPEG XL comes from the JPEG committee as ISO/IEC 18181. It handles lossy and lossless coding, alpha channels, animation and progressive decoding, along with high bit depth, wide color gamuts and HDR. Existing JPEG files can be recompressed by it without any loss. A .jxl file is either a bare codestream or a box-based container, and its media type is image/jxl.\n\nThis page does not recompress losslessly. Your browser decodes the JPG to 8-bit RGBA pixels and ImageMagick encodes them as a lossy JXL with default settings. Pixel values change, and there is no quality control. Metadata is dropped.\n\n### Other ways to convert JPG to JXL\n\n- **cjxl:** run `cjxl input.jpg output.jxl`; by default it recompresses the JPEG losslessly.\n- **ImageMagick:** run `magick input.jpg converted.jxl`, which needs the JPEG XL delegate library.\n- **GIMP:** open the JPG, pick File > Export As, and save the result as a JPEG XL file. GIMP 2.10.34 added export, limited to 8-bit lossless.\n\n### Problems with JPG files\n\n- JPEG offers no alpha channel, so transparent pixels cannot survive an export to it.\n- An editable layer stack is not preserved in JPEG, so hold on to the project file.\n- Older photo frames may reject progressive JPEG; turn progressive mode off when you export for one."
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a JPG into a JXL file?",
+        "answer": "Pick the JPG; the browser decodes it and ImageMagick encodes a JXL for you to download. Nothing leaves your device. Add several JPGs and they are encoded one after the other, each into a separate JXL."
+      },
+      {
+        "question": "Is the JXL lossless?",
+        "answer": "No. The page encodes with ImageMagick's default settings, which produce a lossy file. Pixel values change, and the page has no lossless option."
+      },
+      {
+        "question": "Can JPEG XL recompress a JPEG without loss?",
+        "answer": "The format can, and cjxl does it by default, so the original JPEG can be rebuilt bit for bit. This page decodes the JPG first, so it does not."
+      },
+      {
+        "question": "Will the JXL be smaller than the JPG?",
+        "answer": "It can be, but the encode runs with default settings and no size target, so no size is promised. Compare the two files before you delete the original."
+      },
+      {
+        "question": "Are my camera details kept in the JXL?",
+        "answer": "No. Only 8-bit pixels pass through, so camera tags and color profiles are dropped. JPEG XL itself can store Exif, XMP and JUMBF metadata in its container."
+      },
+      {
+        "question": "Which programs and browsers open JXL?",
+        "answer": "Safari shows JPEG XL. GIMP imports it, and XnView MP and IrfanView open it. ImageMagick reads it when built with the JPEG XL library."
+      },
+      {
+        "question": "Does the JXL keep the picture's pixel size?",
+        "answer": "Yes. The JPG is decoded at its natural size and encoded at that same size, with no resizing in between."
+      },
+      {
+        "question": "Does it keep a bigger color range?",
+        "answer": "No. A JPG stores 8 bits per channel, and 8-bit RGBA is what this page passes along. JPEG XL supports high bit depth and HDR, but converting from a JPG cannot add them."
+      }
+    ]
+  }
+}

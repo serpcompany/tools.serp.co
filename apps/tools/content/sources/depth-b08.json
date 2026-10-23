@@ -1,0 +1,166 @@
+{
+  "tools": {
+    "mp4-to-av1": {
+      "methods": [
+        {
+          "app": "FFmpeg with SVT-AV1",
+          "steps": "ffmpeg -i camera.mp4 -an -c:v libsvtav1 -crf 35 -preset 8 -f ivf camera.av1",
+          "limits": "Requires an FFmpeg build with libsvtav1. A higher preset is faster and lower in quality.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "nef-to-tiff": {
+      "methods": [
+        {
+          "app": "Nikon NX Studio",
+          "steps": "Select the photograph; click Export; under Export as choose TIFF (8 Bit) or TIFF (16 Bit); LZW compression is optional; check the settings; Export.",
+          "limits": "Nikon's software writes the TIFF at the depth you choose.",
+          "source": "https://nikonimglib.com/nxstdo/onlinehelp/en/saving_pictures_in_other_formats_64.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick portrait.nef portrait.tiff",
+          "limits": "ImageMagick lists NEF among its readable formats.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "ogv-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i seminar.ogv -vn -c:a libmp3lame -b:a 192k seminar.mp3",
+          "limits": "The OGV needs a decodable sound track.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "png-to-ppm": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick diagram.png diagram.ppm",
+          "limits": "The output ending selects PPM; the formats list shows PNG and PPM as readable and writable.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Netpbm",
+          "steps": "pngtopam -mix -background=white diagram.png > diagram.ppm",
+          "limits": "A grayscale PNG yields PGM and a black-and-white one PBM, so check the header.",
+          "source": "https://netpbm.sourceforge.net/doc/pngtopam.html"
+        }
+      ]
+    },
+    "wav-to-wma": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i rehearsal.wav -c:a wmav2 -b:a 192k rehearsal.wma",
+          "limits": "Writes lossy WMA version 2 and needs an encoder in your build.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Open the WAV; File > Export Audio; choose WMA (version 2) Files (FFmpeg) as the format.",
+          "limits": "Needs the FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/wma_export_options.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        }
+      ]
+    },
+    "webm-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i browser.webm -map 0 -c copy wrapped.mkv",
+          "limits": "Matroska must accept each mapped stream; nothing is re-encoded.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "xlsx-to-png": {
+      "methods": [
+        {
+          "app": "LibreOffice Calc",
+          "steps": "doc = CreateScriptService(\"Calc\"); doc.ExportRangeToFile(\"Sheet1.A1:F20\", \"/tmp/range.png\", \"png\")",
+          "limits": "Needs the workbook open and the ScriptForge runtime; hidden rows and columns are not exported.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/sbasic/shared/03/sf_calc.html",
+          "supportSources": [
+            "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          ]
+        },
+        {
+          "app": "Numbers and Preview",
+          "steps": "Open the workbook in Numbers; File > Export To > PDF; open the PDF in Preview; File > Export; choose PNG.",
+          "limits": "Numbers opens .xlsx; the PDF opens in Preview, which exports PNG.",
+          "source": "https://support.apple.com/guide/numbers/export-to-excel-or-another-file-format-tan3b922d4ad/mac",
+          "supportSources": [
+            "https://support.apple.com/guide/numbers/open-or-close-spreadsheets-tan753033f43/mac",
+            "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+          ]
+        }
+      ]
+    },
+    "aiff-to-flac": {
+      "methods": [
+        {
+          "app": "Xiph flac",
+          "steps": "flac session.aiff",
+          "limits": "Reads linear PCM AIFF of 4 to 32 bits per sample; A-law and mu-law are not accepted.",
+          "source": "https://xiph.org/flac/documentation_tools_flac.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i take.aiff -c:a flac take.flac",
+          "limits": "Check the decoded sample format for unusual source encodings.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Open the AIFF; File > Export Audio; choose FLAC; set 16-bit or 24-bit and a level from 0 to 8.",
+          "limits": "Project processing and mixing affect the exported sound.",
+          "source": "https://manual.audacityteam.org/man/flac_export_options.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        }
+      ]
+    },
+    "bmp-to-tiff": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick drawing.bmp drawing.tiff",
+          "limits": "The ending of the output name selects TIFF.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "cr2-to-tiff": {
+      "methods": [
+        {
+          "app": "Canon Digital Photo Professional",
+          "steps": "Select the CR2; File > Convert and save; choose TIFF as the image type; set the destination; save.",
+          "limits": "Applies the raw development recipe; the camera must be supported.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-04_EditImage_0170.html",
+          "supportSources": [
+            "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick cr2:exposure.cr2 exposure.tiff",
+          "limits": "CR2 needs the explicit cr2: specifier.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    }
+  }
+}

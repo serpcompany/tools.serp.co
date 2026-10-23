@@ -1,0 +1,340 @@
+{
+  "tools": {
+    "dot-to-png": {
+      "methods": [
+        {
+          "app": "Graphviz",
+          "steps": "Run dot -Tpng input.dot -o diagram.png.",
+          "limits": "Needs Graphviz installed.",
+          "source": "https://graphviz.org/doc/info/command.html"
+        },
+        {
+          "app": "PyGraphviz",
+          "steps": "Import pygraphviz as pgv; g = pgv.AGraph(\"input.dot\"); g.draw(\"diagram.png\", format=\"png\", prog=\"dot\").",
+          "limits": "Draws through Graphviz's layout programs, here dot.",
+          "source": "https://pygraphviz.github.io/documentation/stable/reference/agraph.html"
+        },
+        {
+          "app": "pydot",
+          "steps": "Import pydot; graphs = pydot.graph_from_dot_file(\"input.dot\"); graphs[0].write_png(\"diagram.png\").",
+          "limits": "Graphviz is installed separately. The example takes the first graph with graphs[0].",
+          "source": "https://github.com/pydot/pydot"
+        }
+      ]
+    },
+    "dst-to-png": {
+      "methods": [
+        {
+          "app": "Ink/Stitch and Inkscape",
+          "steps": "File > Open the DST in Inkscape with Ink/Stitch installed. The file opens in Manual Stitch Mode. Then File > Export PNG Image, choose Page, Drawing, Selection or Custom, set the size in pixels, and click Export.",
+          "limits": "The result is a preview of the stitch paths, not a sewing file.",
+          "source": "https://inkstitch.org/docs/import-export/",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "formatSource": "https://inkstitch.org/docs/file-formats/"
+        },
+        {
+          "app": "pyembroidery",
+          "steps": "Import pyembroidery; pattern = pyembroidery.read(\"input.dst\"); pyembroidery.write(pattern, \"preview.png\").",
+          "limits": "A library, not a viewer. Embroidery software shows the real stitches and thread colors.",
+          "source": "https://github.com/EmbroidePy/pyembroidery"
+        }
+      ]
+    },
+    "gif-to-cur": {
+      "methods": [
+        {
+          "app": "RealWorld Cursor Editor",
+          "steps": "Use the quick-conversion wizard on the GIF to make a cursor.",
+          "limits": "The page says the editor makes cursors from GIF images.",
+          "source": "https://www.rw-designer.com/cursor-maker"
+        },
+        {
+          "app": "Axialis CursorWorkshop",
+          "steps": "File > Open the GIF; select the area; Image > Create Static Cursor from Selection; OK in the New Cursor From Image dialog; Draw > Set Cursor Hot Spot, then click the new location.",
+          "limits": "Reducing the color count can leave jagged borders and dithering.",
+          "source": "https://www.axialis.com/tutorials/create-a-static-cursor-from-a-gif-image.html"
+        },
+        {
+          "app": "IcoFX",
+          "steps": "File > Open imports a GIF as an image; Image > Create Cursor From Image; File > Save As, where cursor images are saved as Windows cursor files.",
+          "limits": "Pages name no CUR extension in the Save As steps.",
+          "source": "https://icofx.ro/help3/main.html",
+          "inputSource": "https://icofx.ro/help3/open.html"
+        }
+      ]
+    },
+    "gif-to-tiff": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick \"input.gif[0]\" still.tiff.",
+          "limits": "Index 0 is the first image in the file.",
+          "source": "https://usage.imagemagick.org/files/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Import Image from PIL; Image.open(\"input.gif\").save(\"still.tiff\"). Call seek on the open image to move to a later frame.",
+          "limits": "save picks the format from the file extension; seek counts frames from 0.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Open the GIF; File > Export As and choose TIFF; pick a compression in the TIFF export dialog.",
+          "limits": "Compression choices: None, LZW, Pack Bits, Deflate, JPEG.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-tiff-export.html"
+        }
+      ]
+    },
+    "gif-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.gif -an output.wmv.",
+          "limits": "The output format is guessed from the file extension; -an leaves audio out.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "html-to-webp": {
+      "methods": [
+        {
+          "app": "Chrome DevTools and cwebp",
+          "steps": "In Chrome DevTools open the Device Toolbar, choose More options, then Capture full size screenshot. Run cwebp screenshot.png -o page.webp on the saved image.",
+          "limits": "cwebp accepts PNG, JPEG, TIFF, WebP or raw Y'CbCr input.",
+          "source": "https://developer.chrome.com/docs/devtools/device-mode",
+          "encoderSource": "https://developers.google.com/speed/webp/docs/cwebp"
+        },
+        {
+          "app": "Playwright and Pillow",
+          "steps": "With a Playwright page showing your document, call page.screenshot(path=\"page.png\", full_page=True). Then use Image.open(\"page.png\").save(\"page.webp\") with Pillow.",
+          "limits": "Pillow reads and writes WebP; save picks the format from the file extension.",
+          "source": "https://playwright.dev/python/docs/screenshots",
+          "encoderSource": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "apiSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "Chrome DevTools and GIMP",
+          "steps": "In Chrome DevTools open the Device Toolbar, choose More options, then Capture full size screenshot. Open the screenshot in GIMP, then File > Export As, pick WebP and tick Lossless if you want no quality loss.",
+          "limits": "The GIMP WebP dialog's Lossless checkbox turns off the quality and alpha quality settings.",
+          "source": "https://developer.chrome.com/docs/devtools/device-mode",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-webp-export.html",
+          "exportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        }
+      ]
+    },
+    "jif-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jif compatible.jpeg.",
+          "limits": "Run locally on the sample JIF: it wrote a JPEG of the same pixel size.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "From PIL import Image; Image.open(\"input.jif\").save(\"compatible.jpeg\").",
+          "limits": "Pillow's JPEG quality defaults to 75; the save re-encodes. Run locally on the sample JIF, it wrote a JPEG.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Open the JIF; File > Export As, give the file a .jpeg name and click Export; set the JPEG options in the export dialog.",
+          "limits": "The export dialog offers Quality, Progressive and other options.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "jpeg-to-tif": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the JPEG, File > Export, Format > TIFF, then Save.",
+          "limits": "Preview lists TIFF among its export formats.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the photograph; File > Export As, export as TIFF; choose the Compression in the TIFF export dialog.",
+          "limits": "The dialog offers None, LZW, Pack Bits, Deflate, JPEG and CCITT fax modes; JPEG is lossy.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-tiff-export.html"
+        },
+        {
+          "app": "Pillow",
+          "steps": "From PIL import Image; Image.open(\"input.jpeg\").save(\"delivery.tif\", compression=\"tiff_lzw\").",
+          "limits": "Compression needs libtiff; without it Pillow reads and writes only uncompressed TIFF files.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "jpg-to-jfif": {
+      "methods": [
+        {
+          "app": "Pillow",
+          "steps": "From PIL import Image; Image.open(\"input.jpg\").save(\"output.jfif\", format=\"JPEG\").",
+          "limits": "Pillow writes standard and progressive JFIF files. The save re-encodes the pixels.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg output.jfif.",
+          "limits": "The JPEG format is listed as read and write, described as the JFIF format. The pixels are encoded again.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "libjpeg-turbo djpeg/cjpeg",
+          "steps": "Run djpeg -outfile pixels.ppm input.jpg, then cjpeg -outfile output.jfif pixels.ppm.",
+          "limits": "djpeg writes PPM by default and cjpeg reads PPM; the JPEG files are in the de facto standard JFIF format. Decoding and encoding again is a new lossy pass.",
+          "source": "https://raw.githubusercontent.com/libjpeg-turbo/libjpeg-turbo/main/doc/usage.txt"
+        }
+      ]
+    },
+    "jpg-to-jxl": {
+      "methods": [
+        {
+          "app": "libjxl cjxl",
+          "steps": "Run cjxl input.jpg output.jxl.",
+          "limits": "cjxl compresses JPEG input losslessly by default, so the original JPEG can be rebuilt bit for bit; this page does not do that.",
+          "source": "https://github.com/libjxl/libjxl/blob/main/doc/man/cjxl.txt"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg converted.jxl.",
+          "limits": "Needs the JPEG XL delegate library. This encodes the decoded pixels.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG; File > Export As, and save it as a JPEG XL file.",
+          "limits": "GIMP 2.10.34 added export, limited to 8-bit lossless.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://www.gimp.org/news/2023/02/27/gimp-2-10-34-released/",
+          "currentSupportSource": "https://developer.gimp.org/core/standards/images/"
+        }
+      ]
+    }
+  },
+  "supportingFormatFacts": {
+    "dot": [
+      {
+        "fact": "DOT is Graphviz graph text. Node/edge syntax and graph attributes determine layout inputs. Word templates are a distinct extension collision.",
+        "source": "https://graphviz.org/doc/info/lang.html"
+      }
+    ],
+    "dst": [
+      {
+        "fact": "Ink/Stitch imports machine formats in Manual Stitch Mode, and its supported format list includes Tajima DST.",
+        "source": "https://inkstitch.org/docs/import-export/",
+        "supportSource": "https://inkstitch.org/docs/file-formats/"
+      },
+      {
+        "fact": "Pyembroidery reads DST and writes PNG; default thread-color information requires care.",
+        "source": "https://github.com/EmbroidePy/pyembroidery"
+      }
+    ],
+    "gif": [
+      {
+        "fact": "GIF uses color tables, optional transparent palette indexes and graphic-control timing/disposal information. It does not provide an audio soundtrack.",
+        "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+      }
+    ],
+    "png": [
+      {
+        "fact": "PNG encodes losslessly compressed pixels, with alpha support; media type image/png.",
+        "source": "https://www.w3.org/TR/png/"
+      }
+    ],
+    "cur": [
+      {
+        "fact": "Cursor hotspot identifies the click coordinate; static cursor creation differs from ANI animation.",
+        "source": "https://www.axialis.com/tutorials/create-a-static-cursor-from-a-gif-image.html",
+        "supportSource": "https://www.axialis.com/tutorials/what-is-a-cursor.html"
+      }
+    ],
+    "tiff": [
+      {
+        "fact": "TIFF supports multiple image representations and compression variants; TIF is a short extension; media type image/tiff.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+      }
+    ],
+    "wmv": [
+      {
+        "fact": "WMV commonly uses Windows Media video within ASF; video/x-ms-wmv is a conventional media label, not a guarantee of codec compatibility.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml",
+        "supportSource": "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format"
+      }
+    ],
+    "html": [
+      {
+        "fact": "HTML describes document semantics and can refer to separate resource files; WHATWG maintains the Living Standard.",
+        "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+      },
+      {
+        "fact": "VS Code provides HTML source editing.",
+        "source": "https://code.visualstudio.com/docs/languages/html"
+      },
+      {
+        "fact": "Firefox documents opening local files with its platform-specific Open File shortcut.",
+        "source": "https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly"
+      }
+    ],
+    "jpg": [
+      {
+        "fact": "JPEG photo encoding usually trades information for compactness and cannot recover lost detail through re-export. JPEG export has no alpha or native editing layers.",
+        "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+      }
+    ],
+    "jif": [
+      {
+        "fact": "Available coordinator-02 formats-F08.json sheet marks JIF as sameAs JPG. Rare suffix input must still contain valid JPEG data; historical JIF layout/date claims omitted.",
+        "source": "https://imagemagick.org/formats/"
+      }
+    ],
+    "jfif": [
+      {
+        "fact": "JFIF specifies a minimal JPEG interchange structure, including color interpretation and pixel density.",
+        "source": "https://www.w3.org/Graphics/JPEG/jfif3.pdf"
+      },
+      {
+        "fact": "Pillow exposes JFIF marker information and writes standard/progressive JFIF.",
+        "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+      }
+    ],
+    "jxl": [
+      {
+        "fact": "JPEG XL is standardized in ISO/IEC18181 and supports lossless/lossy coding and specialized reversible recompression of JPEG.",
+        "source": "https://jpeg.org/jpegxl/",
+        "supportSource": "https://github.com/libjxl/libjxl/blob/main/doc/man/cjxl.txt"
+      },
+      {
+        "fact": "The registered JPEG XL media type is image/jxl.",
+        "source": "https://www.iana.org/assignments/media-types/image/jxl"
+      }
+    ],
+    "programs": [
+      {
+        "fact": "Browser GIF/JPEG support extends to common desktop and mobile browser platforms; a file picker can impose extra suffix restrictions.",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+      },
+      {
+        "fact": "Preview documents image conversion and an animated-GIF frame view.",
+        "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+      },
+      {
+        "fact": "GIMP reads common raster pictures and exports through format-specific dialogs.",
+        "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+      }
+    ]
+  },
+  "researchNotes": {
+    "wikiDirectory": "/Users/devin/Documents/Codex/2026-10-22/can-x20/work/coordinator-05/worker-c/wiki-b11",
+    "alternativeCommandsExecuted": false,
+    "date": "2026-10-22"
+  }
+}
