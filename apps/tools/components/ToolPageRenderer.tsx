@@ -59,6 +59,7 @@ export function ToolPageRenderer({ toolId }: ToolPageRendererProps) {
       infoArticle={
         pairNotes ? pairNotesArticle(pairNotes) : (content?.infoArticle ?? buildInfoArticleSection(tool))
       }
+      guide={content?.guide}
       faqs={content ? content.faqs : buildConverterFaqs(tool)}
       aboutSection={content?.aboutSection}
       relatedTools={content?.relatedTools}

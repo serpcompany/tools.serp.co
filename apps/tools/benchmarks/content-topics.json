@@ -1,0 +1,2125 @@
+{
+  "source": "Ahrefs Content Helper topics (US, 2026-10-21/22); word counts from each ranking page's static HTML, without script, style, nav, header and footer (2026-10-22). Static HTML undercounts JavaScript-rendered pages.",
+  "country": "us",
+  "tools": {
+    "avif-to-jpg": {
+      "keyword": "avif to jpg",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "How to Convert AVIF to JPG",
+          "description": "Step-by-step: select AVIF images, convert, download JPG in seconds; follow-up tools to resize JPEG or convert JPG to WebP; third-party tools for large libraries.",
+          "avgScore": 76,
+          "pagesCovering": 8,
+          "ourScore": 100
+        },
+        {
+          "topic": "What Is the JPG Format",
+          "description": "What JPG is: lossy 10:1 to 20:1 compression from the Joint Photographic Experts Group, wide use because of its compression, compared with PNG (lossless) and WebP/AVIF (efficient, adjustable).",
+          "avgScore": 71,
+          "pagesCovering": 8,
+          "ourScore": 100
+        },
+        {
+          "topic": "What Is the AVIF Format",
+          "description": "What AVIF is: AV1 Image File Format from the Alliance for Open Media (2019), much smaller than JPG at equal quality, supports transparency, used by sites like Unsplash for thumbnails.",
+          "avgScore": 64,
+          "pagesCovering": 7,
+          "ourScore": 89
+        },
+        {
+          "topic": "Converting AVIF to JPG on Specific Platforms",
+          "description": "Platform specifics: AVIF opens natively in current browsers, Windows 11 Photos and macOS Preview, yet other apps and social sites need JPG or PNG; in-browser conversion using local resources; Windows 11 forum questions.",
+          "avgScore": 59,
+          "pagesCovering": 7,
+          "ourScore": 37
+        },
+        {
+          "topic": "Batch Conversion of AVIF to JPG",
+          "description": "Converting many AVIF files in one pass: drag in several, keep per-image quality settings, convert to JPG, PNG or WebP, and handle thousands of product photos exported from a web image pipeline.",
+          "avgScore": 58,
+          "pagesCovering": 7,
+          "ourScore": 75
+        },
+        {
+          "topic": "Why Convert AVIF to JPG",
+          "description": "Reasons to convert: older software and email clients cannot read AVIF, compatibility with browsers, apps, operating systems and social media; AVIF compared with HEIC and WebP; JPG's lossy artifacts as a trade-off.",
+          "avgScore": 55,
+          "pagesCovering": 6,
+          "ourScore": 89
+        },
+        {
+          "topic": "Image Quality During Conversion",
+          "description": "Whether quality drops: output format and compression settings decide it, JPG at quality 92 in sRGB for client sharing, keep the AVIF for lossless archive, automatic format optimisation services.",
+          "avgScore": 44,
+          "pagesCovering": 6,
+          "ourScore": 89
+        },
+        {
+          "topic": "Programmatic AVIF to JPG Conversion via API",
+          "description": "Developer route: APIs and real-time media transformation services for converting AVIF to JPG programmatically in automated pipelines.",
+          "avgScore": 24,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "Safety and Security of Online Converters",
+          "description": "Is online conversion safe: files processed inside the browser rather than uploaded, no server-side exposure, privacy and supported-format notes.",
+          "avgScore": 21,
+          "pagesCovering": 3,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/avif-to-jpg",
+          "position": 1,
+          "words": 171
+        },
+        {
+          "url": "https://www.freeconvert.com/avif-to-jpg",
+          "position": 2,
+          "words": 1651
+        },
+        {
+          "url": "https://avif2jpg.com/",
+          "position": 3,
+          "words": 985
+        },
+        {
+          "url": "https://techcommunity.microsoft.com/discussions/windows11/how-do-i-convert-an-avif-file-to-jpg-on-windows-11-pc/4204703",
+          "position": 4,
+          "words": 236
+        },
+        {
+          "url": "https://cloudinary.com/tools/avif-to-jpg",
+          "position": 5,
+          "words": 1849
+        },
+        {
+          "url": "https://jpg.now/avif-to-jpg",
+          "position": 6,
+          "words": 1500
+        },
+        {
+          "url": "https://ezgif.com/avif-to-jpg",
+          "position": 8,
+          "error": "under 150 words (112)"
+        },
+        {
+          "url": "https://imagekit.io/format-converter/avif-to-jpg/",
+          "position": 9,
+          "words": 347
+        },
+        {
+          "url": "https://www.duplichecker.com/avif-to-jpg.php",
+          "position": 10,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://convertio.co/avif-jpeg/",
+          "position": 11,
+          "words": 1163
+        }
+      ],
+      "targetWords": 1074
+    },
+    "avif-to-png": {
+      "keyword": "avif to png",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "What Is the AVIF Format",
+          "description": "AVIF stores AV1-compressed images in a HEIF container, specified in 2019 by the Alliance for Open Media; far smaller than JPEG or WebP, with alpha, animation, HDR and wide colour; every major browser shows it, older software may not.",
+          "avgScore": 75,
+          "pagesCovering": 8,
+          "ourScore": 89
+        },
+        {
+          "topic": "What Is the PNG Format",
+          "description": "Lossless raster format from 1996 with full alpha transparency, indexed and 16-bit colour modes, universal support in browsers and editors, good for logos, screenshots and graphics, at the price of larger files for photos.",
+          "avgScore": 67,
+          "pagesCovering": 7,
+          "ourScore": 97
+        },
+        {
+          "topic": "How to Convert AVIF to PNG",
+          "description": "Drop in or select AVIF files, choose PNG as output, convert in the browser and download one file or a ZIP; works on phones, tablets and desktops without installs; optional quality settings.",
+          "avgScore": 67,
+          "pagesCovering": 7,
+          "ourScore": 100
+        },
+        {
+          "topic": "Why Convert AVIF to PNG",
+          "description": "Older apps and email clients cannot read AVIF, PNG keeps transparency and full pixel fidelity, and it survives repeated edits without generation loss.",
+          "avgScore": 35,
+          "pagesCovering": 4,
+          "ourScore": 90
+        },
+        {
+          "topic": "Batch and API-Based Conversion",
+          "description": "Converting many AVIF files in one go in the browser, plus developer routes: hosted APIs and URL-based transformations that automate format conversion at scale.",
+          "avgScore": 28,
+          "pagesCovering": 5,
+          "ourScore": 66
+        },
+        {
+          "topic": "Handling Animated AVIF Files",
+          "description": "Animated AVIF sequences can become APNG so frames and timing survive, which needs a server-side mode in some tools; otherwise only a single frame is kept.",
+          "avgScore": 17,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Privacy and Security of Online Converters",
+          "description": "Whether images are uploaded or processed locally in the browser, how soon uploads are discarded, and the terms attached to uploading.",
+          "avgScore": 10,
+          "pagesCovering": 3,
+          "ourScore": 63
+        },
+        {
+          "topic": "File Size Limits and Usage Restrictions",
+          "description": "Upload ceilings such as 10 MB per image, daily caps, watermarks, and the fact that PNG outputs run larger than AVIF.",
+          "avgScore": 9,
+          "pagesCovering": 3,
+          "ourScore": 64
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/avif-to-png",
+          "position": 1,
+          "words": 172
+        },
+        {
+          "url": "https://www.freeconvert.com/avif-to-png",
+          "position": 2,
+          "words": 1690
+        },
+        {
+          "url": "https://cloudinary.com/tools/avif-to-png",
+          "position": 3,
+          "words": 1863
+        },
+        {
+          "url": "https://ezgif.com/avif-to-png",
+          "position": 4,
+          "error": "under 150 words (82)"
+        },
+        {
+          "url": "https://convertio.co/avif-png/",
+          "position": 6,
+          "words": 1167
+        },
+        {
+          "url": "https://image.online-convert.com/convert/avif-to-png",
+          "position": 7,
+          "words": 520
+        },
+        {
+          "url": "https://fcconvert.com/avif-to-png",
+          "position": 8,
+          "words": 2042
+        },
+        {
+          "url": "https://flipperfile.com/image/avif-png/",
+          "position": 10,
+          "error": "curl error 92"
+        },
+        {
+          "url": "https://imagekit.io/format-converter/avif-to-png/",
+          "position": 11,
+          "words": 347
+        }
+      ],
+      "targetWords": 1167
+    },
+    "compress-jpeg": {
+      "keyword": "compress jpeg",
+      "serpDate": "2026-10-15",
+      "topics": [
+        {
+          "topic": "Compressing JPEGs in Photoshop",
+          "description": "Desktop route: Photoshop Save As to shrink a JPG while keeping resolution; browser alternatives such as an Adobe Express compressor add-on with a 100-to-0 percent slider, supporting JPEG, PNG, BMP, GIF, WebP; compressing as the last editing step; MozJPEG.",
+          "avgScore": 57,
+          "pagesCovering": 6,
+          "ourScore": 87
+        },
+        {
+          "topic": "Methods to Reduce JPG File Size",
+          "description": "Compression, resizing to the platform's pixel limits, metadata removal, target size in KB or MB, lossless and progressive modes, chroma subsampling 4:2:0; typical 200-300 KB for email and social; JPG and JPEG being the same format.",
+          "avgScore": 48,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "Benefits of Compressing JPEG Images",
+          "description": "Faster pages, easier upload and send, storage and bandwidth savings, aim under 200 KB for web, banners under 1 MB, product photos around 500-600 KB; softer results at strong compression.",
+          "avgScore": 44,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "Troubleshooting JPEG Compression Issues",
+          "description": "Files still large because of resolution, texture and noise; resize first; blur from repeated saves; email size limits; JPEG recompresses on every save.",
+          "avgScore": 43,
+          "pagesCovering": 5,
+          "ourScore": 63
+        },
+        {
+          "topic": "Batch JPEG Compression",
+          "description": "Upload many JPEGs in one go, mixed sizes and both .jpg and .jpeg extensions, one shared target size or proportional reduction, preset sizes (20, 50, 100, 200 KB), 8x8 block mechanics.",
+          "avgScore": 40,
+          "pagesCovering": 5,
+          "ourScore": 78
+        },
+        {
+          "topic": "How to Compress a JPEG Online",
+          "description": "Drag in images or import from Drive, Google Photos, Dropbox or a URL; choose a mode; download copies individually or all at once; works in mobile browsers; no account.",
+          "avgScore": 38,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "How JPEG Compression Works",
+          "description": "Lossy compression removing data the eye rarely notices, MozJPEG encoder, analysis-driven encoding, three compression modes from better quality to smaller size.",
+          "avgScore": 38,
+          "pagesCovering": 4,
+          "ourScore": 100
+        },
+        {
+          "topic": "Balancing Quality and File Size",
+          "description": "Quality 75 to 85 without visible loss, compare step by step from lighter to stronger compression, pick the smallest file that still looks good, slider and target-size options.",
+          "avgScore": 36,
+          "pagesCovering": 5,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://compressjpeg.com/",
+          "position": 1,
+          "words": 518
+        },
+        {
+          "url": "https://tinyjpg.com/",
+          "position": 2,
+          "words": 355
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/image/compress/jpg",
+          "position": 3,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.iloveimg.com/compress-image/compress-jpg",
+          "position": 5,
+          "error": "under 150 words (86)"
+        },
+        {
+          "url": "https://www.freeconvert.com/compress-jpeg",
+          "position": 6,
+          "words": 1271
+        },
+        {
+          "url": "https://smallpdf.com/blog/jpg-size-reducer",
+          "position": 7,
+          "words": 1699
+        },
+        {
+          "url": "https://imageresizer.com/compress-jpeg",
+          "position": 8,
+          "words": 515
+        },
+        {
+          "url": "https://watermarkly.com/compress-jpeg/",
+          "position": 10,
+          "words": 1414
+        }
+      ],
+      "targetWords": 894
+    },
+    "compress-jpg": {
+      "keyword": "compress jpg",
+      "serpDate": "2026-10-16",
+      "topics": [
+        {
+          "topic": "Compressing JPG to a Specific File Size (KB)",
+          "description": "Hitting an upload limit: type a target such as 15 KB or 50 KB, a quality slider, 200 KB as a web target, example reductions for phone and DSLR photos, caps on batch size and file size, resizing when still too big.",
+          "avgScore": 53,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "Batch JPG Compression",
+          "description": "Compress many JPGs together (drag up to 20, fine-tune per thumbnail, save all), upload multiple in one session, APIs for automatic optimisation, and avoiding recompressing the same file.",
+          "avgScore": 52,
+          "pagesCovering": 6,
+          "ourScore": 75
+        },
+        {
+          "topic": "Common Situations Where Smaller JPGs Help",
+          "description": "Faster page loads, product photos and catalogs, email attachment limits, easier sharing, lower storage and bandwidth cost, auto-selected best format for each device.",
+          "avgScore": 51,
+          "pagesCovering": 6,
+          "ourScore": 93
+        },
+        {
+          "topic": "How to Compress a JPG Online",
+          "description": "Upload or drag in a JPG, choose compression level or advanced settings, compress and download; mobile browser use; export back to JPG; adding a compressor add-on in an editor.",
+          "avgScore": 49,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "Methods to Reduce JPG File Size",
+          "description": "Three levers: compression, resizing (images wider than about 2000 px), and stripping metadata; lossless and progressive options, chroma subsampling, typical 40 to 80 percent savings, converting format.",
+          "avgScore": 47,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "How JPEG Compression Works",
+          "description": "Lossy compression discards detail the eye misses; MozJPEG encoder giving 5 to 15 percent better results; each re-save compresses again; analysis-based encoders; 10:1 to 20:1 ratios.",
+          "avgScore": 41,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "Image Quality vs. File Size Trade-off",
+          "description": "Quality 75 to 85 usually looks unchanged; 60 to 80 percent reductions without visible loss; 8x8 block transforms; slider with live size readout; before/after comparison; dimensions, detail and metadata drive size.",
+          "avgScore": 35,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "Troubleshooting JPG Compression Issues",
+          "description": "Fixes when the file is still too large (second pass, resize first) or blurry (already-compressed source, small text or logos better as PNG), and repeated-save warnings.",
+          "avgScore": 17,
+          "pagesCovering": 2,
+          "ourScore": 64
+        },
+        {
+          "topic": "Why Some JPG Files Are Still Large",
+          "description": "High camera resolution, rich texture and colour detail, and embedded metadata keep files heavy even though JPG is compressed.",
+          "avgScore": 16,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Data Security When Using Online Compressors",
+          "description": "TLS encryption in transit, protection during processing, advice to download and avoid sharing links for sensitive images.",
+          "avgScore": 10,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://compressjpeg.com/",
+          "position": 1,
+          "words": 518
+        },
+        {
+          "url": "https://www.iloveimg.com/compress-image/compress-jpg",
+          "position": 2,
+          "error": "under 150 words (86)"
+        },
+        {
+          "url": "https://tinyjpg.com/",
+          "position": 4,
+          "words": 355
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/image/compress/jpg",
+          "position": 5,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://cloudconvert.com/compress-jpg",
+          "position": 6,
+          "error": "under 150 words (112)"
+        },
+        {
+          "url": "https://image.pi7.org/jpg-to-kb",
+          "position": 7,
+          "words": 168
+        },
+        {
+          "url": "https://smallpdf.com/blog/jpg-size-reducer",
+          "position": 8,
+          "words": 1699
+        },
+        {
+          "url": "https://www.freeconvert.com/compress-jpeg",
+          "position": 9,
+          "words": 1271
+        },
+        {
+          "url": "https://cloudinary.com/tools/compress-jpg",
+          "position": 10,
+          "words": 1745
+        }
+      ],
+      "targetWords": 894
+    },
+    "heic-to-jpg": {
+      "keyword": "heic to jpg",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "Platform-Specific Conversion Methods",
+          "description": "Per-platform routes: Windows (Zoner Photo Studio, Photos app), Mac Preview, iPhone settings, Android HEIC support, online converters from Adobe; forum questions about Windows 10.",
+          "avgScore": 62,
+          "pagesCovering": 8,
+          "ourScore": 83
+        },
+        {
+          "topic": "Understanding HEIC vs. JPG Formats",
+          "description": "What HEIC is: Apple's variant of HEIF adopted with iOS 11 in 2017, up to 50 percent smaller than JPG, not supported everywhere; upload limits such as 2 GB.",
+          "avgScore": 62,
+          "pagesCovering": 7,
+          "ourScore": 92
+        },
+        {
+          "topic": "Free Online Conversion Tools",
+          "description": "Free browser converters needing no account or install; extras such as resize, crop and compress JPEG (up to 80 percent smaller), sharing iPhone photos as JPG.",
+          "avgScore": 60,
+          "pagesCovering": 7,
+          "ourScore": 48
+        },
+        {
+          "topic": "How to Convert HEIC to JPG",
+          "description": "Drag in HEIC files, press convert, download JPG; fast conversion of iPhone images, what HEIF/HEIC and HEVC-encoded images are.",
+          "avgScore": 57,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "Using JPG Files After Conversion",
+          "description": "Using the finished JPG: universal compatibility, print and digital design use, why JPG compression made it so widely used compared with MPEG-developed HEIF (2013).",
+          "avgScore": 51,
+          "pagesCovering": 8,
+          "ourScore": 86
+        },
+        {
+          "topic": "Batch Conversion of Multiple Files",
+          "description": "Converting many HEIC photos at once: whole folders, hundreds of trip photos, multi-image HEIF containers, and how HEIF/JPG differ in device support.",
+          "avgScore": 48,
+          "pagesCovering": 6,
+          "ourScore": 85
+        },
+        {
+          "topic": "Maintaining Image Quality During Conversion",
+          "description": "Keeping sharpness through conversion; JPG is lossy so some detail loss is unavoidable, compression keeps web images small.",
+          "avgScore": 41,
+          "pagesCovering": 5,
+          "ourScore": 76
+        },
+        {
+          "topic": "File Security and Privacy",
+          "description": "Privacy when uploading personal photos: what happens to files after conversion, with built-in Photos and Preview apps and bulk shortcuts as offline alternatives.",
+          "avgScore": 11,
+          "pagesCovering": 2,
+          "ourScore": 61
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://heictojpg.com/",
+          "position": 1,
+          "words": 270
+        },
+        {
+          "url": "https://www.freeconvert.com/heic-to-jpg",
+          "position": 2,
+          "words": 1719
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/image/convert/heic-to-jpg",
+          "position": 4,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://cloudconvert.com/heic-to-jpg",
+          "position": 5,
+          "words": 166
+        },
+        {
+          "url": "https://techcommunity.microsoft.com/discussions/windows10space/how-do-i-convert-heic-files-to-jpegs-in-windows/4508209",
+          "position": 7,
+          "words": 220
+        },
+        {
+          "url": "https://www.canva.com/features/heic-to-jpg-converter/",
+          "position": 8,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://jpg.now/heic-to-jpg",
+          "position": 10,
+          "words": 1747
+        },
+        {
+          "url": "https://www.iloveimg.com/convert-to-jpg/heic-to-jpg",
+          "position": 11,
+          "error": "under 150 words (114)"
+        },
+        {
+          "url": "https://discussions.apple.com/thread/254778762",
+          "position": 12,
+          "error": "under 150 words (57)"
+        }
+      ],
+      "targetWords": 270
+    },
+    "image-to-pdf": {
+      "keyword": "image to pdf",
+      "serpDate": "2026-10-21",
+      "topics": [
+        {
+          "topic": "How to Convert Images to PDF",
+          "description": "Upload by drag and drop, adjust settings, download the PDF; which input formats are accepted (JPG, PNG, HEIC, GIF, BMP, TIFF, WebP, AVIF), iPhone HEIC photos, no watermark, quality kept, browser vs cloud conversion.",
+          "avgScore": 51,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "Combining Multiple Images into One PDF",
+          "description": "Add many images and merge them into a single PDF; drag-and-drop reordering of thumbnails, one page per image, batch uploads, versus one-image-at-a-time tools.",
+          "avgScore": 43,
+          "pagesCovering": 5,
+          "ourScore": 96
+        },
+        {
+          "topic": "Browser-Based & Cross-Device Accessibility",
+          "description": "Runs in the browser with nothing to install, no account, works on Windows, Mac, Linux, phones and tablets.",
+          "avgScore": 37,
+          "pagesCovering": 4,
+          "ourScore": 69
+        },
+        {
+          "topic": "Sharing & Storing PDF Files",
+          "description": "PDF is an open format that opens on any device, is easy to email and attach, compresses and saves storage, keeps image detail, and suits archiving notes and records.",
+          "avgScore": 35,
+          "pagesCovering": 5,
+          "ourScore": 27
+        },
+        {
+          "topic": "File Security & Cloud-Based Processing",
+          "description": "How uploads are handled: TLS encryption, automatic deletion of files after about an hour, server region, cloud servers doing the conversion; privacy of the images.",
+          "avgScore": 23,
+          "pagesCovering": 3,
+          "ourScore": 34
+        },
+        {
+          "topic": "Page Size, Orientation & Quality Settings",
+          "description": "Output options: A4, Letter or auto-fit page size, portrait or landscape, margin choices (none, small, large), keeping image resolution.",
+          "avgScore": 20,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Common Use Cases for Image-to-PDF Conversion",
+          "description": "Practical uses: legal evidence and chat-log screenshots, application and visa materials, ID and medical records, archiving reference posts, lecture or meeting note photos, HR paperwork.",
+          "avgScore": 17,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Additional Editing & Modification Tools",
+          "description": "Extra tools offered next to conversion: photo editing, filters, stickers and captions, crop and rotate, then PDF compress, merge or encrypt without re-uploading.",
+          "avgScore": 11,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://acrobat.adobe.com/tools/jpg-to-pdf",
+          "position": 1,
+          "words": 1330
+        },
+        {
+          "url": "https://www.ilovepdf.com/jpg_to_pdf",
+          "position": 2,
+          "error": "under 150 words (104)"
+        },
+        {
+          "url": "https://smallpdf.com/jpg-to-pdf",
+          "position": 3,
+          "words": 576
+        },
+        {
+          "url": "https://www.dpdf.com/images-to-pdf",
+          "position": 5,
+          "words": 723
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.vidmar.pti&hl=en_US",
+          "position": 6,
+          "words": 724
+        },
+        {
+          "url": "https://www.drawboard.com/tools/convert-jpg-to-pdf",
+          "position": 7,
+          "words": 640
+        },
+        {
+          "url": "https://www.camscanner.com/jpg-to-pdf",
+          "position": 8,
+          "words": 1111
+        },
+        {
+          "url": "https://www.canva.com/features/jpg-to-pdf-converter/",
+          "position": 9,
+          "error": "under 150 words (37)"
+        }
+      ],
+      "targetWords": 723
+    },
+    "jfif-to-jpg": {
+      "keyword": "jfif to jpg",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "How to Convert JFIF to JPG",
+          "description": "Three-step flow of upload, pick JPG, download; conversion finishing in seconds; using the output afterwards for compression, resizing or WebP; opening the converted file in any viewer.",
+          "avgScore": 57,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "Understanding JFIF and JPG File Formats",
+          "description": "JFIF is a thin wrapper around JPEG data (a header marker, resolution and colour info), nearly every JPEG is effectively JFIF, the extensions are interchangeable, Windows sometimes saves as JFIF, and which programs open each.",
+          "avgScore": 45,
+          "pagesCovering": 5,
+          "ourScore": 97
+        },
+        {
+          "topic": "Features of Online JFIF to JPG Converters",
+          "description": "No installs or plugins, free use, simple interface, fast processing, drag-to-reorder, quality preserved, plus the broad compatibility that makes JPG the safe target.",
+          "avgScore": 41,
+          "pagesCovering": 5,
+          "ourScore": 74
+        },
+        {
+          "topic": "Batch Conversion of JFIF to JPG",
+          "description": "Dropping several JFIF files in at once and converting them in one session, then downloading everything together.",
+          "avgScore": 40,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "Who Can Benefit from JFIF to JPG Conversion",
+          "description": "Photographers, students, designers, office workers and developers who receive browser-saved or scanned JFIF files and need a format that every app and upload form accepts.",
+          "avgScore": 25,
+          "pagesCovering": 4,
+          "ourScore": 70
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/jfif-to-jpg",
+          "position": 1,
+          "words": 158
+        },
+        {
+          "url": "https://www.freeconvert.com/jfif-to-jpg",
+          "position": 2,
+          "words": 1645
+        },
+        {
+          "url": "https://convertio.co/jfif-jpg/",
+          "position": 4,
+          "words": 1196
+        },
+        {
+          "url": "https://www.fotor.com/convert/jfif-to-jpg/",
+          "position": 8,
+          "words": 1357
+        },
+        {
+          "url": "https://image.online-convert.com/convert/jfif-to-jpg",
+          "position": 9,
+          "words": 492
+        },
+        {
+          "url": "https://www.jpgconverters.com/jfif-to-jpg",
+          "position": 11,
+          "words": 760
+        },
+        {
+          "url": "https://imageresizer.com/jfif-to-jpg",
+          "position": 12,
+          "words": 708
+        }
+      ],
+      "targetWords": 760
+    },
+    "jpeg-to-jpg": {
+      "keyword": "jpeg to jpg",
+      "serpDate": "2026-10-21",
+      "topics": [
+        {
+          "topic": "Online JPEG to JPG Converter Tools",
+          "description": "Hub-style sites that convert, resize and compress JPG and support PNG, GIF, BMP, TIFF, SVG, WebP; lossless output, fast processing, local re-export in the browser, size-range targets such as 20 KB to 50 KB for government forms.",
+          "avgScore": 58,
+          "pagesCovering": 6,
+          "ourScore": 26
+        },
+        {
+          "topic": "How to Convert JPEG to JPG",
+          "description": "Upload, choose JPG as output, press convert, download; PNG also accepted; browser-local conversion; the resulting file is a real JPEG with a .jpg name.",
+          "avgScore": 50,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "When to Convert JPEG to JPG",
+          "description": "Upload portals that insist on the .jpg extension, the reverse need for .jpeg, and why PNG-to-JPG saves size.",
+          "avgScore": 25,
+          "pagesCovering": 3,
+          "ourScore": 76
+        },
+        {
+          "topic": "Batch Conversion of JPEG Files",
+          "description": "Converting many files at once (up to 50 in some tools), previewing and removing files from the queue, bulk conversion that runs entirely on the device.",
+          "avgScore": 19,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "File Privacy and Security During Conversion",
+          "description": "Secure processing, HTTPS/SSL and encryption, uploads removed from servers within about two hours, versus files that never leave the browser.",
+          "avgScore": 18,
+          "pagesCovering": 3,
+          "ourScore": 46
+        },
+        {
+          "topic": "JPEG vs JPG: Key Differences",
+          "description": "Same format, different extension: .jpg survives from systems limited to three-letter extensions; converting only re-labels the same image data; some forms also check contents, dimensions or size.",
+          "avgScore": 13,
+          "pagesCovering": 2,
+          "ourScore": 98
+        },
+        {
+          "topic": "Frequently Asked Questions About JPEG to JPG Conversion",
+          "description": "Common questions: supported formats, account requirements, output quality, speed and number of files.",
+          "avgScore": 0,
+          "pagesCovering": 0,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://community.adobe.com/questions-716/how-to-convert-a-jpeg-to-a-jpg-file-1195844",
+          "position": 1,
+          "words": 654
+        },
+        {
+          "url": "https://www.jpgconverters.com/",
+          "position": 3,
+          "words": 402
+        },
+        {
+          "url": "https://www.iloveimg.com/jpg-to-image",
+          "position": 4,
+          "error": "under 150 words (128)"
+        },
+        {
+          "url": "https://bigconvert.11zon.com/en/jpg-to-jpeg/",
+          "position": 5,
+          "words": 685
+        },
+        {
+          "url": "https://web.reaconverter.com/convert-to-jpg/jpeg-to-jpg/",
+          "position": 6,
+          "words": 270
+        },
+        {
+          "url": "https://cloudconvert.com/jpeg-to-pdf",
+          "position": 7,
+          "words": 166
+        },
+        {
+          "url": "https://jpegtojpg.weebly.com/",
+          "position": 8,
+          "error": "HTTP 404"
+        },
+        {
+          "url": "https://lensup.ai/jpeg-to-jpg/",
+          "position": 9,
+          "words": 861
+        },
+        {
+          "url": "https://www.canva.com/features/jpg-to-png-converter/",
+          "position": 10,
+          "error": "under 150 words (37)"
+        }
+      ],
+      "targetWords": 528
+    },
+    "jpeg-to-pdf": {
+      "keyword": "jpeg to pdf",
+      "serpDate": "2026-10-20",
+      "topics": [
+        {
+          "topic": "How to Convert JPG to PDF",
+          "description": "Upload one or up to 20 JPG/JPEG files by drag and drop, preview and adjust settings, convert, download; also handles PNG, HEIC, GIF, BMP, TIFF; editing before saving, free and no watermark, phone methods.",
+          "avgScore": 72,
+          "pagesCovering": 7,
+          "ourScore": 100
+        },
+        {
+          "topic": "Combining Multiple Images into One PDF",
+          "description": "Why a PDF can hold unlimited pages while a JPG holds one image; upload limits (20 at a time), first image becomes page one, reorder before converting, download combined or separate PDFs, chaining batches with a PDF merger.",
+          "avgScore": 47,
+          "pagesCovering": 5,
+          "ourScore": 96
+        },
+        {
+          "topic": "Browser-Based & Cross-Device Compatibility",
+          "description": "Runs in the browser with no install, account or uploads in some tools; works on Mac, Windows, Linux, phones and tablets; cloud conversion uses no local CPU.",
+          "avgScore": 41,
+          "pagesCovering": 4,
+          "ourScore": 68
+        },
+        {
+          "topic": "Benefits of PDF Format for Sharing & Storage",
+          "description": "PDFs look the same on every device, are open-format and easy to email, keep image detail while saving storage, and offer digital or print output.",
+          "avgScore": 35,
+          "pagesCovering": 5,
+          "ourScore": 77
+        },
+        {
+          "topic": "Page Size, Orientation & Quality Settings",
+          "description": "Choose A4, Letter or auto-fit, portrait or landscape, margins (none, small, large), and output quality.",
+          "avgScore": 25,
+          "pagesCovering": 3,
+          "ourScore": 12
+        },
+        {
+          "topic": "Safety & Privacy of Online Conversion",
+          "description": "Is online conversion safe: TLS encryption, automatic file deletion after about an hour, local-only processing, password-protecting the PDF.",
+          "avgScore": 18,
+          "pagesCovering": 2,
+          "ourScore": 61
+        },
+        {
+          "topic": "Additional Document Editing Features",
+          "description": "Extras beside conversion: photo edits, filters, stickers, captions, crop and rotate, annotation and paid PDF editing plans.",
+          "avgScore": 10,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://acrobat.adobe.com/tools/jpg-to-pdf",
+          "position": 1,
+          "words": 1330
+        },
+        {
+          "url": "https://www.ilovepdf.com/jpg_to_pdf",
+          "position": 2,
+          "error": "under 150 words (104)"
+        },
+        {
+          "url": "https://smallpdf.com/jpg-to-pdf",
+          "position": 3,
+          "words": 576
+        },
+        {
+          "url": "https://jpg2pdf.com/",
+          "position": 4,
+          "words": 566
+        },
+        {
+          "url": "https://www.drawboard.com/tools/convert-jpg-to-pdf",
+          "position": 7,
+          "words": 640
+        },
+        {
+          "url": "https://tools.pdf24.org/en/jpg-to-pdf",
+          "position": 8,
+          "words": 611
+        },
+        {
+          "url": "https://www.canva.com/features/jpg-to-pdf-converter/",
+          "position": 9,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://www.dpdf.com/images-to-pdf",
+          "position": 10,
+          "words": 723
+        }
+      ],
+      "targetWords": 625
+    },
+    "jpg-to-png": {
+      "keyword": "jpg to png",
+      "serpDate": "2026-10-12",
+      "topics": [
+        {
+          "topic": "How to Convert JPG to PNG",
+          "description": "Choose or drag in JPG files (some tools cap at five at once), convert automatically, download singly or as a ZIP; transparent-PNG makers; multilingual iLoveIMG pages; no signup or watermark.",
+          "avgScore": 53,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "PNG Transparency and Background Removal",
+          "description": "JPG cannot hold transparency while PNG can; making logos, icons and product shots transparent, AI background removal, replacing backgrounds, social and marketing visuals.",
+          "avgScore": 33,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "JPG Format Overview",
+          "description": "JPEG/JPG as lossy compression from the Joint Photographic Experts Group; pros (small size, adjustable compression, wide support) and cons (data lost, quality degrades with each re-save, no transparency).",
+          "avgScore": 29,
+          "pagesCovering": 3,
+          "ourScore": 83
+        },
+        {
+          "topic": "Image Quality Comparison",
+          "description": "Lossless PNG keeps all detail and survives repeated edits, but files are larger than JPG; sharp text overlays stay crisp; converting does not restore detail JPG already lost; size settings in some tools.",
+          "avgScore": 29,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "PNG Format Overview",
+          "description": "PNG as lossless Portable Network Graphics: pros (quality, transparency, editing reuse) and cons (large files for photos).",
+          "avgScore": 16,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Privacy and Data Security",
+          "description": "How uploads are handled: SSL transfer to a server, automatic deletion after conversion, versus processing locally on the device.",
+          "avgScore": 14,
+          "pagesCovering": 3,
+          "ourScore": 63
+        },
+        {
+          "topic": "Why Convert JPG to PNG",
+          "description": "Motivations: preserving quality, needing transparency, or simply switching format.",
+          "avgScore": 12,
+          "pagesCovering": 2,
+          "ourScore": 94
+        },
+        {
+          "topic": "Typical Use Cases and Platform Compatibility",
+          "description": "JPG for web and cameras and social uploads; PNG for graphics and logos, which Facebook, Instagram and Twitter accept but often recompress to JPG.",
+          "avgScore": 10,
+          "pagesCovering": 1,
+          "ourScore": 79
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://www.simpleimageresizer.com/image-converter/jpg-to-png",
+          "position": 1,
+          "words": 1375
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.jpgtopng.converter&hl=en_US",
+          "position": 2,
+          "words": 487
+        },
+        {
+          "url": "https://www.pixelcut.ai/background-remover/png-maker",
+          "position": 4,
+          "words": 1086
+        },
+        {
+          "url": "https://fileflux.io/jpg-to-png",
+          "position": 5,
+          "words": 343
+        },
+        {
+          "url": "https://online2pdf.com/jpg-to-png",
+          "position": 6,
+          "words": 459
+        },
+        {
+          "url": "https://www.iloveimg.com/es/jpg-a-imagen/jpg-a-png",
+          "position": 7,
+          "error": "under 150 words (140)"
+        },
+        {
+          "url": "https://smallpngtools.com/convert-jpg-to-png.php",
+          "position": 8,
+          "words": 1867
+        },
+        {
+          "url": "https://asanconvert.com/convert/jpg-to-png",
+          "position": 9,
+          "words": 435
+        },
+        {
+          "url": "https://www.iloveimg.com/fr/jpg-en-image/jpg-en-png",
+          "position": 10,
+          "words": 151
+        }
+      ],
+      "targetWords": 473
+    },
+    "m4a-to-mp3": {
+      "keyword": "m4a to mp3",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "How to Convert M4A to MP3",
+          "description": "Upload or drag in the M4A, choose MP3, convert and download; alternatives using Apple Music or iTunes, VLC, ffmpeg, mobile apps and Windows; batch conversion and quick turnaround.",
+          "avgScore": 75,
+          "pagesCovering": 8,
+          "ourScore": 100
+        },
+        {
+          "topic": "What is an MP3 File?",
+          "description": "MP3 is a lossy audio format from the early 1990s, usually 128 to 320 kbps, small and playable on virtually every player, car stereo and phone.",
+          "avgScore": 51,
+          "pagesCovering": 7,
+          "ourScore": 80
+        },
+        {
+          "topic": "Why Convert M4A to MP3?",
+          "description": "Older Android phones, car stereos and some platforms do not play M4A, MP3 plays everywhere and suits email or websites, and sound stays close at a high enough bitrate.",
+          "avgScore": 49,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "What is an M4A File?",
+          "description": "An audio-only MPEG-4 container, usually AAC and sometimes Apple Lossless, introduced with iTunes downloads, and playable in iTunes, QuickTime, VLC and many other apps.",
+          "avgScore": 48,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "Conversion Settings and Audio Quality",
+          "description": "Choosing bitrate, sample rate and channels; 128 kbps for speech, 192 to 320 for music; both formats are lossy, so transcoding costs a little; keep the original as backup.",
+          "avgScore": 36,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "File Security During Conversion",
+          "description": "Whether files are uploaded, how long servers keep them, and the privacy of conversions that run locally in the browser.",
+          "avgScore": 21,
+          "pagesCovering": 4,
+          "ourScore": 62
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/m4a-to-mp3",
+          "position": 1,
+          "words": 164
+        },
+        {
+          "url": "https://www.freeconvert.com/m4a-to-mp3",
+          "position": 2,
+          "words": 2071
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=grant.m4a.to.mp3&hl=en_US",
+          "position": 3,
+          "words": 946
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/audio/convert/m4a-to-mp3",
+          "position": 5,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://discussions.apple.com/thread/255514416",
+          "position": 6,
+          "error": "under 150 words (57)"
+        },
+        {
+          "url": "https://www.happyscribe.com/tools/convert-m4a-to-mp3",
+          "position": 7,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://techcommunity.microsoft.com/discussions/windows11/how-can-i-convert-m4a-to-mp3-on-my-windows-11-pc/4389746",
+          "position": 8,
+          "words": 249
+        },
+        {
+          "url": "https://convertio.co/m4a-mp3/",
+          "position": 9,
+          "words": 1510
+        },
+        {
+          "url": "https://soundandgo.com/en/m4a-to-mp3/",
+          "position": 11,
+          "words": 1658
+        }
+      ],
+      "targetWords": 1228
+    },
+    "mov-to-mp4": {
+      "keyword": "mov to mp4",
+      "serpDate": "2026-10-21",
+      "topics": [
+        {
+          "topic": "How to Convert MOV to MP4",
+          "description": "Step-by-step routes: upload, convert, preview and download in a web tool; the same flow on Windows, Mac and phones; built-in options such as saving from the Photos app; and the point that an MP4 and MOV can sometimes just be renamed.",
+          "avgScore": 61,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "Shareability and Compatibility of MP4",
+          "description": "MP4 plays on nearly every device, browser and social platform, while MOV is happiest on Apple gear; playback failures usually come from the codec inside the container, not the extension.",
+          "avgScore": 35,
+          "pagesCovering": 4,
+          "ourScore": 86
+        },
+        {
+          "topic": "Batch MOV to MP4 Conversion",
+          "description": "Converting several clips in one pass instead of one by one, aimed at people with large video libraries; mobile apps and online tools advertise multi-file queues.",
+          "avgScore": 35,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "Maintaining Quality During Conversion",
+          "description": "Whether MOV to MP4 loses quality: copying streams keeps full quality, adjustable quality settings, resolution kept intact, and modern processing making loss minor.",
+          "avgScore": 33,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "Platform-Specific Conversion Methods",
+          "description": "Differences by device: Mac, Windows, Android and iPhone, using QuickTime or VLC to open stubborn files, and web converters that behave the same on desktop and mobile.",
+          "avgScore": 28,
+          "pagesCovering": 5,
+          "ourScore": 10
+        },
+        {
+          "topic": "Video Editing Features During Conversion",
+          "description": "Trimming the clip, muting audio, adding captions or transitions, and choosing output quality or file size while converting; some tools double as full editors.",
+          "avgScore": 24,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "MOV vs MP4 Format Overview",
+          "description": "How the two containers differ: MOV is Apple's QuickTime format with atoms and tracks, MP4 is the MPEG-4 standard; compatibility, which players open which, and other file types that share the MOV extension.",
+          "avgScore": 22,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "File Size and Storage Optimization",
+          "description": "MP4 is typically easier to store and upload than MOV, upload limits on forms and sites, size caps on converters (such as 1 GB), and balancing resolution against file size.",
+          "avgScore": 17,
+          "pagesCovering": 2,
+          "ourScore": 70
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/mov-to-mp4",
+          "position": 1,
+          "words": 158
+        },
+        {
+          "url": "https://www.freeconvert.com/mov-to-mp4",
+          "position": 2,
+          "words": 2406
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/video/convert/mov-to-mp4",
+          "position": 3,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.canva.com/features/mov-to-mp4-converter/",
+          "position": 4,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://support.apple.com/en-us/120755",
+          "position": 6,
+          "words": 566
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=grant.mov.to.mp4&hl=en_US",
+          "position": 7,
+          "words": 660
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/answers/questions/3721658/how-do-i-convert-a-mov-file-to-mp4",
+          "position": 8,
+          "words": 898
+        },
+        {
+          "url": "https://tinywow.com/video/mov-to-mp4",
+          "position": 10,
+          "words": 736
+        }
+      ],
+      "targetWords": 698
+    },
+    "mp4-to-gif": {
+      "keyword": "mp4 to gif",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "How to Convert MP4 to GIF",
+          "description": "Upload an MP4 (or MOV, MPEG, MKV, WebM, AVI) from computer, phone or URL, trim, choose quality, convert and download; transparent video to transparent GIF; works the same on desktop and mobile; no screen recorder needed.",
+          "avgScore": 73,
+          "pagesCovering": 7,
+          "ourScore": 100
+        },
+        {
+          "topic": "GIF Size, Speed, and Quality Settings",
+          "description": "Controls for frame rate (8-15 fps typical), width and resolution presets (480p, 540p, 720p), loop count, playback speed, aspect ratio, file-size caps tied to duration, 256-colour palette optimisation and dithering, WebP as a smaller alternative.",
+          "avgScore": 62,
+          "pagesCovering": 8,
+          "ourScore": 89
+        },
+        {
+          "topic": "Trimming and Clipping Video Length",
+          "description": "Pick start and end times or drag handles, default of the first five seconds, duration limits that depend on frame rate, trimming beforehand in QuickTime or Photos, crop and resize afterwards.",
+          "avgScore": 47,
+          "pagesCovering": 5,
+          "ourScore": 61
+        },
+        {
+          "topic": "Frequently Asked Questions About MP4 to GIF",
+          "description": "Is it free, which video formats are supported, desktop and mobile use, GIF's universal support in email and older apps versus WebP, other converters (WebM, AVI, MOV, FLV, 3GP, MKV to GIF).",
+          "avgScore": 43,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "Enhancing GIFs with Effects and Editing Tools",
+          "description": "Post-conversion editing: filters, colour levels, captions and subtitles, graphics, crop, GIF maker from images, professional-quality palette technique.",
+          "avgScore": 41,
+          "pagesCovering": 5,
+          "ourScore": 17
+        },
+        {
+          "topic": "Use Cases and Who Uses MP4 to GIF",
+          "description": "Memes, reaction GIFs, social posts, product demos, how-to loops, silent autoplay in chats, docs, newsletters and emails.",
+          "avgScore": 24,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "API Access and Bulk Conversion",
+          "description": "APIs and custom integrations, running conversions from a dashboard, API or MCP client, bulk GIF creation inside an app.",
+          "avgScore": 12,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Data Security and Privacy",
+          "description": "How apps and services collect, share and delete user data when converting videos.",
+          "avgScore": 9,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/mp4-to-gif",
+          "position": 1,
+          "words": 168
+        },
+        {
+          "url": "https://ezgif.com/video-to-gif",
+          "position": 2,
+          "error": "under 150 words (107)"
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/video/convert/mp4-to-gif",
+          "position": 3,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.freeconvert.com/convert/mp4-to-gif",
+          "position": 4,
+          "words": 719
+        },
+        {
+          "url": "https://kommodo.ai/tools/video-to-gif",
+          "position": 5,
+          "words": 834
+        },
+        {
+          "url": "https://www.canva.com/features/mp4-to-gif-converter/",
+          "position": 7,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://vivideo.ai/tools/mp4-to-gif",
+          "position": 8,
+          "words": 974
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.enzodev.convertirmp4agif&hl=en_US",
+          "position": 9,
+          "words": 405
+        },
+        {
+          "url": "https://www.ffmpeg-micro.com/tools/mp4-to-gif",
+          "position": 10,
+          "words": 321
+        }
+      ],
+      "targetWords": 562
+    },
+    "pdf-to-png": {
+      "keyword": "pdf to png",
+      "serpDate": "2026-10-21",
+      "topics": [
+        {
+          "topic": "Conversion Process",
+          "description": "Upload or drag in a PDF, pick PNG, convert, download; multi-page PDFs give a ZIP of PNGs, protected PDFs need the password first, delete unwanted pages beforehand, desktop apps such as PDFgear as an alternative, PDF being a document and PNG an image.",
+          "avgScore": 62,
+          "pagesCovering": 6,
+          "ourScore": 100
+        },
+        {
+          "topic": "Additional Tools & Features",
+          "description": "Extras beside conversion: PDF editing, organizing, merging, compressing, flattening, annotation, 200+ supported formats, large-file limits, paid plans.",
+          "avgScore": 41,
+          "pagesCovering": 5,
+          "ourScore": 20
+        },
+        {
+          "topic": "Online & Cross-Platform Accessibility",
+          "description": "Works in any browser on Windows, Mac, iOS and Android; PDFs look identical everywhere while PNGs can be posted where PDFs cannot (social networks); some tools keep working offline after loading.",
+          "avgScore": 37,
+          "pagesCovering": 6,
+          "ourScore": 98
+        },
+        {
+          "topic": "Output Image Quality",
+          "description": "Lossless, sharp PNG output that keeps text, colour and layout; resolution questions; quality depends on the source PDF; check results before saving.",
+          "avgScore": 30,
+          "pagesCovering": 3,
+          "ourScore": 75
+        },
+        {
+          "topic": "Batch Conversion",
+          "description": "Each PDF page becomes its own PNG, so multi-page documents convert in one go; PNGs cannot hold several pages; transparent PNGs for logos and product shots.",
+          "avgScore": 28,
+          "pagesCovering": 3,
+          "ourScore": 73
+        },
+        {
+          "topic": "Free Use & Watermarks",
+          "description": "Whether the converter is free, free of hidden fees and watermark-free.",
+          "avgScore": 19,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "API & Developer Integration",
+          "description": "APIs for embedding PDF-to-PNG conversion into apps, and PNG transparency for layering design elements.",
+          "avgScore": 17,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "Conversion Speed & Ease of Use",
+          "description": "Fast, minimal-step conversion needing no technical skill; confirmation message when done.",
+          "avgScore": 10,
+          "pagesCovering": 3,
+          "ourScore": 64
+        },
+        {
+          "topic": "File Security & Privacy",
+          "description": "Secure processing and deletion of uploaded files from servers unless the user saves them to an account.",
+          "avgScore": 8,
+          "pagesCovering": 1,
+          "ourScore": 21
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://pdf2png.com/",
+          "position": 1,
+          "words": 548
+        },
+        {
+          "url": "https://www.adobe.com/acrobat/online/pdf-to-png.html",
+          "position": 2,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.drawboard.com/tools/convert-pdf-to-png",
+          "position": 3,
+          "words": 661
+        },
+        {
+          "url": "https://cloudconvert.com/pdf-to-png",
+          "position": 4,
+          "words": 179
+        },
+        {
+          "url": "https://www.canva.com/features/pdf-to-png-converter/",
+          "position": 5,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://smallpdf.com/pdf-to-png",
+          "position": 6,
+          "words": 677
+        },
+        {
+          "url": "https://apps.microsoft.com/detail/9np56ft9j0fp?hl=en-US&gl=US",
+          "position": 9,
+          "error": "under 150 words (15)"
+        }
+      ],
+      "targetWords": 604
+    },
+    "png-to-jpg": {
+      "keyword": "png to jpg",
+      "serpDate": "2026-10-21",
+      "topics": [
+        {
+          "topic": "How to Convert PNG to JPG",
+          "description": "Step-by-step process, online or with dedicated software.",
+          "avgScore": 58,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "Understanding JPG Files",
+          "description": "What JPG files are, how they work, how they differ from other formats (JPG vs JPEG naming, Joint Photographic Experts Group, compatibility, programs that open them).",
+          "avgScore": 57,
+          "pagesCovering": 6,
+          "ourScore": 77
+        },
+        {
+          "topic": "PNG vs JPG: Format Differences",
+          "description": "Lossless vs lossy, transparency, file size, which to use for photos vs screenshots/graphics with text.",
+          "avgScore": 47,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "Why Convert PNG to JPG",
+          "description": "Smaller files, storage, upload limits, compatibility; transparent areas get a solid background.",
+          "avgScore": 45,
+          "pagesCovering": 4,
+          "ourScore": 95
+        },
+        {
+          "topic": "Image Quality and Compression",
+          "description": "What JPG compression discards, generation loss on re-save, keep the PNG original.",
+          "avgScore": 36,
+          "pagesCovering": 5,
+          "ourScore": 43
+        },
+        {
+          "topic": "Additional Image Editing Features",
+          "description": "Resizing, compressing, cropping after conversion.",
+          "avgScore": 29,
+          "pagesCovering": 3,
+          "ourScore": 48
+        },
+        {
+          "topic": "Converting PNG to JPG on Different Devices",
+          "description": "Desktop and phone; platform tools (default image viewers, GIMP, Photoshop, Apple Preview, Microsoft Photos).",
+          "avgScore": 16,
+          "pagesCovering": 2,
+          "ourScore": 14
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://png2jpg.com/",
+          "position": 1,
+          "words": 589
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/image/convert/png-to-jpg",
+          "position": 2,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.freeconvert.com/png-to-jpg",
+          "position": 3,
+          "words": 1843
+        },
+        {
+          "url": "https://cloudconvert.com/png-to-jpg",
+          "position": 4,
+          "words": 174
+        },
+        {
+          "url": "https://www.iloveimg.com/convert-to-jpg/png-to-jpg",
+          "position": 5,
+          "error": "under 150 words (115)"
+        },
+        {
+          "url": "https://www.canva.com/features/png-to-jpg-converter/",
+          "position": 6,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://imageresizer.com/png-to-jpg",
+          "position": 9,
+          "words": 729
+        }
+      ],
+      "targetWords": 659
+    },
+    "png-to-pdf": {
+      "keyword": "png to pdf",
+      "serpDate": "2026-10-16",
+      "topics": [
+        {
+          "topic": "How to Convert PNG to PDF",
+          "description": "Pick or drag in a PNG, convert, download; one image to one PDF, shorter drag-and-drop flows, watermark-free high-resolution output, merging afterwards, plus phone methods such as the iPhone Photos app and Share sheet.",
+          "avgScore": 75,
+          "pagesCovering": 7,
+          "ourScore": 100
+        },
+        {
+          "topic": "Online PNG to PDF Tools",
+          "description": "Free browser-based converters that need no software install, work in Edge, Chrome and Safari, and sit beside other PDF tools (merge, compress, protect, convert to Word).",
+          "avgScore": 50,
+          "pagesCovering": 5,
+          "ourScore": 100
+        },
+        {
+          "topic": "Batch and Multi-File Conversion",
+          "description": "Turning several PNGs into one multi-page PDF or into separate PDFs; upload caps (about 20 files), reordering pages, one-at-a-time tools, why one combined file is easier to review.",
+          "avgScore": 46,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "PNG vs. Other File Formats",
+          "description": "PNG lossless detail versus JPG small size versus PDF as a document container; JPG and JPEG being the same format; mixing PNG, JPG, GIF, BMP, TIFF and WebP in one conversion; when an image upload (Instagram) needs an image not a PDF.",
+          "avgScore": 46,
+          "pagesCovering": 5,
+          "ourScore": 82
+        },
+        {
+          "topic": "Cross-Platform Compatibility",
+          "description": "A PDF looks the same on phone, laptop, Mac and Windows; converters used from any browser or iPhone; wide format support.",
+          "avgScore": 37,
+          "pagesCovering": 6,
+          "ourScore": 83
+        },
+        {
+          "topic": "File Security and Privacy",
+          "description": "Encryption of uploads, a stated safe-and-secure answer, password protecting the resulting PDF.",
+          "avgScore": 18,
+          "pagesCovering": 2,
+          "ourScore": 0
+        },
+        {
+          "topic": "Advanced Features and API Access",
+          "description": "Developer API for custom integrations, adjustable quality and other conversion options.",
+          "avgScore": 8,
+          "pagesCovering": 1,
+          "ourScore": 0
+        },
+        {
+          "topic": "Conversion Quality and Output",
+          "description": "Keeping image quality in the PDF, avoiding blur, no watermark.",
+          "avgScore": 3,
+          "pagesCovering": 1,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://png2pdf.com/",
+          "position": 1,
+          "words": 560
+        },
+        {
+          "url": "https://www.adobe.com/acrobat/online/png-to-pdf.html",
+          "position": 2,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.drawboard.com/tools/convert-png-to-pdf",
+          "position": 3,
+          "words": 631
+        },
+        {
+          "url": "https://smallpdf.com/png-to-pdf",
+          "position": 5,
+          "words": 429
+        },
+        {
+          "url": "https://www.canva.com/features/png-to-pdf/",
+          "position": 6,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://cloudconvert.com/png-to-pdf",
+          "position": 7,
+          "words": 167
+        },
+        {
+          "url": "https://www.shutterstock.com/image-converter/png-to-pdf",
+          "position": 10,
+          "error": "HTTP 403"
+        }
+      ],
+      "targetWords": 494
+    },
+    "png-to-svg": {
+      "keyword": "png to svg",
+      "serpDate": "2026-10-12",
+      "topics": [
+        {
+          "topic": "Common Use Cases for PNG to SVG Conversion",
+          "description": "Turning logos, icons, illustrations and sketches into scalable artwork for print, web, cutting machines (Cricut, Silhouette), embroidery and CAD; also stylised vector versions of photos; opening results in Illustrator, Figma or Inkscape.",
+          "avgScore": 49,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "Supported Input and Output Formats",
+          "description": "Inputs commonly accepted: PNG, JPG, GIF, WebP, BMP, sometimes TIFF; outputs beyond SVG include EPS, PDF, DXF and AI; size limits stated in megabytes or pixels.",
+          "avgScore": 45,
+          "pagesCovering": 4,
+          "ourScore": 78
+        },
+        {
+          "topic": "Benefits of SVG for Design Work",
+          "description": "Scales from favicon to billboard without blur, stays editable path by path, keeps transparency, shrinks files for simple art, and works in browsers, design tools and print workflows.",
+          "avgScore": 37,
+          "pagesCovering": 4,
+          "ourScore": 79
+        },
+        {
+          "topic": "How to Convert PNG to SVG",
+          "description": "Upload the PNG, let the tool trace or vectorize it (about 10 seconds for AI tools), preview and download; manual tweaks possible in the same tool.",
+          "avgScore": 30,
+          "pagesCovering": 3,
+          "ourScore": 100
+        },
+        {
+          "topic": "Editing SVG Output After Conversion",
+          "description": "Result paths, shapes and fills can be adjusted afterwards: remove stray shapes, reconnect broken lines, recolor regions, set corner sharpness, or finish in a vector editor.",
+          "avgScore": 28,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "AI Vectorization vs Traditional Auto-Tracing",
+          "description": "Classic tracers (Potrace-style threshold tracing) follow pixel edges and often leave many anchor points; newer AI methods recognise shapes and produce fewer, cleaner curves and better colour matching.",
+          "avgScore": 25,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "PNG vs Other Raster Image Formats",
+          "description": "How PNG compares with JPG as the source: PNG for sharp graphics and text, JPG for photos and smaller files, and why both are pixel grids unlike vectors.",
+          "avgScore": 21,
+          "pagesCovering": 2,
+          "ourScore": 76
+        },
+        {
+          "topic": "Free Online Converter Features and Privacy",
+          "description": "Whether it is free, needs signup, adds watermarks or caps daily conversions, and whether images are uploaded to a server and when they are deleted.",
+          "avgScore": 17,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://www.recraft.ai/features/image-converter/png-to-svg",
+          "position": 1,
+          "words": 4764
+        },
+        {
+          "url": "https://www.shutterstock.com/image-converter/png-to-svg",
+          "position": 3,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://vectormagic.com/",
+          "position": 4,
+          "words": 1993
+        },
+        {
+          "url": "https://svgco.de/",
+          "position": 5,
+          "error": "under 150 words (17)"
+        },
+        {
+          "url": "https://www.svgai.org/convert/image-to-svg",
+          "position": 6,
+          "words": 1943
+        },
+        {
+          "url": "https://online.reaconverter.com/convert/png-to-svg",
+          "position": 7,
+          "words": 310
+        },
+        {
+          "url": "https://vectorizer.ai/",
+          "position": 8,
+          "words": 2348
+        },
+        {
+          "url": "https://cloudconvert.com/svg-converter",
+          "position": 9,
+          "words": 278
+        }
+      ],
+      "targetWords": 1968
+    },
+    "svg-to-png": {
+      "keyword": "svg to png",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "How to Convert SVG to PNG",
+          "description": "A walkthrough of the conversion: pick the SVG, run the converter, preview and download the PNG, with a short note on what each format is and why a simple tool is enough.",
+          "avgScore": 76,
+          "pagesCovering": 8,
+          "ourScore": 100
+        },
+        {
+          "topic": "When to Convert SVG to PNG",
+          "description": "Situations that call for PNG: platforms that reject SVG, blurry SVG rendering on some displays, icons and logos needing transparency, and re-exporting at any size later from the original.",
+          "avgScore": 51,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "SVG vs PNG: Key Differences",
+          "description": "Vector versus raster: SVG is XML built from nodes, lines and curves that scale endlessly and can animate; PNG is pixel-based, universally supported, and defaults to the SVG's viewBox size.",
+          "avgScore": 48,
+          "pagesCovering": 6,
+          "ourScore": 72
+        },
+        {
+          "topic": "Resolution and Quality Settings",
+          "description": "Controlling output sharpness: DPI and pixel dimensions, scale multipliers for larger exports, keeping detail in a high-resolution PNG, and how PNG aligns exactly to the pixel grid.",
+          "avgScore": 47,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "How SVG to PNG Converters Work",
+          "description": "What happens under the hood: SVG describes shapes with coordinates and drawing commands, browsers can render it natively, and simple converters often stumble on complex files, fonts and reused elements.",
+          "avgScore": 40,
+          "pagesCovering": 8,
+          "ourScore": 0
+        },
+        {
+          "topic": "Applications of SVG to PNG Conversion",
+          "description": "Where SVG to PNG pays off: sharing on social media, apps that cannot display SVG, fixed-size exports for web design and icons, and PNG's transparency for overlays.",
+          "avgScore": 39,
+          "pagesCovering": 5,
+          "ourScore": 75
+        },
+        {
+          "topic": "Batch Conversion of SVG Files",
+          "description": "Converting many SVGs at once: add the files, convert, then save each result or grab them all together; unlimited-batch tools and the practical gain in speed.",
+          "avgScore": 38,
+          "pagesCovering": 5,
+          "ourScore": 16
+        },
+        {
+          "topic": "Common Questions About SVG to PNG Conversion",
+          "description": "Quick answers readers look for: working offline, merging several SVGs into one PNG, converting raw SVG code, and putting text or annotations on the result.",
+          "avgScore": 18,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://svgtopng.com/",
+          "position": 1,
+          "words": 492
+        },
+        {
+          "url": "https://cloudconvert.com/svg-to-png",
+          "position": 2,
+          "words": 163
+        },
+        {
+          "url": "https://www.canva.com/features/svg-to-png-converter/",
+          "position": 3,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://vexlio.com/svg-to-png/",
+          "position": 4,
+          "words": 1423
+        },
+        {
+          "url": "https://www.freeconvert.com/svg-to-png",
+          "position": 5,
+          "words": 1745
+        },
+        {
+          "url": "https://www.svgviewer.dev/svg-to-png",
+          "position": 6,
+          "words": 281
+        },
+        {
+          "url": "https://techcommunity.microsoft.com/discussions/windows11/how-to-convert-svg-to-png-without-losing-quality/4211177",
+          "position": 7,
+          "words": 160
+        },
+        {
+          "url": "https://github.com/vincerubinetti/svg-to-png",
+          "position": 8,
+          "words": 640
+        },
+        {
+          "url": "https://chromewebstore.google.com/detail/convert-svg-to-png/leakpkiajhlppcdaamfakildcfkihoig?hl=en",
+          "position": 9,
+          "words": 1566
+        },
+        {
+          "url": "https://www.geeksforgeeks.org/utilities/svg-to-png-converter/",
+          "position": 10,
+          "words": 685
+        }
+      ],
+      "targetWords": 640
+    },
+    "video-to-gif": {
+      "keyword": "video to gif",
+      "serpDate": "2026-10-20",
+      "topics": [
+        {
+          "topic": "How to Convert Video to GIF",
+          "description": "Upload a clip, pick the start and length, optionally trim or resize, then export and download the GIF; works for MP4, MOV and WebM, from desktop or phone, in about a minute without installing software.",
+          "avgScore": 92,
+          "pagesCovering": 9,
+          "ourScore": 100
+        },
+        {
+          "topic": "Free Online GIF Maker Tools",
+          "description": "Browser-based makers that cost nothing and need no download, with no watermark, quality kept intact, and everything done from a single tab.",
+          "avgScore": 56,
+          "pagesCovering": 7,
+          "ourScore": 62
+        },
+        {
+          "topic": "Creating GIFs from YouTube Videos",
+          "description": "Paste a YouTube or Vimeo link instead of uploading a file, then cut the moment you want; pitched at memes, reaction clips and short demos.",
+          "avgScore": 47,
+          "pagesCovering": 6,
+          "ourScore": 0
+        },
+        {
+          "topic": "Editing and Customizing GIFs",
+          "description": "Trim, crop, rotate and loop; add captions, stickers, filters, branding and fonts; some tools double as full video editors with team collaboration.",
+          "avgScore": 43,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "Resizing GIFs for Social Media",
+          "description": "Preset aspect ratios and dimensions for Instagram, email and web embeds, smaller files that share easily, and direct export to social channels.",
+          "avgScore": 38,
+          "pagesCovering": 4,
+          "ourScore": 83
+        },
+        {
+          "topic": "Ease and Speed of Conversion",
+          "description": "One-click, fast rendering in the browser, short clips finishing in seconds, and the ability to keep working while it renders.",
+          "avgScore": 35,
+          "pagesCovering": 6,
+          "ourScore": 20
+        },
+        {
+          "topic": "Supported Video and GIF Formats",
+          "description": "Source files such as MP4, MOV, WebM, AVI, M4V, FLV and WMV, with GIF as the output.",
+          "avgScore": 31,
+          "pagesCovering": 3,
+          "ourScore": 98
+        },
+        {
+          "topic": "GIF Quality and File Size Control",
+          "description": "Frame rate, width and clip length decide how large a GIF gets; advice such as roughly 480 px wide at 10 to 15 fps; compression and resolution sliders.",
+          "avgScore": 22,
+          "pagesCovering": 3,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://www.kapwing.com/tools/convert/video-to-gif",
+          "position": 1,
+          "words": 1369
+        },
+        {
+          "url": "https://tools.gliacloud.com/video-to-gif/",
+          "position": 3,
+          "error": "under 150 words (13)"
+        },
+        {
+          "url": "https://flixier.com/tools/video-to-gif/youtube-gif-maker",
+          "position": 5,
+          "words": 1460
+        },
+        {
+          "url": "https://beecut.com/video-to-gif-online",
+          "position": 6,
+          "words": 610
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.impact.video_gif_maker_pro.video_gif_maker_pro&hl=en_US",
+          "position": 7,
+          "words": 414
+        },
+        {
+          "url": "https://www.moonb.io/tools/video-to-gif",
+          "position": 8,
+          "words": 473
+        },
+        {
+          "url": "https://vimeo.com/features/video-editor/gif-maker",
+          "position": 9,
+          "words": 1075
+        },
+        {
+          "url": "https://clipchamp.com/en/gif-maker/",
+          "position": 10,
+          "words": 595
+        }
+      ],
+      "targetWords": 610
+    },
+    "webp-to-jpg": {
+      "keyword": "webp to jpg",
+      "serpDate": "2026-10-19",
+      "topics": [
+        {
+          "topic": "How to Convert WebP to JPG",
+          "description": "Step-by-step: upload, convert, download; JPG compatibility for social uploads and email; animated WebP exported as a frame sequence.",
+          "avgScore": 70,
+          "pagesCovering": 8,
+          "ourScore": 100
+        },
+        {
+          "topic": "What Is WebP and Why Convert It",
+          "description": "What WebP is: Google's format, lossy and lossless, roughly 30 percent smaller than JPG/PNG, but not supported by every browser, viewer or email client.",
+          "avgScore": 70,
+          "pagesCovering": 8,
+          "ourScore": 84
+        },
+        {
+          "topic": "Opening and Using JPG Files",
+          "description": "What JPG is (JPEG, lossy 10:1 to 20:1 compression), why its small size suits the web, and uses such as social media and printed cards.",
+          "avgScore": 42,
+          "pagesCovering": 5,
+          "ourScore": 90
+        },
+        {
+          "topic": "Batch Conversion of Multiple Files",
+          "description": "Converting several WebP files at once: drag-and-drop batches, static and animated WebP, mobile browser use, bulk tools and software.",
+          "avgScore": 27,
+          "pagesCovering": 4,
+          "ourScore": 70
+        },
+        {
+          "topic": "Cost and Accessibility of Conversion Tools",
+          "description": "Whether conversion is free: no sign-up or watermark, adjustable quality options, why JPG is still needed for social media and print workflows.",
+          "avgScore": 23,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "Image Quality After Conversion",
+          "description": "Does conversion lower quality: JPG quality factor 0-100, background colour for transparent areas, lossy re-encoding and file size comparisons.",
+          "avgScore": 23,
+          "pagesCovering": 5,
+          "ourScore": 0
+        },
+        {
+          "topic": "API and Programmatic Conversion Options",
+          "description": "Developer angle: APIs (CloudConvert, Cloudinary) that automate or embed WebP-to-JPG conversion in an app or workflow.",
+          "avgScore": 15,
+          "pagesCovering": 3,
+          "ourScore": 0
+        },
+        {
+          "topic": "Features of Online Conversion Tools",
+          "description": "Tool feature notes: ease, speed, device support, no watermark, plus pointers to related tools such as WebP to PNG for transparency and a WebP compressor.",
+          "avgScore": 13,
+          "pagesCovering": 4,
+          "ourScore": 0
+        },
+        {
+          "topic": "Data Security and Privacy",
+          "description": "How uploaded images are handled: encryption, deletion, privacy of files during conversion.",
+          "avgScore": 4,
+          "pagesCovering": 2,
+          "ourScore": 0
+        }
+      ],
+      "competitors": [
+        {
+          "url": "https://cloudconvert.com/webp-to-jpg",
+          "position": 1,
+          "error": "under 150 words (143)"
+        },
+        {
+          "url": "https://ezgif.com/webp-to-jpg",
+          "position": 2,
+          "words": 153
+        },
+        {
+          "url": "https://www.freeconvert.com/webp-to-jpg",
+          "position": 3,
+          "words": 1745
+        },
+        {
+          "url": "https://www.iloveimg.com/convert-to-jpg/webp-to-jpg",
+          "position": 4,
+          "error": "under 150 words (114)"
+        },
+        {
+          "url": "https://techcommunity.microsoft.com/discussions/windowsinsiderprogram/how-do-you-convert-webp-to-jpg-on-mac-or-windows-11/4399430",
+          "position": 6,
+          "words": 285
+        },
+        {
+          "url": "https://www.adobe.com/express/feature/image/convert/webp-to-jpg",
+          "position": 8,
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.jpgconverters.com/webp-to-jpg",
+          "position": 9,
+          "words": 467
+        },
+        {
+          "url": "https://www.canva.com/features/webp-to-jpg-converter/",
+          "position": 10,
+          "error": "under 150 words (37)"
+        },
+        {
+          "url": "https://cloudinary.com/tools/webp-to-jpg",
+          "position": 12,
+          "words": 1887
+        }
+      ],
+      "targetWords": 467
+    }
+  }
+}

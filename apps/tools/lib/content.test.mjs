@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   applyBatch,
+  britishSpellings,
   checkContent,
   joinRegistry,
   loadContext,
@@ -342,7 +343,7 @@ test("content:apply keeps content a batch doesn't name", () => {
   const tools = catalog();
   tools[1].content = {
     tool: { title: "MP4 to MP3", subtitle: "Old.", from: "mp4", to: "mp3" },
-    howTo: { title: "How to", steps: [] },
+    howTo: { title: "How to convert MP4 to MP3", steps: ["Choose the MP4.", "Convert it.", "Save the MP3."] },
     relatedTools: [{ toolId: "compress-m4a", title: "M4A Compressor" }],
   };
   const { text, problems } = applyBatch(registryOf(tools), batchFor("mp4 audio"), noKeywords);
@@ -350,7 +351,7 @@ test("content:apply keeps content a batch doesn't name", () => {
   const content = JSON.parse(splitRegistry(text)[1]).content;
   assert.deepEqual(Object.keys(content), ["tool", "seo", "faqs", "aboutSection", "pairNotes", "howTo", "relatedTools"]);
   assert.equal(content.tool.subtitle, "A subtitle about mp4 audio.");
-  assert.deepEqual(content.howTo, { title: "How to", steps: [] });
+  assert.deepEqual(content.howTo, { title: "How to convert MP4 to MP3", steps: ["Choose the MP4.", "Convert it.", "Save the MP3."] });
 });
 
 test("content:apply refuses unknown, retired and non-converter Tools, and fields a page doesn't show", () => {
@@ -364,7 +365,7 @@ test("content:apply refuses unknown, retired and non-converter Tools, and fields
       "old-to-new": entry,
       "x-dl": entry,
       "csv-to-json": { seo: entry.seo, faqs: entry.faqs },
-      "mp4-to-mp3": { ...entry, tool: { title: "MP4 to MP3", accept: ".mp4" }, howTo: {} },
+      "mp4-to-mp3": { ...entry, tool: { title: "MP4 to MP3", accept: ".mp4" }, videoSection: {} },
     },
     noKeywords,
   );
@@ -375,7 +376,7 @@ test("content:apply refuses unknown, retired and non-converter Tools, and fields
     "old-to-new: the Tool is retired",
     "x-dl: not a converter or compressor (operation download)",
     "csv-to-json.faqs: this Tool's page doesn't show it (it shows seo)",
-    "mp4-to-mp3.howTo: not a batch field (seo, tool, faqs, aboutSection, pairNotes)",
+    "mp4-to-mp3.videoSection: not a batch field (seo, tool, faqs, aboutSection, pairNotes, howTo, guide)",
     "mp4-to-mp3.tool.title: a batch sets only tool.subtitle",
     "mp4-to-mp3.tool.accept: a batch sets only tool.subtitle",
   ]);
@@ -386,6 +387,99 @@ test("content:apply reports a batch that breaks a rule", () => {
   batch["mp4-to-mp3"].seo.description = "Too short.";
   const { problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
   assert.deepEqual(problems, ["mp4-to-mp3 [length] description is 10 characters, outside 110–160"]);
+});
+
+// A page written in depth: the catalog's first Tool with eight FAQs and a
+// guide with the five sections.
+const SECTIONS = [
+  "What is a WebP file?",
+  "Programs that open WebP files",
+  "WebP and PNG compared",
+  "Other ways to convert WebP to PNG",
+  "Problems with WebP files",
+];
+const WORDS = ["amber", "basalt", "cobalt", "dune", "ember", "fjord", "garnet", "harbor", "indigo", "jasper"];
+function deepCatalog() {
+  const tools = catalog();
+  const { content } = tools[0];
+  content.faqs = WORDS.slice(0, 8).map((word, index) => ({ question: `Question ${index}?`, answer: `The ${word} answer.` }));
+  content.guide = { title: "About WebP files", markdown: SECTIONS.map((heading) => `### ${heading}\n\nText with a color cache.`).join("\n\n") };
+  return tools;
+}
+
+test("a page with a guide has at least 8 FAQs and the guide's five sections in order, with no table", () => {
+  assert.deepEqual(checkContent(deepCatalog(), noKeywords), []);
+
+  const tools = deepCatalog();
+  tools[0].content.faqs.pop();
+  tools[0].content.guide.markdown = tools[0].content.guide.markdown
+    .replace("### WebP and PNG compared", "### Problems first")
+    .concat("\n\n| a | b |\n|---|---|\n| 1 | 2 |");
+  const messages = checkContent(tools, noKeywords).map((failure) => `[${failure.rule}] ${failure.message}`);
+  assert.equal(messages.length, 3);
+  assert.equal(messages[0], "[depth] content.faqs needs at least 8 questions on a page with a guide");
+  assert.match(messages[1], /^\[depth\] content\.guide needs these ### sections, in order: "What is a \{FROM\} file", .* it has "What is a WebP file", "Programs that open WebP files", "Problems first", /);
+  assert.equal(messages[2], "[depth] content.guide has a table; write a list instead");
+
+  const missing = deepCatalog();
+  missing[0].content.guide.markdown = "No sections at all.";
+  assert.match(checkContent(missing, noKeywords)[0].message, /it has none$/);
+});
+
+test("copy on a page with a guide is in US spelling", () => {
+  assert.deepEqual(
+    britishSpellings("Colour, greyscale, a licence, modelled, optimised, centre, behaviour; colors, gray, analysis and analyses").map(({ word }) => word),
+    ["Colour", "greyscale", "licence", "modelled", "centre", "behaviour", "optimised"],
+  );
+
+  const tools = deepCatalog();
+  tools[0].content.guide.markdown += "\n\nIn greyscale or colour.";
+  tools[0].content.pairNotes.points[0] = "A licence fee.";
+  assert.deepEqual(
+    checkContent(tools, noKeywords).map((failure) => `[${failure.rule}] ${failure.message}`),
+    [
+      '[spelling] content.pairNotes.points[0] spells "licence" the British way (US: license)',
+      '[spelling] content.guide.markdown spells "colour" the British way (US: color)',
+      '[spelling] content.guide.markdown spells "greyscale" the British way (US: gray)',
+    ],
+  );
+
+  // A page without a guide isn't held to it yet: older copy is rewritten batch by batch.
+  const older = catalog();
+  older[0].content.pairNotes.points[0] = "A licence fee.";
+  assert.deepEqual(checkContent(older, noKeywords), []);
+});
+
+test("a written How-to's title is a How-to heading, over at least three steps", () => {
+  const keywords = new Map([["webp-to-png", "webp to png"]]);
+  const tools = catalog();
+  tools[0].content.howTo = {
+    title: "How do I convert a WebP to a PNG?",
+    steps: ["Choose the WebP.", "Wait for the PNG.", "Save it."],
+  };
+  assert.deepEqual(checkContent(tools, { keywords }), []);
+
+  tools[0].content.howTo = { title: "How do I convert a WebP image?", steps: ["Choose it."] };
+  assert.deepEqual(checkContent(tools, { keywords }).map((failure) => failure.message), [
+    'How-to heading "How do I convert a WebP image?" lacks a word of the keyword "webp to png"',
+    "content.howTo needs at least 3 steps",
+  ]);
+});
+
+test("content:apply writes a batch's How-to and guide", () => {
+  const batch = batchFor("mp4 audio");
+  batch["mp4-to-mp3"].howTo = { title: "How to convert MP4 to MP3", steps: ["One.", "Two.", "Three."] };
+  batch["mp4-to-mp3"].faqs = WORDS.slice(0, 8).map((word, index) => ({ question: `Question ${index}?`, answer: `The ${word} answer.` }));
+  batch["mp4-to-mp3"].guide = {
+    title: "About MP4 and MP3",
+    markdown: ["What is an MP4 file?", "Programs that open MP4 files", "MP4 and MP3 compared", "Other ways to convert MP4 to MP3", "Problems with MP4 files"]
+      .map((heading) => `### ${heading}\n\nA container.`)
+      .join("\n\n"),
+  };
+  const { text, problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
+  assert.deepEqual(problems, []);
+  const written = JSON.parse(splitRegistry(text)[1]).content;
+  assert.deepEqual(Object.keys(written), ["tool", "seo", "faqs", "aboutSection", "pairNotes", "guide", "howTo"]);
 });
 
 test("content:apply writes a batch's How-to heading", () => {

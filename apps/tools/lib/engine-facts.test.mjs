@@ -20,7 +20,8 @@ import {
   mapQualityToVideoCrf,
 } from "./compression-utils.ts";
 import { MAX_VIDEO_FPS, MAX_VIDEO_SIZE, VIDEO_FILTER, buildCompressionCommand, buildConvertCommand } from "./convert/ffmpeg-args.ts";
-import { IMAGE_PDF_MAX_BYTES, IMAGE_PDF_MAX_IMAGES, IMAGE_PDF_MAX_PIXELS } from "./convert/image-pdf-inputs.ts";
+import { MAX_PAGE_SIDE, PHOTO_QUALITY } from "./convert/image-pdf.ts";
+import { IMAGE_PDF_INPUTS, IMAGE_PDF_MAX_BYTES, IMAGE_PDF_MAX_IMAGES, IMAGE_PDF_MAX_PIXELS } from "./convert/image-pdf-inputs.ts";
 import { MAX_RENDER_PIXELS } from "./convert/pdf.ts";
 import { SERVER_ACTION_RATE_LIMIT_WINDOW_MS } from "./server-action-contract.js";
 
@@ -78,7 +79,7 @@ test("the PNG compressor states its lossy main-thread fallback", () => {
   const colours = Math.max(16, Math.round(COMPRESS_QUALITY * 256));
   const { text: png } = factsOf("png-to-png");
   assert.match(png, /oxipng at level 1, which is lossless/);
-  assert.match(png, new RegExp(`falls back to the main thread .*compressPngOnMainThread.*at most ${colours} colours, which is lossy, and keeps only the first frame`));
+  assert.match(png, new RegExp(`falls back to the main thread .*compressPngOnMainThread.*at most ${colours} colors, which is lossy, and keeps only the first frame`));
 });
 
 test("the image compressor facts are the quality mappings' numbers", () => {
@@ -102,6 +103,11 @@ test("the PDF and image-to-PDF limits are their constants", () => {
       `Limits: ${IMAGE_PDF_MAX_IMAGES} images, ${IMAGE_PDF_MAX_BYTES / 1024 / 1024} MB in all, ${IMAGE_PDF_MAX_PIXELS / 1_000_000} megapixels per image`,
     ),
   );
+  assert.match(imagePdf, new RegExp(`a side over ${MAX_PAGE_SIDE.toLocaleString("en-US")} points \\(${MAX_PAGE_SIDE / 72} inches`));
+  assert.match(imagePdf, new RegExp(`as a JPEG at quality ${Math.round(PHOTO_QUALITY * 100)} `));
+  for (const format of ["jpg", "png", "gif", "webp", "bmp", "avif", "ico", "svg", "heic", "heif", "tiff", "psd", "dng"]) {
+    assert.ok(IMAGE_PDF_INPUTS.includes(format), `the facts say Image to PDF reads ${format}`);
+  }
 });
 
 test("the server's wait between conversions is the server-action cooldown", () => {
@@ -186,7 +192,7 @@ test("SVG input facts give the browser's size and no background, and leave anima
 });
 
 test("alpha and layer questions stay unsettled", () => {
-  assert.match(factsOf("png-to-jpg").unsettledText, /colour fills transparent areas in a JPG/);
+  assert.match(factsOf("png-to-jpg").unsettledText, /color fills transparent areas in a JPG/);
   assert.match(factsOf("heic-to-pdf").unsettledText, /alpha plane/);
   assert.match(factsOf("psd-to-pdf").unsettledText, /Which page or layer/);
 });
@@ -231,4 +237,34 @@ test("compress-mp4 and compress-gif facts", () => {
   const gif = factsOf("compress-gif");
   assert.match(gif.text, /Every frame is kept/);
   assert.match(gif.text, /exactly the same pixels/);
+});
+
+test("the JPEG compressor facts are @jsquash/jpeg's defaults and the worker's calls", async () => {
+  const { label, defaultOptions, defaultDecodeOptions } = await import("@jsquash/jpeg/meta.js");
+  const worker = readFileSync(path.join(appRoot, "workers/compress.worker.js"), "utf8");
+  // compressJpeg passes no decode options and only a quality to encode.
+  assert.match(worker, /await decodeJpeg\(buf\);/);
+  assert.match(worker, /encodeJpeg\(imageData, \{ quality: mapQualityToImageQuality\(quality\) \}\)/);
+  for (const id of ["compress-jpg", "compress-jpeg"]) {
+    const { text: facts } = factsOf(id);
+    assert.equal(label, "MozJPEG");
+    assert.match(facts, /with MozJPEG/);
+    assert.equal(defaultOptions.progressive, true);
+    assert.equal(defaultOptions.optimize_coding, true);
+    assert.match(facts, /a progressive JPEG with optimized Huffman tables/);
+    assert.equal(defaultDecodeOptions.preserveOrientation, false);
+    assert.match(facts, /EXIF orientation isn't applied on decode/);
+  }
+  assert.doesNotMatch(factsOf("compress-webp").text, /MozJPEG/);
+});
+
+test("m4a-to-mp3 drops cover art because the command has -vn", () => {
+  assert.ok(buildConvertCommand("m4a", "mp3").args.includes("-vn"));
+  assert.match(factsOf("m4a-to-mp3").text, /the MP3 has no cover art/);
+});
+
+test("a browser-raster output has 8 bits per channel, as the RGBA type holds", () => {
+  const heif = readFileSync(path.join(appRoot, "lib/convert/heif.ts"), "utf8");
+  assert.match(heif, /export type RGBA = \{ data: Uint8ClampedArray;/);
+  assert.match(text("browser-raster"), /a canvas output has 8 bits per channel/);
 });

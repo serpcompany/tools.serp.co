@@ -36,7 +36,7 @@ test("a brief gives each Tool its keyword, engine facts, current copy and an ent
   assert.match(webp, /Keyword: \*\*webp to png\*\* \(exact match\), [\d,]+ searches a month worldwide/);
   assert.match(webp, /Engine: browser-raster; runs client-only\./);
   assert.match(webp, /An animated input gives its first frame only/);
-  assert.match(webp, /Not settled by the code[^]*What colour fills transparent areas in a JPG output/);
+  assert.match(webp, /Not settled by the code[^]*What color fills transparent areas in a JPG output/);
   assert.match(webp, /formats\.json, #357\) doesn't exist yet/);
   assert.match(webp, /The page's copy was written to the style guide\./);
   assert.match(webp, /- How-to heading: How to convert WebP to PNG\n/);
@@ -118,4 +118,36 @@ test("a brief names several outputs' files only for Tools that can make several"
   const text = brief(["png-to-pdf", "pdf-to-png"]);
   assert.doesNotMatch(section(text, "png-to-pdf"), /_page1/);
   assert.match(section(text, "pdf-to-png"), /"<name>_page1"/);
+});
+
+test("a Tool in the topics file gets a brief in depth: competing pages, guide facts and a guide, with no written How-to", () => {
+  const depth = {
+    topics: {
+      tools: {
+        "webp-to-png": {
+          serpDate: "2026-10-21",
+          targetWords: 1200,
+          topics: [{ topic: "WebP vs PNG", description: "Lossy and lossless.", avgScore: 50, ourScore: 0 }],
+          competitors: [{ url: "https://example.com/", position: 1, words: 1200 }],
+        },
+      },
+    },
+    guides: {
+      formats: { webp: { background: [{ fact: "Google announced WebP in 2010.", source: "https://developers.google.com/speed/webp" }] } },
+      tools: { "webp-to-png": { methods: [{ app: "Preview (macOS)", steps: "File > Export.", source: "https://support.apple.com/" }] } },
+    },
+  };
+  const text = buildBrief({ name: "test", ids: ["webp-to-png", "compress-m4a"], tools, statusRows, formats: null, styleGuide, examples, readDoc, depth });
+  assert.match(text, /## Writing in depth\n/);
+  const webp = section(text, "webp-to-png");
+  assert.match(webp, /median of 1,200 words in their static HTML \(1 measured\)/);
+  assert.match(webp, /\*\*WebP vs PNG\*\* \(theirs 50, ours 0\)/);
+  assert.match(webp, /Google announced WebP in 2010\. \(https:\/\/developers\.google\.com\/speed\/webp\)/);
+  assert.match(webp, /Preview \(macOS\): File > Export\./);
+  assert.doesNotMatch(webp, /"howTo"/, "a page in depth keeps the generated How-to");
+  assert.match(webp, /"guide": \{/);
+  assert.match(text, /programs that open it, grouped by Windows, Mac, Linux, web and mobile/);
+  assert.equal(webp.match(/"question": ""/g).length, 8);
+  const m4a = section(text, "compress-m4a");
+  assert.doesNotMatch(m4a, /### Competing pages|"guide"/, "a Tool without topics gets the usual brief");
 });

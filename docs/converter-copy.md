@@ -116,16 +116,59 @@ writes one.
 - **Format cards** (`aboutSection`): a card for each format, required on a
   converter. Take names, full names and facts from the format reference
   (`apps/tools/content/formats.json`, #357) once it exists.
+- **How-to** (`howTo`, optional): a title and at least 3 steps, in place of
+  the generated How-to. The title follows the How-to heading's rules, and
+  `seo.howToHeading` is then left out. A page written in depth doesn't
+  write one (owner decision, 2026-10-22): the generated How-to stays.
+- **Guide** (`guide`, optional): a Markdown article after the pair notes,
+  with `###` subheadings, paragraphs, bulleted lists and bold labels, and no
+  tables. What it holds is under "Writing in depth".
+
+### Writing in depth
+
+A Tool in `apps/tools/benchmarks/content-topics.json` gets a longer page,
+modeled on a file-extension reference page such as filext.com's (owner
+decision, 2026-10-22). That file holds the Ahrefs topics and lengths of the
+pages ranking for its keyword: a check on what visitors ask, not an outline
+to copy. The page has at least 8 FAQs and a `guide` with these `###`
+sections, in this order, written for the pair:
+
+1. **What is a {FROM} file**: what it is, who made it, its history, and
+   where people come across one.
+2. **Programs that open {FROM} files**: grouped under Windows, Mac, Linux,
+   web and mobile, one line on each program.
+3. **{FROM} and {TO} compared**: extensions, media types, variants,
+   compression, transparency, color depth and metadata, and how the two
+   differ for this conversion.
+4. **Other ways to convert {FROM} to {TO}**: the methods in
+   `apps/tools/content/format-guides.json`, with their menu paths and limits.
+5. **Problems with {FROM} files**: what goes wrong (won't open, wrong
+   extension, too big, lost transparency) and the fix for each.
+
+The FAQs follow the guide on the page. Aim the guide, FAQs, format cards and
+pair notes together at 1,200 to 1,500 words. A page that can't reach that
+with true, specific sentences stops short; say so instead of padding. Write
+every page on its own: a format that appears on several pages (JPG, PDF)
+gets a new angle for each pair, never a paragraph copied from another page.
 
 ## What may be claimed
 
-Every claim has a source a reviewer can check:
+Nothing on a page is false, and what the site does is always checkable:
 
 - What the page does: the engine facts in the brief, read from the code (see
   "Briefs" below). If the brief says the code doesn't settle something, don't
   claim it either way.
 - What a format is: the format reference.
-- Nothing else. No dates, release notes, version numbers, statistics,
+- In a guide, a format's background, the programs that open it and other
+  ways to convert: `apps/tools/content/format-guides.json` (each fact with
+  its primary source), and the owner's wiki, `wiki.serp.co/file-types/<ext>/`,
+  for facts and topics. Much of the wiki's text is copied word for word from
+  FileInfo.com, so take its facts, never its wording: write every sentence
+  fresh, in this page's structure and voice, with no sentence-by-sentence
+  paraphrase and no list in the wiki's order with its notes. Leave out a wiki
+  claim you know or find to be wrong, and a date, version or app-support
+  claim you can't confirm.
+- Outside a guide, no dates, release notes, version numbers, statistics,
   percentages, speeds, user counts or reviews. Converter pages have no
   changelog and no blog posts; `content:check` fails a Tool that has either.
 - Never promise a result the engine can't give: "without losing quality" on a
@@ -184,7 +227,14 @@ compressor. It fails when:
   Tool for each operation and each place the file is converted: in the
   browser or server first); or a required
   field is missing (subtitle, 3 FAQs, pair notes with 2 points, and format
-  cards on a converter).
+  cards on a converter);
+- for a Tool with a `guide` (written in depth): it has fewer than 8 FAQs; the
+  guide's `###` headings aren't the five sections of "Writing in depth", in
+  order (known by how they start or end: "What is", "Programs that",
+  "compared", "Other ways to", "Problems with"); the guide has a table; or
+  any field of its copy uses a common British spelling (colour, grey,
+  licence, modelled, centre, behaviour, -ise and -isation, and others in
+  `apps/tools/scripts/lib/content.mjs`).
 
 Near-duplicate means a Jaccard similarity of 0.6 or more between the two
 answers' three-word phrases, after lower-casing and replacing each Tool's own

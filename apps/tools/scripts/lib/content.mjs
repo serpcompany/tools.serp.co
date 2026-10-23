@@ -51,16 +51,60 @@ export const FAQS_MIN = 3;
 // people search one.
 export const HOW_TO_HEADING_MAX = 70;
 export const PAIR_NOTES_MIN = 2;
+// A written How-to (content.howTo) lists the steps on this site.
+export const HOW_TO_STEPS_MIN = 3;
+// A page written in depth (a Tool with content.guide; "Writing in depth" in
+// docs/converter-copy.md): at least this many FAQs, so the page covers what
+// the ranking pages answer, and the guide's `###` sections, in this order.
+// Each heading names the pair in its own words ("What is a JFIF file?",
+// "Lossy and lossless JPEG compression compared"), so a section is known by
+// how its heading starts or ends.
+export const DEPTH_FAQS_MIN = 8;
+export const GUIDE_SECTIONS = [
+  { name: "What is a {FROM} file", pattern: /^What is /i },
+  { name: "Programs that open {FROM} files", pattern: /^Programs that /i },
+  { name: "{FROM} and {TO} compared", pattern: / compared$/i },
+  { name: "Other ways to convert {FROM} to {TO}", pattern: /^Other ways to /i },
+  { name: "Problems with {FROM} files", pattern: /^Problems with /i },
+];
+// British spellings writers fall into, with the US spelling the style guide
+// asks for ("plain US English"). A word is matched whole, in any case, with
+// these endings.
+const BRITISH_SPELLINGS = [
+  [/\bcolour(s|ed|ful|ing|less)?\b/gi, "color"],
+  [/\bgrey(s|scale)?\b/gi, "gray"],
+  [/\blicence(s|d)?\b/gi, "license"],
+  [/\b(model|label|travel|cancel|signal|channel|level)l(ed|ing)\b/gi, "one l"],
+  [/\bcentre(s|d)?\b/gi, "center"],
+  [/\bbehaviour(s|al)?\b/gi, "behavior"],
+  [/\bfavour(s|ed|ite|ites)?\b/gi, "favor"],
+  [/\bflavour(s)?\b/gi, "flavor"],
+  [/\b(optimi|organi|recogni|customi|minimi|maximi|normali|standardi|synchroni|summari|visuali|categori|prioriti|authori|initiali|finali|utili|reali)s(e|ed|es|ing|ation|ations)\b/gi, "-ize"],
+  [/\banalys(e|ed|ing)\b/gi, "analyze"],
+  [/\bcatalogue(s|d)?\b/gi, "catalog"],
+  [/\bartefact(s)?\b/gi, "artifact"],
+  [/\b(whilst|amongst)\b/gi, "while, among"],
+];
+
+// The British spellings in a text, each as the word found and its US form.
+export function britishSpellings(text) {
+  const found = [];
+  for (const [pattern, us] of BRITISH_SPELLINGS) {
+    for (const match of text.matchAll(pattern)) found.push({ word: match[0], us });
+  }
+  return found;
+}
 
 // The fields a batch may set on a Tool, and the order content keys are
 // written in. Keys this list doesn't name keep their order after these.
-export const BATCH_FIELDS = ["seo", "tool", "faqs", "aboutSection", "pairNotes"];
+export const BATCH_FIELDS = ["seo", "tool", "faqs", "aboutSection", "pairNotes", "howTo", "guide"];
 const CONTENT_KEY_ORDER = [
   "tool",
   "seo",
   "faqs",
   "aboutSection",
   "pairNotes",
+  "guide",
   "howTo",
   "infoArticle",
   "relatedTools",
@@ -203,12 +247,49 @@ function checkHowToHeading(tool, content, keyword, fail) {
   } else if (content.howTo) {
     fail("unshown", "content.seo.howToHeading is set, but content.howTo replaces the How-to section");
   }
+  headingRules(tool, heading, keyword, fail);
+}
+
+function headingRules(tool, heading, keyword, fail) {
   if (heading.length > HOW_TO_HEADING_MAX) {
     fail("length", `How-to heading is ${heading.length} characters, over ${HOW_TO_HEADING_MAX}`);
   }
   const words = keyword ?? [tool.from, tool.to].filter(Boolean).join(" ");
   if (!hasKeywordWords(heading, words)) {
     fail("keyword", `How-to heading "${heading}" lacks a word of ${keyword ? `the keyword "${keyword}"` : `the formats "${words}"`}`);
+  }
+}
+
+// A written How-to (content.howTo), on a Tool written to the style guide:
+// its title is the How-to heading, held to the same rules, over at least
+// HOW_TO_STEPS_MIN steps.
+function checkWrittenHowTo(tool, content, keyword, fail) {
+  const { title, steps } = content.howTo;
+  if (!title?.trim()) fail("required", "content.howTo.title is empty");
+  else headingRules(tool, title, keyword, fail);
+  if ((steps?.length ?? 0) < HOW_TO_STEPS_MIN) fail("required", `content.howTo needs at least ${HOW_TO_STEPS_MIN} steps`);
+}
+
+// A page written in depth: at least DEPTH_FAQS_MIN FAQs, a guide with the
+// GUIDE_SECTIONS and no other `###` sections, no table (the guide renders
+// without GFM, so a table would show as pipes), and US spelling in every
+// field of its copy.
+function checkDepth(content, fail) {
+  if ((content.faqs?.length ?? 0) < DEPTH_FAQS_MIN) {
+    fail("depth", `content.faqs needs at least ${DEPTH_FAQS_MIN} questions on a page with a guide`);
+  }
+  const markdown = content.guide.markdown ?? "";
+  const headings = [...markdown.matchAll(/^###\s+(.+?)\s*$/gm)].map((match) => match[1].replace(/[?:.]+$/, ""));
+  const matches = headings.length === GUIDE_SECTIONS.length && GUIDE_SECTIONS.every((section, index) => section.pattern.test(headings[index]));
+  if (!matches) {
+    fail(
+      "depth",
+      `content.guide needs these ### sections, in order: ${GUIDE_SECTIONS.map((section) => `"${section.name}"`).join(", ")}; it has ${headings.length ? headings.map((heading) => `"${heading}"`).join(", ") : "none"}`,
+    );
+  }
+  if (/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/m.test(markdown)) fail("depth", "content.guide has a table; write a list instead");
+  for (const [where, text] of strings(content, "content")) {
+    for (const { word, us } of britishSpellings(text)) fail("spelling", `${where} spells "${word}" the British way (US: ${us})`);
   }
 }
 
@@ -273,6 +354,8 @@ export function checkContent(tools, { keywords }) {
     }
     if (content.seo) requiredFields(tool, content, fail);
     if (content.seo?.howToHeading !== undefined) checkHowToHeading(tool, content, keyword, fail);
+    else if (content.seo && content.howTo) checkWrittenHowTo(tool, content, keyword, fail);
+    if (content.guide) checkDepth(content, fail);
   }
 
   // The template FAQs a page without curated FAQs shows, as another Tool's

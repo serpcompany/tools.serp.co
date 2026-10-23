@@ -59,13 +59,14 @@ export const ENGINE_FACTS = {
       "JPEG, WebP and AVIF outputs are written at quality 0.85 (workers/convert.worker.js); PNG has no quality setting.",
       "BMP, GIF, ICO and similar outputs are written by ImageMagick (lib/convert/encode.ts).",
       "Metadata isn't carried over: the image goes through raw pixels, so EXIF, ICC profiles and XMP are dropped (lib/convert/decode.ts, lib/convert/encode.ts).",
+      "The pixels pass through 8-bit RGBA (the RGBA type in lib/convert/heif.ts holds a Uint8ClampedArray), so a canvas output has 8 bits per channel: extra depth in the source, such as a 16-bit PNG or a 10- or 12-bit AVIF, is lost.",
       "No size limit of its own.",
       'Errors a visitor can see: "Image decode failed."; "This browser can\'t open … files; try a current Chrome, Edge, Firefox or Safari."',
     ],
     unsettled: [
-      "What colour fills transparent areas in a JPG output (the canvas JPEG encoder decides).",
+      "What color fills transparent areas in a JPG output (the canvas JPEG encoder decides).",
       "Whether EXIF orientation is applied on decode.",
-      "How an ICC profile affects the decoded colours.",
+      "How an ICC profile affects the decoded colors.",
     ],
   },
   "imagemagick-wasm": {
@@ -76,7 +77,7 @@ export const ENGINE_FACTS = {
     ],
     convert: ["Conversions set no quality and strip nothing explicitly."],
     compress: [
-      "GIF: every frame is re-optimised. TIFF: LZW compression. BMP: RLE8 when the image has no transparency and 256 colours or fewer. AVIF: quality 82 (lib/convert/image-compress.ts).",
+      "GIF: every frame is re-optimized. TIFF: LZW compression. BMP: RLE8 when the image has no transparency and 256 colors or fewer. AVIF: quality 82 (lib/convert/image-compress.ts).",
       "If the result isn't smaller, the visitor gets the original back (compressImageInBrowser in lib/convert/image-compress.ts).",
       "Nothing is resized.",
     ],
@@ -147,7 +148,7 @@ export const ENGINE_FACTS = {
     where: "In the browser: jSquash encoders in a Web Worker (workers/compress.worker.js). No server.",
     compress: [
       "JPEG and WebP are re-encoded at quality 82; PNG goes through oxipng at level 1, which is lossless.",
-      "If the worker can't run oxipng (it fails or can't load), PNG falls back to the main thread (compressPngWithWorker, compressPngOnMainThread in lib/convert/workerClient.ts): UPNG reduces the picture to at most 210 colours, which is lossy, and keeps only the first frame of an animated PNG. Copy may call PNG compression lossless only with that exception.",
+      "If the worker can't run oxipng (it fails or can't load), PNG falls back to the main thread (compressPngWithWorker, compressPngOnMainThread in lib/convert/workerClient.ts): UPNG reduces the picture to at most 210 colors, which is lossy, and keeps only the first frame of an animated PNG. Copy may call PNG compression lossless only with that exception.",
       "If the result isn't smaller, the visitor gets the original back.",
     ],
     unsettled: ["What happens to an animated PNG or WebP.", "How often the oxipng worker fails in a given browser."],
@@ -158,6 +159,11 @@ export const ENGINE_FACTS = {
       "Several images become one PDF, one page each, in the order of the list: images join it in the order they are picked, and the Move up, Move down and Remove buttons change it (components/ImagesToPdfConverter.tsx).",
       "Limits: 100 images, 250 MB in all, 50 megapixels per image.",
       "Transparency becomes a soft mask; a JPEG goes in as it is, with its ICC profile kept.",
+      "Each page is its image's size, one point a pixel, with no margin; a side over 14,400 points (200 inches, Acrobat's largest page) is scaled down to fit, keeping every pixel (MAX_PAGE_SIDE).",
+      "A JPEG's EXIF orientation turns its page, as a browser shows it; the rest of its EXIF (with GPS) and its XMP are left out. CMYK, 12-bit, lossless and arithmetic-coded JPEGs are decoded instead of going in as they are.",
+      "An opaque photo in another photo format (HEIC, HEIF, AVIF, lossy WebP, JPEG XL, JPEG 2000, camera RAW) goes in as a JPEG at quality 92 (PHOTO_QUALITY); every other image (PNG, GIF, BMP, lossless WebP, a transparent photo) goes in as lossless pixels.",
+      "An animated GIF or WebP gives its first frame.",
+      "It reads JPEG, PNG, GIF, WebP, BMP, AVIF, ICO, SVG, HEIC and HEIF, TIFF, PSD, camera RAW and the other ImageMagick formats (IMAGE_PDF_INPUTS in lib/convert/image-pdf-inputs.ts).",
     ],
     unsettled: [],
   },
@@ -205,7 +211,7 @@ export const TARGET_FACTS = {
     engines: ["browser-raster"],
     facts: [
       "The picture is not traced to vector shapes. The SVG holds one `<image>` with the picture embedded as a PNG (base64), at the picture's pixel width and height, so it doesn't scale like a vector (encodeFromRGBA in lib/convert/encode.ts).",
-      "Nothing is resized or reduced: the full-colour picture is embedded, and transparency is kept in the embedded PNG.",
+      "Nothing is resized or reduced: the full-color picture is embedded, and transparency is kept in the embedded PNG.",
     ],
   },
   ico: {
@@ -259,13 +265,32 @@ for (const raw of ["hevc", "av1"]) {
   };
 }
 
+// The JPEG compressor (compressJpeg in workers/compress.worker.js) calls
+// @jsquash/jpeg's decode and encode with only a quality, so their defaults
+// (meta.js) decide the rest.
+const JPEG_COMPRESS = {
+  engines: ["jsquash-worker"],
+  facts: [
+    "The JPEG is decoded and encoded again with MozJPEG (@jsquash/jpeg) at its defaults apart from quality: a progressive JPEG with optimized Huffman tables. The width and height don't change.",
+    "The image goes through raw pixels, so EXIF (with GPS), the ICC profile and XMP are not in the result.",
+    "EXIF orientation isn't applied on decode (decodeJpeg is called without preserveOrientation, which defaults to false) and the tag is dropped, so a photo that stands upright only through its orientation tag comes out turned (unless the original comes back because the result isn't smaller). Copy must not claim the orientation is kept.",
+  ],
+};
+
 // Facts for single Tools, by Tool id.
 export const TOOL_FACTS = {
+  "compress-jpg": JPEG_COMPRESS,
+  "compress-jpeg": JPEG_COMPRESS,
   "mp3-to-mp4": {
     facts: [
       "The command adds no picture of its own (buildConvertCommand in lib/convert/ffmpeg-args.ts): an MP3 without cover art gives an MP4 with audio only, as AAC at 96 kbit/s. Do not call it H.264 video. The command does set `-c:v libx264`, so embedded cover art may come through as a picture stream.",
     ],
     unsettled: ["What happens to cover art embedded in the MP3 (untested)."],
+  },
+  "m4a-to-mp3": {
+    facts: [
+      "`-vn` leaves out every video stream, and FFmpeg reads cover art embedded in an M4A as one, so the MP3 has no cover art (buildConvertCommand in lib/convert/ffmpeg-args.ts).",
+    ],
   },
   "gif-to-mp4": {
     facts: ["The command sets no loop option and an MP4 carries no loop flag of its own, so whether the video repeats is up to the player (buildConvertCommand in lib/convert/ffmpeg-args.ts)."],
@@ -278,7 +303,7 @@ export const TOOL_FACTS = {
   },
   "compress-gif": {
     facts: [
-      "Every frame is kept and nothing is resized or reduced in colours: ImageMagick re-optimises how the frames are stored (coalesce, optimizePlus, optimizeTransparency).",
+      "Every frame is kept and nothing is resized or reduced in colors: ImageMagick re-optimizes how the frames are stored (coalesce, optimizePlus, optimizeTransparency).",
       "The result is used only if it decodes to exactly the same pixels, frame by frame, as the original (samePixels); otherwise, or if it isn't smaller, the visitor gets the original back (compressImageWithMagick in lib/convert/magickBrowser.ts).",
     ],
   },

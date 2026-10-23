@@ -15,6 +15,7 @@ import {
 import { buildConverterFaqs } from "../../lib/tool-sections.ts";
 import {
   BATCH_DIR,
+  DEPTH_FAQS_MIN,
   DESCRIPTION_MAX,
   DESCRIPTION_MIN,
   FAQS_MIN,
@@ -61,6 +62,13 @@ export function statusIndex(rows) {
 }
 
 export const TOP_TERMS = 8;
+// A page written in depth (a Tool in benchmarks/content-topics.json) has at
+// least DEPTH_FAQS_MIN FAQs, which content:check enforces (content.mjs).
+export { DEPTH_FAQS_MIN };
+// The page length to aim at, at least: Ahrefs counted the rendered pages
+// ranking for "png to jpg" (Adobe Express, Canva) at a median of about 1,240
+// words, where their static HTML gives far fewer.
+export const DEPTH_WORDS_MIN = 1200;
 export const TOP_QUESTIONS = 5;
 
 const byVolume = (items) => [...(items ?? [])].sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0));
@@ -147,6 +155,52 @@ function formatSection(tool, formats) {
     .join("\n\n");
 }
 
+// What the pages ranking for the keyword cover (Ahrefs Content Helper), and
+// how long they are.
+function competitionSection(topics) {
+  const counted = (topics.competitors ?? []).filter((page) => Number.isFinite(page.words));
+  const lines = [
+    `Ahrefs Content Helper, US, ${topics.serpDate ?? "undated"}. The ranking pages run to a median of ${number(topics.targetWords)} words in their static HTML (${counted.length} measured), which undercounts pages built in JavaScript. Aim the whole page at about ${number(Math.max(topics.targetWords ?? 0, DEPTH_WORDS_MIN))} words, with every sentence earning its place.`,
+    "",
+    "Topics they cover, with how well each covers it (0–100) and how well this page does now:",
+    "",
+    list(
+      (topics.topics ?? []).map(
+        (topic) => `**${topic.topic}** (theirs ${topic.avgScore}, ours ${topic.ourScore ?? "none"}): ${topic.description}`,
+      ),
+    ),
+    "",
+    "Cover each topic the brief's facts support, in the guide, the How-to or an FAQ. A topic the facts don't support stays out.",
+  ];
+  return lines.join("\n");
+}
+
+// Sourced facts for the guide: each format's background and other ways to
+// convert (apps/tools/content/format-guides.json).
+function guideFactsSection(tool, guides, formats) {
+  const keys = [...new Set([tool.from, tool.to])];
+  const parts = [];
+  for (const format of keys) {
+    const key = formats ? (resolveAlias(format, formats)?.key ?? format) : format;
+    const facts = guides.formats?.[format]?.background ?? guides.formats?.[key]?.background ?? [];
+    parts.push(
+      `**${format.toUpperCase()} background:**`,
+      "",
+      facts.length ? list(facts.map((fact) => `${fact.fact} (${fact.source})`)) : "No sourced facts: say nothing beyond the format reference.",
+      "",
+    );
+  }
+  const methods = guides.tools?.[tool.id]?.methods ?? [];
+  parts.push(
+    "**Other ways to convert:**",
+    "",
+    methods.length
+      ? list(methods.map((method) => `${method.app}: ${method.steps}${method.limits ? ` Limits: ${method.limits}` : ""} (${method.source})`))
+      : "None sourced: leave other apps out.",
+  );
+  return parts.join("\n").trimEnd();
+}
+
 function currentCopy(tool) {
   const seo = toolSeo(tool);
   const content = tool.content;
@@ -163,32 +217,37 @@ function currentCopy(tool) {
     return parts.join("\n");
   }
   parts.push("", content.seo ? "The page's copy was written to the style guide." : "The page's copy predates the style guide: replace it.");
-  for (const field of ["faqs", "aboutSection", "pairNotes"]) {
+  for (const field of ["faqs", "aboutSection", "pairNotes", "howTo", "guide"]) {
     if (content[field]) parts.push("", `${field}:`, "", json(content[field]));
   }
   return parts.join("\n");
 }
 
 // An entry to fill in, with only the fields the Tool's page shows.
-function skeleton(tool) {
+function skeleton(tool, deep = false) {
   const fields = pageFields(tool);
   const seo = toolSeo(tool);
   const entry = { seo: { title: seo.title, h1: seo.h1, description: "" } };
   if (fields.includes("tool")) entry.tool = { subtitle: "" };
-  if (fields.includes("faqs")) entry.faqs = Array.from({ length: FAQS_MIN }, () => ({ question: "", answer: "" }));
+  if (fields.includes("faqs")) {
+    entry.faqs = Array.from({ length: deep ? DEPTH_FAQS_MIN : FAQS_MIN }, () => ({ question: "", answer: "" }));
+  }
   if (fields.includes("aboutSection") && tool.from !== tool.to) {
     const format = { name: "", fullName: "", description: "", details: [""] };
     entry.aboutSection = { title: "", fromFormat: format, toFormat: format };
   }
   if (fields.includes("pairNotes")) entry.pairNotes = { title: "", points: Array.from({ length: PAIR_NOTES_MIN }, () => "") };
+  if (deep && fields.includes("guide")) entry.guide = { title: "", markdown: "" };
   return { [tool.id]: entry };
 }
 
-function toolSection(tool, status, formats, ideas) {
+function toolSection(tool, status, formats, ideas, depth) {
   const row = status.tools.get(tool.id);
   const engine = row?.engine || null;
   const facts = engineFactsFor(tool, engine);
   const idea = ideas?.tools?.[tool.id];
+  const topics = depth?.topics?.tools?.[tool.id];
+  const deep = Boolean(topics) && onConverterPage(tool);
   const lines = [
     `## ${tool.id}`,
     "",
@@ -202,6 +261,8 @@ function toolSection(tool, status, formats, ideas) {
     "",
     variantSection(tool, idea, ideas),
     "",
+    ...(deep ? ["### Competing pages", "", competitionSection(topics), ""] : []),
+    ...(deep && depth.guides ? ["### Guide facts", "", guideFactsSection(tool, depth.guides, formats), ""] : []),
     "### Engine and execution path",
     "",
     `- Engine: ${engine ?? "not in the Tool status view"}; runs ${row?.processing_location || "unknown"}.`,
@@ -233,9 +294,27 @@ function toolSection(tool, status, formats, ideas) {
     "",
     "Fill in every empty field. The title (a verb phrase) and H1 (a noun phrase) below are the default: keep them, or rewrite both in the same shape when the keyword or an alias has a noun the default lacks (optimizer, generator, \"to X online\"):",
     "",
-    json(skeleton(tool)),
+    json(skeleton(tool, deep)),
   );
   return lines.join("\n");
+}
+
+// What a page written in depth adds, once, when the batch has one.
+function depthSection(selected, depth) {
+  if (!selected.some((tool) => depth?.topics?.tools?.[tool.id] && onConverterPage(tool))) return [];
+  return [
+    "## Writing in depth",
+    "",
+    "Tools with a \"Competing pages\" section get a longer page, modeled on a file-extension reference page (see \"Writing in depth\" in the style guide). The competing pages' topics show what visitors ask; they aren't an outline. No `howTo`: the generated How-to stays.",
+    "",
+    list([
+      `\`faqs\`: at least ${DEPTH_FAQS_MIN}, answering the Tool's listed questions and the visitor questions the facts support.`,
+      "`guide`: a Markdown article after the pair notes, with paragraphs, bulleted lists, bold labels and these `###` sections, and no tables: what the source format is (maker, history, where people meet it); programs that open it, grouped by Windows, Mac, Linux, web and mobile; the two formats compared (extensions, media types, variants, compression, transparency, color depth, metadata); other ways to convert (the methods in \"Guide facts\", with their menu paths and limits); problems with the source format and their fixes.",
+      "Facts come from \"Guide facts\", the format reference, the engine facts and the owner's wiki (wiki.serp.co/file-types/<ext>/). The wiki copies FileInfo.com word for word: take its facts, never its wording or its lists' order and notes, and leave out a claim that is wrong or that you can't confirm. No source URLs or links off the site.",
+      "Aim the guide, FAQs, format cards and pair notes at 1,200 to 1,500 words together; stop short and say so rather than pad. Nothing repeats across sections, or across Tools' pages.",
+    ]),
+    "",
+  ];
 }
 
 // Problems with the ids asked for: unknown, retired, or not on the converter
@@ -254,7 +333,7 @@ export function briefProblems(ids, tools) {
 
 // The whole brief: what to deliver, the style guide, one finished example,
 // then a section per Tool.
-export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, examples, readDoc, keywordIdeas = null }) {
+export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, examples, readDoc, keywordIdeas = null, depth = null }) {
   const byId = new Map(tools.map((tool) => [tool.id, tool]));
   const selected = ids.map((id) => byId.get(id));
   const status = statusIndex(statusRows);
@@ -266,7 +345,7 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
   const appendix = docs.flatMap((doc) => [
     `## Appendix: ${doc}`,
     "",
-    "The engine's behaviour as the repository documents it from the code:",
+    "The engine's behavior as the repository documents it from the code:",
     "",
     demote(readDoc(doc)),
     "",
@@ -298,7 +377,8 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
     "",
     json({ [exampleId]: examples[exampleId] }),
     "",
-    ...selected.map((tool) => toolSection(tool, status, formats, keywordIdeas)),
+    ...depthSection(selected, depth),
+    ...selected.map((tool) => toolSection(tool, status, formats, keywordIdeas, depth)),
     "",
     ...appendix,
   ].join("\n");
