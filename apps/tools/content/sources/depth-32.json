@@ -1,0 +1,220 @@
+{
+  "tools": {
+    "rmvb-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i archive.rmvb -c:v libx264 -c:a aac archive.mp4.",
+          "limits": "Requires RealMedia demuxing, the RealVideo decoder, AAC, and libx264 in the installed build.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmdec.c"
+        },
+        {
+          "app": "VLC",
+          "steps": "Select Media > Convert/Save, click Add, choose the RMVB and click Open, type a destination file name, choose a conversion profile that outputs MP4 and click Start.",
+          "limits": "The documentation does not list the available profiles; choose one that outputs MP4.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSource": "https://www.videolan.org/vlc/features.html"
+        }
+      ]
+    },
+    "svg-to-tiff": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -density 300 logo.svg logo-print.tiff.",
+          "limits": "The -density option sets the canvas resolution while rendering SVG; renderer selection can affect appearance.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the SVG as an image, choose File > Export As to store it in a format other than XCF, and pick TIFF; the TIFF dialog offers the compression options.",
+          "limits": "Renders vectors to pixels; check fonts, profiles, and export options.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-using-paths-and-svg.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/gimp-file-export-as.html",
+          "formatSource": "https://docs.gimp.org/3.2/en/file-tiff-export.html"
+        }
+      ]
+    },
+    "swf-to-gif": {
+      "methods": [
+        {
+          "app": "JPEXS Free Flash Decompiler",
+          "steps": "Run ffdec -format frame:gif -export frame frames-out banner.swf, using the platform-specific executable.",
+          "limits": "The documented -format pre-option selects GIF for frame export, which gives individual frame images; review unsupported effects or script-driven appearance.",
+          "source": "https://github.com/jindrapetrik/jpexs-decompiler/wiki/Commandline-arguments"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "For decodable embedded video, run ffmpeg -i clip.swf flash-preview.gif.",
+          "limits": "The SWF demuxer reads bitmap, video and audio data and skips unknown tags; it is not a complete vector/ActionScript renderer.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/swfdec.c"
+        },
+        {
+          "app": "Ruffle, OBS Studio, then FFmpeg",
+          "steps": "Play a compatible SWF in Ruffle; in OBS add a window or display capture source, click Start Recording and perform the sequence; encode the saved recording as GIF with FFmpeg.",
+          "limits": "Captures the particular playback session and its errors; Ruffle compatibility varies; extra render/encode generation.",
+          "source": "https://obsproject.com/kb/quick-start-guide",
+          "supportSource": "https://ruffle.rs/compatibility",
+          "encodeSource": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "tiff-to-svg": {
+      "methods": [
+        {
+          "app": "GIMP plus Inkscape",
+          "steps": "In GIMP choose File > Export As (Shift+Ctrl+E) to store the TIFF as PNG. In Inkscape import the PNG with File > Import, select it with the Selector tool, open Path > Trace Bitmap, adjust the options, update the preview and apply the trace.",
+          "limits": "Tracing approximates image regions; the vector result is positioned exactly above the picture, so the original stays underneath until it is moved or deleted.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick plus Potrace",
+          "steps": "Run magick scan.tiff scan.bmp, then potrace -s scan.bmp -o scan-outline.svg.",
+          "limits": "Potrace does not list TIFF input; it reads PBM, PGM, PPM and BMP, converts other pixels to black and white with a threshold, and does not keep continuous tones.",
+          "source": "https://potrace.sourceforge.net/potrace.1.html",
+          "supportSource": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "ttf-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick display-face.ttf display-face-preview.png.",
+          "limits": "The TTF reader returns a preview and requires FreeType support; it is not a full glyph sheet.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://imagemagick.org/command-line-processing/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Load the font with ImageFont.truetype; create an image with Image.new; draw the sample text with ImageDraw.text and the loaded font; call save with a .png file name.",
+          "limits": "Requires a script, explicit canvas bounds and selected sample; a PNG has no reusable font tables.",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/ImageFont.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html",
+          "saveSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "With the typeface available in the font selector, create an image, choose the Text tool, pick the font and size, type the sample, then choose File > Export As and pick PNG.",
+          "limits": "This is a manually composed sample of an available font, not direct import of TTF as an image or an automatic atlas.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-tool-text.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+        }
+      ]
+    },
+    "txt-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Create an image; choose the Text tool; enable the editor window and use its folder icon to load the TXT; pick the font and size and drag a text frame; File > Export As and choose JPEG.",
+          "limits": "Proofread encoding and clipping; text outside the canvas is not preserved as an editable JPG object.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-tool-text.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -background white -fill black -pointsize 24 -size 800x caption:@notes.txt notes-card.jpg.",
+          "limits": "The caption: operator word-wraps to the -size width and -font picks the typeface; a local security policy may restrict indirect @file reads; inspect wrapping.",
+          "source": "https://usage.imagemagick.org/text/",
+          "supportSource": "https://imagemagick.org/security-policy/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Read TXT with the correct encoding, create a canvas using Image.new (default color black, so pass white), draw lines with ImageDraw.multiline_text and a font, and save with a .jpg name.",
+          "limits": "Requires custom sizing, measurement, and wrapping/pagination choices.",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        }
+      ]
+    },
+    "wav-to-aac": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i session.wav -vn -c:a aac -b:a 192k session-listen.aac.",
+          "limits": "AAC encoder required; specify channel/rate settings explicitly for a fixed delivery specification.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Open the WAV; File > Export Audio; select Custom FFmpeg Export; open the format options and choose a format and an AAC codec; export.",
+          "limits": "The optional FFmpeg library is needed; the formats and codecs offered depend on how FFmpeg was built.",
+          "source": "https://manual.audacityteam.org/man/custom_ffmpeg_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/custom_ffmpeg_export_options.html"
+        },
+        {
+          "app": "WavePad",
+          "steps": "Open the WAV; File > Save As; choose AAC.",
+          "limits": "AAC writing is listed for Windows and Mac; avoid repeated lossy editing generations.",
+          "source": "https://help.nchsoftware.com/help/en/wavepad/win/files.html",
+          "supportSource": "https://www.nch.com.au/wavepad/kb/1414.html"
+        }
+      ]
+    },
+    "wav-to-m4r": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i cue.wav -t 30 -c:a aac -b:a 192k -vn -f ipod cue-tone.m4r.",
+          "limits": "This desktop example explicitly trims at 30 seconds; it does not install or assign a ringtone.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "WavePad for Windows",
+          "steps": "Open the WAV; File > Save As; choose M4R.",
+          "limits": "NCH lists M4R saving as Windows-only.",
+          "source": "https://help.nchsoftware.com/help/en/wavepad/win/files.html",
+          "supportSource": "https://www.nch.com.au/wavepad/kb/1414.html"
+        },
+        {
+          "app": "GarageBand on iPhone",
+          "steps": "Create a recording project; Tracks > Loops Browser > Files > Browse items from Files; bring WAV into Tracks, trim; My Songs, select project, Share > Ringtone > Export.",
+          "limits": "Creates and installs a device ringtone rather than a separate M4R file download; 30-second ringtone limit, and GarageBand offers to shorten a longer export.",
+          "source": "https://support.apple.com/en-us/120692"
+        }
+      ]
+    },
+    "wmv-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i legacy.wmv -c:v mpeg4 -c:a libmp3lame legacy.avi.",
+          "limits": "Installed build must have the input decoder and the requested encoders; this re-encodes the streams instead of copying them.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "xcf-to-pdf": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the XCF; File > Export As (Shift+Ctrl+E); export as PDF; the PDF dialog has options such as Layers as pages and Fill transparent areas with background color.",
+          "limits": "Layers as pages is optional.",
+          "source": "https://docs.gimp.org/3.2/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/file-pdf-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick project.xcf project-review.pdf.",
+          "limits": "The formats page lists XCF as read-only and says PDF output needs Ghostscript installed.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://imagemagick.org/command-line-processing/"
+        },
+        {
+          "app": "GIMP plus Mac Preview",
+          "steps": "Export the intended composition from GIMP as PNG, open the PNG in Preview, then File > Export > Format PDF and Save.",
+          "limits": "Preview operates on the PNG intermediate, not directly on the XCF project.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac",
+          "supportSource": "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+        }
+      ]
+    }
+  }
+}

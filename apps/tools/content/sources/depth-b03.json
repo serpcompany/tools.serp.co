@@ -1,0 +1,173 @@
+{
+  "tools": {
+    "jpg-to-hdr": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick ordinary_photo.jpg radiance_copy.hdr",
+          "limits": "Does not infer missing exposure range.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://imagemagick.org/convert/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Export As; use .hdr or select Radiance RGBE.",
+          "limits": "No bracket merging is implied.",
+          "source": "https://docs.gimp.org/3.2/en/file-rgbe-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        }
+      ]
+    },
+    "m4a-to-aac": {
+      "methods": [
+        {
+          "app": "FFmpeg AAC encoding",
+          "steps": "ffmpeg -i library_item.m4a -c:a aac -b:a 192k elementary.aac",
+          "limits": "Lossy new encode.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "ffmpeg -i library_copy.m4a -c:a copy -f adts extracted.aac",
+          "limits": "Only for an already-compatible AAC stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "mp4-to-divx": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i source_movie.mp4 -c:v mpeg4 -vtag DIVX -c:a libmp3lame legacy_movie.avi",
+          "limits": "Tag alone does not certify device support.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "ogg-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.ogg -vn -codec:a aac -b:a 192k listening-copy.m4a",
+          "limits": "Source decoder required; metadata mapping not guaranteed.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "File > Import > Audio; File > Export Audio; choose M4A.",
+          "limits": "M4A export needs the optional FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "orf-to-jpg": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Select image; export module; target storage file on disk; choose JPEG as the file format; set quality and size; start export.",
+          "limits": "Verify camera-model support.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSource": "https://www.darktable.org/resources/camera-support/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick camera_photo.orf developed_photo.jpg",
+          "limits": "ORF is readable, JPEG readable and writable.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "psd-to-gif": {
+      "methods": [
+        {
+          "app": "GIMP still image",
+          "steps": "File > Export As; GIF extension; inspect palette; animation off.",
+          "limits": "PSD import fidelity varies.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        },
+        {
+          "app": "GIMP animation",
+          "steps": "Prepare frame layers; Export As GIF; As animation; choose delay/disposal.",
+          "limits": "No layer-group animation export.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick 'design.psd[0]' preview.gif",
+          "limits": "[0] selects the first image; quote the file name.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://legacy.imagemagick.org/script/command-line-processing.php/"
+        }
+      ]
+    },
+    "svg-to-ttf": {
+      "methods": [
+        {
+          "app": "FontForge GUI",
+          "steps": "Glyph window; File > Import; format SVG; reposition and scale with Element > Transform; Generate dialog; True Type.",
+          "limits": "Reposition and scale the outline after import.",
+          "source": "https://fontforge.org/docs/tutorial/importexample.html",
+          "supportSource": "https://fontforge.org/docs/ui/dialogs/generate.html"
+        },
+        {
+          "app": "FontForge Python",
+          "steps": "glyph.importOutlines with svg; font.generate with a file name whose extension sets the type.",
+          "limits": "Needs FontForge's Python module.",
+          "source": "https://fontforge.org/docs/scripting/python/fontforge.html"
+        },
+        {
+          "app": "IcoMoon",
+          "steps": "Import panel: add SVGs; Export panel: keep Font format; download package.",
+          "limits": "Code points are set in the Metadata tab of the Batch panel.",
+          "source": "https://icomoon.io/docs"
+        }
+      ]
+    },
+    "xls-to-jpg": {
+      "methods": [
+        {
+          "app": "Excel and PowerPoint",
+          "steps": "Select cells; Home tab > arrow beside Copy > Copy as Picture; As shown on screen and Picture; OK; paste in PowerPoint; right-click, Save as Picture; JPEG.",
+          "limits": "Captures how the cells look on screen.",
+          "source": "https://support.microsoft.com/en-us/excel/create-a-picture-from-cells-a-chart-or-an-object-in-excel",
+          "supportSource": "https://support.microsoft.com/en-us/office/graphics-visuals/save-a-picture-or-other-graphic-as-a-separate-file"
+        }
+      ]
+    },
+    "xps-to-jpg": {
+      "methods": [
+        {
+          "app": "MuPDF and ImageMagick",
+          "steps": "mutool draw -r 150 -o page-%d.png document.xps; magick page-1.png page-1.jpg",
+          "limits": "Convert each required numbered PNG; no native mutool JPEG output.",
+          "source": "https://mupdf.readthedocs.io/en/latest/tools/mutool-draw.html",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "3gp-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg transcode",
+          "steps": "ffmpeg -i handset.3gp -c:v libx264 -c:a aac editable.mov",
+          "limits": "New lossy encoding; settings should match destination.",
+          "source": "https://ffmpeg.org/general.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg remux",
+          "steps": "ffmpeg -i handset.3gp -c copy rewrapped.mov",
+          "limits": "Conditional on original codecs fitting MOV and receiving application.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    }
+  }
+}

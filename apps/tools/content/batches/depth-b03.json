@@ -1,0 +1,792 @@
+{
+  "jpg-to-hdr": {
+    "seo": {
+      "title": "Convert JPG to HDR Online (Free, No Upload)",
+      "h1": "JPG to HDR Converter",
+      "description": "Convert a JPG to a Radiance HDR (RGBE) file in your browser. The HDR holds only the detail the JPG already had, so no new highlight range appears."
+    },
+    "tool": {
+      "subtitle": "Save a JPG as a Radiance HDR (.hdr) image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to HDR?",
+        "answer": "Choose the JPG above and save the .hdr file when it finishes. The picture is decoded by the browser's image decoder and ImageMagick writes the Radiance HDR file, all on your device."
+      },
+      {
+        "question": "Does converting JPG to HDR add dynamic range?",
+        "answer": "No. The converter turns your JPG into 8-bit pixels, and the HDR file holds those values. The format can store a wider brightness range, but the JPG has nothing more to put in it."
+      },
+      {
+        "question": "What kind of HDR file is this?",
+        "answer": "It is a Radiance HDR image, also called RGBE: a red, green and blue byte for each pixel plus a shared exponent. Renderers and lighting tools use it, for example for environment maps."
+      },
+      {
+        "question": "Does a .jpeg file work too?",
+        "answer": "Yes. The file picker takes both extensions, since they name one format, and the result is saved as a .hdr file."
+      },
+      {
+        "question": "Can I convert several JPGs, or merge exposure brackets?",
+        "answer": "You can choose several JPGs at once. They are converted in turn and every one is saved separately as a .hdr file, with no ZIP. Nothing merges them into a single HDR."
+      },
+      {
+        "question": "Does the HDR keep the photo's camera details?",
+        "answer": "No. Only the pixel values reach the HDR file, so the EXIF tags, ICC profile and XMP packet of the JPG are all left behind."
+      },
+      {
+        "question": "What does \"Image decode failed\" mean?",
+        "answer": "That error means the file could not be read as a picture. Make sure the JPG opens in an image viewer, then choose it again."
+      },
+      {
+        "question": "What opens a Radiance HDR file?",
+        "answer": "Programs such as Blender, GIMP and Luminance HDR open it, as does Adobe Photoshop. ImageMagick reads and writes it too."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and HDR",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "HDR",
+        "fullName": "Radiance HDR image",
+        "description": "A high-dynamic-range image format created for the Radiance lighting simulation software, also known as RGBE. It stores each pixel as an RGB mantissa with a shared exponent.",
+        "details": [
+          "high dynamic range",
+          "shared-exponent RGBE pixels",
+          "run-length encoding"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPG to HDR",
+      "points": [
+        "The HDR file holds only what the JPG had: 8-bit pixels.",
+        "EXIF, ICC profile and XMP are dropped.",
+        "One JPG gives one HDR file; exposure brackets are not merged."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and HDR",
+      "markdown": "### What is a JPG file?\n\nA JPG file is a photograph saved with lossy compression. The format was defined by the Joint Photographic Experts Group as ISO/IEC 10918-1 and was designed for photographs. The .jpg and .jpeg extensions are the same format.\n\nYou meet JPG files as digital camera output, as photos on the web, and as email attachments and shared pictures. The format has no alpha transparency.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP imports JPEG for editing. ImageMagick reads JPG.\n- **Windows:** Windows Photos opens JPG.\n- **Mac:** Preview opens JPG.\n- **Web and mobile:** Google Chrome shows JPG.\n- **Web:** Mozilla Firefox shows JPG.\n- **Mobile:** Safari shows JPG.\n\n### JPG and HDR compared\n\n- **Extensions**: a JPG uses .jpg or .jpeg. Radiance HDR uses .hdr or .pic.\n- **Pixels**: Radiance HDR stores a red, green and blue byte plus a shared exponent for each pixel, four bytes in all. Compared with ordinary 24-bit RGB, that leaves room for much brighter values.\n- **Compression**: JPEG is lossy. Radiance HDR uses run-length encoding.\n- **Media type**: the registered type for Radiance HDR is image/vnd.radiance.\n- **Metadata**: EXIF, ICC profile and XMP from the JPG are dropped.\n\nGreg Ward created RGBE for the Radiance lighting simulation system, where it stores calculated brightness. It is relevant when a renderer or lighting tool asks for an .hdr image. The converter hands it the 8-bit pixels of your JPG, so the extra range of the format goes unused.\n\n### Other ways to convert JPG to HDR\n\n- **ImageMagick (command line):** run `magick ordinary_photo.jpg radiance_copy.hdr`. ImageMagick lists HDR, the Radiance RGBE image format, as readable and writable.\n- **GIMP (Windows, Mac, Linux):** from File > Export As, end the name in .hdr or choose Radiance RGBE as the file type. Confirm the name and the export starts, with no options dialog.\n\n### Problems with JPG files\n\n- **Highlight detail is gone**: a JPG that lost its bright detail can't get it back from a format change. Go back to the original capture if you need that range.\n- **Transparency is missing**: JPEG can't hold transparent pixels, so choose a format with alpha instead.\n- **A photo frame won't show the file**: older frames can refuse progressive JPEG. Turn progressive mode off and export again.\n- **Quality numbers don't match between editors**: a matching number is no promise of matching compression or looks.\n- **Layers are gone**: a JPG doesn't keep an editable layer stack, so keep the project file.\n"
+    }
+  },
+  "m4a-to-aac": {
+    "seo": {
+      "title": "Convert M4A to AAC Online (Free, No Upload)",
+      "h1": "M4A to AAC Converter",
+      "description": "Convert an M4A to a standalone .aac audio file in your browser. The sound is re-encoded at 192 kbps and the cover art is left out."
+    },
+    "tool": {
+      "subtitle": "Turn an M4A recording into a plain .aac audio file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4A to AAC?",
+        "answer": "Choose the M4A above and save the .aac file when it's done. FFmpeg runs in your browser and writes a new AAC stream at 192 kbps, so nothing is uploaded."
+      },
+      {
+        "question": "Are M4A and AAC the same thing?",
+        "answer": "No. AAC is the audio coding, and M4A is an MPEG-4 file that usually holds it, or Apple Lossless. A standalone .aac file is the bare stream without the MPEG-4 wrapper."
+      },
+      {
+        "question": "Is the AAC copied out of the M4A unchanged?",
+        "answer": "No. The audio is decoded and run through the AAC encoder again. If the M4A already held AAC, that is a second lossy pass."
+      },
+      {
+        "question": "What happens to an Apple Lossless M4A?",
+        "answer": "It comes out as lossy AAC, so hold on to the M4A if the lossless version could matter later."
+      },
+      {
+        "question": "Can I get the AAC out without re-encoding?",
+        "answer": "On a desktop, `ffmpeg -i input.m4a -c:a copy -f adts output.aac` rewraps AAC audio without decoding it. It only works when the M4A holds AAC, not Apple Lossless."
+      },
+      {
+        "question": "Will the cover art and tags come across?",
+        "answer": "No. The converter leaves out video streams, which is where an M4A keeps its cover art, and the .aac file holds the audio stream alone. Keep the M4A for the artwork and tags."
+      },
+      {
+        "question": "Is renaming the file enough?",
+        "answer": "No. Renaming leaves the MPEG-4 wrapper in place, and a standalone .aac file commonly uses ADTS framing instead. Convert it so the framing is rewritten."
+      },
+      {
+        "question": "What opens a .aac file?",
+        "answer": "VLC accepts raw AAC input, FFmpeg decodes it, and Adobe Audition imports it, including HE-AAC."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and AAC",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      },
+      "toFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A lossy audio coding format carried in transports such as ADTS or in MPEG-4 containers.",
+        "details": [
+          "lossy audio coding",
+          "ADTS transport or MPEG-4 packaging",
+          "requires compatible decoder"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting M4A to AAC",
+      "points": [
+        "The audio is decoded and re-encoded as AAC, not copied.",
+        "The cover art is left out of the .aac file.",
+        "Apple Lossless becomes lossy."
+      ]
+    },
+    "guide": {
+      "title": "About M4A and AAC",
+      "markdown": "### What is an M4A file?\n\nAn M4A file is MPEG-4 audio with nothing else inside. Apple took up the extension for its unprotected music files. Most carry AAC audio, specified in ISO/IEC 14496-3, while some hold lossless Apple Lossless (ALAC), so the extension doesn't name one codec.\n\nThe wrapper can carry metadata tags and cover art, and its media type is audio/mp4. Typical sources are music from iTunes and Apple Music, podcasts and iPhone voice memos. Android plays AAC in .m4a files on every version.\n\n### Programs that open M4A files\n\n- **Windows, Mac and Linux:** Audacity brings in M4A audio after you install its optional FFmpeg library, and leaves out protected files.\n- **Web:** Firefox and Chrome play M4A audio directly.\n- **Mobile:** VLC for Android and mpv for Android play it.\n\n### M4A and AAC compared\n\n- **Layer**: M4A is a container. AAC is the coding inside it. A .aac file is the stream itself, commonly with ADTS headers.\n- **Contents**: an M4A can hold AAC or ALAC and carries tags and cover art. The .aac file this page writes holds the audio stream and nothing else.\n- **Profiles**: AAC profiles include LC, HE-AAC and HE-AAC v2.\n- **Media type**: audio/aac is registered for ADTS and LATM/LOAS transport.\n\nAAC, Advanced Audio Coding, is a lossy codec standardized through MPEG: Part 7 of MPEG-2 and Part 3 of MPEG-4. It succeeds MP3 and covers sample rates between 8 and 96 kHz. You hear it in streaming audio, music downloads and the soundtracks of MP4 videos and on mobile devices.\n\n### Other ways to convert M4A to AAC\n\n- **FFmpeg re-encode:** in a terminal, `ffmpeg -i library_item.m4a -c:a aac -b:a 192k elementary.aac` writes a new lossy AAC stream.\n- **FFmpeg rewrap:** the command `ffmpeg -i library_copy.m4a -c:a copy -f adts extracted.aac` keeps AAC as it is, without re-encoding, and can't turn ALAC into AAC.\n\n### Problems with M4A files\n\n- **Audacity shows no import**: the program asks for its optional FFmpeg library first.\n- **DRM-protected files stay closed**: Audacity's FFmpeg route can't import them.\n- **Tags get overwritten**: when several recordings go into one Audacity window, the project tags become those of the last file.\n"
+    }
+  },
+  "mp4-to-divx": {
+    "seo": {
+      "title": "Convert MP4 to DivX Online (Free, No Upload)",
+      "h1": "MP4 to DivX Converter",
+      "description": "Convert MP4 to DivX in your browser: MPEG-4 video with the DIVX tag and MP3 sound, saved as a .divx file. Free, with no sign-up and no upload."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 as DIVX-tagged MPEG-4 video with MP3 sound, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to DivX?",
+        "answer": "Choose the MP4 above and download the .divx file when it finishes. The video is re-encoded in your browser into MPEG-4 video tagged DIVX with MP3 audio, inside an AVI container."
+      },
+      {
+        "question": "What file does the converter actually write?",
+        "answer": "A file named after your MP4 with the .divx extension. The video is MPEG-4 (Part 2) with the DIVX tag, the audio is MP3 at 96 kbps, and the picture is encoded at a fixed quality setting."
+      },
+      {
+        "question": "Is the result DivX-certified?",
+        "answer": "No. The converter writes MPEG-4 video with the DIVX tag and adds nothing more. DivX certification profiles describe what a given device can play, so check your player's own list of supported formats."
+      },
+      {
+        "question": "Does it keep my video's size and frame rate?",
+        "answer": "Within limits. Frames wider or taller than 1920 px are scaled down to fit, and a frame size is never scaled up. Video faster than 30 fps has frames dropped but keeps its length, and an odd dimension loses a pixel so it comes out even."
+      },
+      {
+        "question": "Will it make a DivX menu?",
+        "answer": "No. The page converts the video and sound into one file and builds no menu. Use DivX's own authoring software if you need one."
+      },
+      {
+        "question": "Is Xvid the same as DivX?",
+        "answer": "No. Xvid is a separate encoder that FFmpeg lists as libxvid, an MPEG-4 Part 2 encoder wrapper. This page uses FFmpeg's own MPEG-4 encoder and writes the DIVX tag."
+      },
+      {
+        "question": "Will a small MP4 look better as DivX?",
+        "answer": "No. The video is re-encoded from the MP4, so the DivX copy can't show detail the MP4 lacked. Test one clip before converting a whole collection."
+      },
+      {
+        "question": "What plays a DivX file?",
+        "answer": "VLC and DivX Player play DivX files on Windows and Mac. On Linux, VLC does too, and FFplay handles DivX streams."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and DivX",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters"
+        ]
+      },
+      "toFormat": {
+        "name": "DivX",
+        "fullName": "DivX video",
+        "description": "A brand of video codec and container software from DivX, Inc. Early versions were MPEG-4 Part 2 video, usually stored in AVI files, and later versions added H.264.",
+        "details": [
+          "MPEG-4 Part 2 video",
+          "usually in AVI",
+          "proprietary codec"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to DivX",
+      "points": [
+        "You get an MPEG-4 video tagged DIVX with MP3 audio at 96 kbps, in a .divx file.",
+        "The tag is not certification for any device.",
+        "No menus are made."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and DivX",
+      "markdown": "### What is an MP4 file?\n\nMP4 is formally MPEG-4 Part 14, or ISO/IEC 14496-14, and dates from 2003. Under the hood it follows the ISO Base Media File Format; that standard comes out of Apple's QuickTime format, and stores its data in nested boxes (QuickTime's word was atoms).\n\nThe file wraps streams instead of fixing one codec. H.264 with AAC is the common combination, though AV1, VP9, MP3 and Opus can sit inside too. Both .mp4 and .m4v mark video. Registered media types: video/mp4 and audio/mp4. On Android, HEVC video inside an MP4 plays from version 5.0 on.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** mpv plays MP4 on the desktop.\n- **Windows and Mac:** Adobe Premiere imports MP4.\n- **Web:** Firefox and Chrome play MP4 directly.\n- **Mobile:** VLC for Android plays MP4, and so does VLC for iOS.\n\n### MP4 and DivX compared\n\n- **Container**: MP4 is MPEG-4 Part 14. DivX is a brand of video codec and container software from DivX, Inc., and its files are usually AVI.\n- **Video**: MP4 commonly carries H.264, H.265 or AV1. Early DivX versions were MPEG-4 Part 2 video, and later versions added H.264. This page writes MPEG-4 Part 2 video.\n- **Audio**: this page writes MP3 at 96 kbps.\n- **Extras**: Menus and chapter points come from DivX authoring, and a DivX movie can hold more than one audio track. This page adds no menu.\n- **Devices**: DivX certification profiles distinguish what a device can play, and advanced menus, chapters and tracks depend on the receiving device's profile.\n\nThe .divx extension is one of the formats DivX Player lists. The converter names your download with that extension.\n\n### Other ways to convert MP4 to DivX\n\n- **FFmpeg (command line):** run `ffmpeg -i source_movie.mp4 -c:v mpeg4 -vtag DIVX -c:a libmp3lame legacy_movie.avi`. The video is MPEG-4 with the DIVX tag, as in the converter above, and the audio is MP3.\n\n### Problems with MP4 files\n\n- **A player shows no picture or no sound**: a player that opens the container also needs a decoder for what each stream holds.\n- **A cut-off recording won't play**: a normal MP4 stores its packet metadata in one place, so an early stop can leave the file unplayable.\n"
+    }
+  },
+  "ogg-to-m4a": {
+    "seo": {
+      "title": "Convert OGG to M4A Online (Free, No Upload)",
+      "h1": "OGG to M4A Converter",
+      "description": "Convert an OGG audio file to M4A in your browser. The sound is decoded and re-encoded as AAC at 192 kbps, so it's another lossy generation."
+    },
+    "tool": {
+      "subtitle": "Turn an OGG recording into an M4A with AAC audio, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert OGG to M4A?",
+        "answer": "Pick the OGG file, wait for the conversion, then save the M4A. The sound is encoded to AAC inside your browser tab, and no upload happens."
+      },
+      {
+        "question": "Is OGG a codec?",
+        "answer": "No. Ogg is Xiph.Org's open container, and the codec inside decides how the sound is compressed. By convention .ogg means Vorbis, and .oga is the wider audio ending."
+      },
+      {
+        "question": "Which codec does the M4A use?",
+        "answer": "AAC at 192 kbps. The page doesn't keep the original Vorbis, and it offers no other bitrate."
+      },
+      {
+        "question": "Will the M4A sound as good as the OGG?",
+        "answer": "It can't be better. Vorbis is lossy and so is AAC, which makes the M4A a second lossy encode of the same sound."
+      },
+      {
+        "question": "Can I just rename .ogg to .m4a?",
+        "answer": "No. Renaming leaves the Ogg container and its audio as they were, and a player expecting MPEG-4 audio will still reject it."
+      },
+      {
+        "question": "Will the title and artist survive?",
+        "answer": "Yes. The converter sets no stream mapping, so FFmpeg's defaults copy the OGG's global tags, the title and artist among them, over to the M4A when it can hold them."
+      },
+      {
+        "question": "Can I convert several OGG files at once?",
+        "answer": "Yes. Pick several OGG files together and the converter works through them one by one, giving you a separate M4A for each rather than a ZIP."
+      },
+      {
+        "question": "Why won't my player open the OGG?",
+        "answer": "It needs the codec as well as Ogg support. An Ogg file can hold more than Vorbis, so identify the stream. VLC plays Ogg and decodes Vorbis."
+      }
+    ],
+    "aboutSection": {
+      "title": "OGG and M4A",
+      "fromFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "container for encoded media",
+          "often carries Vorbis audio",
+          "codec support varies"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting OGG to M4A",
+      "points": [
+        "The audio is decoded and re-encoded as AAC at 192 kbps.",
+        "That is a second lossy generation after Vorbis.",
+        "Video is left out, and the M4A holds audio only."
+      ]
+    },
+    "guide": {
+      "title": "About OGG and M4A",
+      "markdown": "### What is an OGG file?\n\nXiph.Org maintains Ogg, a free container that wraps compressed multimedia. Sound and video streams can be interleaved inside it, and each stream's codec, not the container, sets how it is compressed. Data is read and written in sequence, a design that fits streaming, and every page of it carries a timestamp and an error check.\n\nOgg is open and patent-free, and its uses include games, open-source music on Linux, and audio on the web. A Vorbis file usually ends in .ogg, whereas .oga is the wider ending for any audio in Ogg. RFC 5334, from September 2008, registered audio/ogg for audio-only streams and video/ogg for video.\n\n### Programs that open OGG files\n\n- **Windows, Mac and Linux:** Audacity opens Ogg Vorbis audio for editing, and VLC plays the container and decodes its Vorbis.\n- **Web:** Firefox and Chrome open OGG files.\n\n### OGG and M4A compared\n\n- **Container**: Ogg comes from Xiph.Org. M4A is audio alone, stored in an MPEG-4 file.\n- **Audio**: an OGG usually holds Vorbis, a lossy codec. An M4A holds AAC or Apple Lossless, with tags and cover art in the wrapper.\n- **Fit**: Ogg suits streaming. M4A suits software that expects MPEG-4 audio.\n\nVorbis and AAC are both lossy, so going from one to the other decodes the sound and encodes it afresh. This page asks for AAC and leaves video out.\n\n### Other ways to convert OGG to M4A\n\n- **FFmpeg (command line):** run `ffmpeg -i recording.ogg -vn -codec:a aac -b:a 192k listening-copy.m4a` to drop video and write the audio as AAC.\n- **Audacity (Windows, Mac, Linux):** import with File > Import > Audio, export through File > Export Audio and choose M4A, which needs the optional FFmpeg library.\n\n### Problems with OGG files\n\n- **Your player says it can't play it**: Ogg only packages the audio, so the player must also have a decoder for the codec inside, and the container never names which codec that is.\n- **The extension points to the wrong thing**: .ogg normally means Vorbis, but .oga covers other audio and .ogv covers video, as RFC 5334 sets out.\n- **Pieces of the recording are missing**: Ogg notices damaged pages, yet it can't rebuild the audio they held.\n"
+    }
+  },
+  "orf-to-jpg": {
+    "seo": {
+      "title": "Convert ORF to JPG Online (Free, No Upload)",
+      "h1": "ORF to JPG Converter",
+      "description": "Convert an Olympus or OM System ORF RAW photo to JPG in your browser. ImageMagick with LibRaw develops it on your device, with no upload."
+    },
+    "tool": {
+      "subtitle": "Develop an Olympus or OM System ORF RAW photo into a JPG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert ORF to JPG?",
+        "answer": "Choose the ORF above and save the JPG. ImageMagick, running as WebAssembly in the page, decodes the ORF with LibRaw on your device, and nothing is sent anywhere."
+      },
+      {
+        "question": "What is an ORF file?",
+        "answer": "It is the raw format of Olympus digital cameras, now OM System. The file is not a finished photo, so it has to be developed into visible pixels."
+      },
+      {
+        "question": "Can I change the JPG quality?",
+        "answer": "No. The page has no quality control and passes no quality value. darktable has a quality setting in its export module if you need to choose one."
+      },
+      {
+        "question": "What happens if the ORF is damaged or cut short?",
+        "answer": "Conversion stops with an error that says so, such as \"The RAW file is damaged\" or that the file ends before its picture does."
+      },
+      {
+        "question": "Does it convert several ORF files at once?",
+        "answer": "Yes. Select several ORF files and the converter handles them in turn, each result downloading as a separate JPG. The file picker lists only .orf files."
+      },
+      {
+        "question": "Should I delete the ORF after converting?",
+        "answer": "No. The ORF stays untouched, and the JPG is rendered pixels with lossy compression. Keep the ORF if you may want to develop the picture again."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "The page puts no cap on the file. It refuses only a picture whose declared pixels would pass the engine's memory, and then it says the picture is too large to convert here."
+      },
+      {
+        "question": "Why is the first conversion slow to start?",
+        "answer": "The first time, the page loads the ImageMagick WebAssembly module. Later conversions in the same visit reuse it."
+      }
+    ],
+    "aboutSection": {
+      "title": "ORF and JPG",
+      "fromFormat": {
+        "name": "ORF",
+        "fullName": "Olympus RAW Format",
+        "description": "Camera RAW data produced by supported Olympus and OM System models.",
+        "details": [
+          "unprocessed sensor data",
+          "TIFF-based structure",
+          "embedded JPEG preview"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting ORF to JPG",
+      "points": [
+        "The ORF is developed by ImageMagick with LibRaw; the page has no quality or color control.",
+        "Keep the ORF if you may want to develop the picture again.",
+        "A damaged or incomplete ORF stops with an error."
+      ]
+    },
+    "guide": {
+      "title": "About ORF and JPG",
+      "markdown": "### What is an ORF file?\n\nORF is the raw-picture extension used by Olympus and OM SYSTEM cameras. The file holds unprocessed sensor data in a TIFF-based structure, plus an embedded JPEG preview, so colors and brightness must be worked out before you see an image. It is a proprietary format.\n\nRaw compatibility is tied to the camera model and the application version: Adobe's table first lists OM-1 ORF support with Camera Raw 14.2. OM Workspace, the manufacturer's software, develops raw images with white-balance and exposure adjustments, and it records processing choices so an edit can return to its original settings.\n\n### Programs that open ORF files\n\n- **Windows and Mac:** OM Workspace is the manufacturer's raw processing software. Adobe Camera Raw also opens ORF files, so check the minimum version for your exact camera.\n- **Linux:** ImageMagick lists ORF as a readable camera raw format.\n\n### ORF and JPG compared\n\n- **What they hold**: an ORF keeps camera sensor data. A JPG keeps rendered pixels with lossy compression and no transparency.\n- **Reach**: a JPG is supported everywhere, while an ORF is proprietary and needs raw-capable software.\n\nThis page uses ImageMagick compiled to WebAssembly, which reads the ORF with the LibRaw decoder and writes the JPG on the main thread of your browser tab. It reads one image and sets no quality value.\n\n### Other ways to convert ORF to JPG\n\n- **darktable:** pick the image and open the export module. Set target storage to file on disk, select JPEG for the file format, adjust quality and size, and press start export. darktable's camera-support page lists Olympus and OM System bodies, among them the OM-1 and OM-5.\n- **ImageMagick (command line):** run `magick camera_photo.orf developed_photo.jpg`. In its format list, ORF is read-only and JPEG can be both read and written.\n\n### Problems with ORF files\n\n- **The file won't open in older software**: an older raw plug-in may lack the specific camera even when it understands other ORF files.\n- **A Workspace option is unavailable**: not every raw image supports every processing option there.\n- **High Res Shot raw needs memory**: OM Workspace wants at least 8 GB of it to process these files.\n- **A very large picture fails here**: pictures over about 537 megapixels are too big for this page.\n"
+    }
+  },
+  "psd-to-gif": {
+    "seo": {
+      "title": "Convert PSD to GIF Online (Free, No Upload)",
+      "h1": "PSD to GIF Converter",
+      "description": "Convert a Photoshop PSD to a single-frame GIF in your browser. You get one still picture limited to 256 colors, not an animation of the layers."
+    },
+    "tool": {
+      "subtitle": "Save a Photoshop PSD as a still, 256-color GIF image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert PSD to GIF?",
+        "answer": "Pick your PSD, wait a moment, then save the GIF. The whole job happens in the browser tab through ImageMagick, and the file never leaves your device."
+      },
+      {
+        "question": "Will each PSD layer become an animation frame?",
+        "answer": "No. You get a single-frame GIF built from one image in the PSD. Layers are not turned into frames."
+      },
+      {
+        "question": "How many colors does the GIF have?",
+        "answer": "At most 256 per frame, which is the GIF limit. Photos and smooth gradients get squeezed into that palette."
+      },
+      {
+        "question": "What happens to soft or partly transparent edges?",
+        "answer": "In a GIF each pixel is fully transparent or fully solid, so drop shadows and feathered edges lose their gradual fade."
+      },
+      {
+        "question": "Can I make an animated GIF from a PSD?",
+        "answer": "Not on this page, which writes one frame. GIMP can build an animation from layers, as the other-ways section above describes."
+      },
+      {
+        "question": "Should I keep the PSD?",
+        "answer": "Yes. A GIF keeps no layers, masks or editable text, so the PSD stays your master."
+      },
+      {
+        "question": "Does the converter cap the input size?",
+        "answer": "There is no cap on the file itself. Images beyond roughly 537 megapixels are turned away because they exceed what the browser engine can decode."
+      },
+      {
+        "question": "What opens a PSD if I want to check it first?",
+        "answer": "Photopea runs in a browser and opens a PSD through File > Open. ImageMagick and XnView MP read PSD on the desktop."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and GIF",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PSD to GIF",
+      "points": [
+        "The GIF is one still frame, not an animation of layers.",
+        "A GIF frame holds at most 256 colors.",
+        "A GIF has 1-bit transparency, so partial opacity is lost."
+      ]
+    },
+    "guide": {
+      "title": "About PSD and GIF",
+      "markdown": "### What is a PSD file?\n\nAdobe Photoshop saves its working documents as PSD. Inside are the layers, masks, adjustment layers and text that let a designer reopen and keep editing, in RGB or CMYK. Designers lean on it for mockups and retouching, and Adobe owns the specification.\n\nEvery file starts with the signature 8BPS, then come blocks for image resources, layer and mask data, and the merged image. Each side can be 30,000 pixels at most; PSB lifts that ceiling. Its registered media type is image/vnd.adobe.photoshop.\n\n### Programs that open PSD files\n\n- **Windows, Mac and Linux:** ImageMagick can read PSD, and so can GIMP. XnView MP also handles PSD, though business use needs a paid license.\n- **Web:** Photopea treats PSD as its home format; choose File > Open to load one.\n\n### PSD and GIF compared\n\n- **Color**: a PSD can store 1, 8, 16 or 32 bits for each channel, while a GIF frame draws from a table capped at 256 colors.\n- **Compression**: PSD stores pixels uncompressed or packed with RLE or ZIP, whereas GIF packs them with lossless LZW.\n- **Transparency**: a GIF pixel is either see-through or not, with nothing in between.\n- **Structure**: a PSD keeps layers and masks, while a GIF may hold many frames, though this page writes only one.\n\nImageMagick decodes one picture from the PSD and encodes it as GIF. No timed sequence is built from the layers.\n\n### Other ways to convert PSD to GIF\n\n- **GIMP still export:** open the PSD, pick File > Export As, choose GIF and keep As animation unticked. GIMP limits the export to 256 colors, and switching the image to indexed mode beforehand gives the best results.\n- **GIMP animation export:** give every frame its own layer, export as GIF, tick As animation, then choose the frame delay and disposal. Layer groups are not supported.\n- **ImageMagick (command line):** run `magick 'design.psd[0]' preview.gif`. The [0] picks the first image stored in the file, and the quotes stop the shell from reading the brackets.\n\n### Problems with PSD files\n\n- **The file is too big for PSD**: a canvas wider or taller than the 30,000 pixel ceiling has to go into PSB or some other format.\n- **Layers and masks vanish on export**: a flattened export can't hold the editable layers and masks, so hold on to the PSD.\n- **Another program opens it oddly**: programs other than Photoshop must interpret its private structures, so a working preview doesn't promise that every layer behaves the same.\n"
+    }
+  },
+  "svg-to-ttf": {
+    "seo": {
+      "title": "Convert SVG to TTF Online (Free, No Upload)",
+      "h1": "SVG to TTF Converter",
+      "description": "Turn the filled shapes of an SVG icon into a one-glyph TrueType font in your browser. The icon sits on U+E000, in a font named after your file."
+    },
+    "tool": {
+      "subtitle": "Create a one-glyph TrueType icon font from filled SVG shapes in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert SVG to TTF?",
+        "answer": "Choose the SVG above and save the .ttf when it's done. The page reads the filled shapes in the file and writes a TrueType font with one glyph, entirely in your browser."
+      },
+      {
+        "question": "Which character holds the icon?",
+        "answer": "U+E000, the first code point of the Unicode Private Use Area, where icon fonts usually put their glyphs. Install the font, then insert that character with the font selected."
+      },
+      {
+        "question": "What is the font called?",
+        "answer": "It takes its name from your file when the name is plain ASCII, and is called Icon otherwise."
+      },
+      {
+        "question": "Why was my SVG refused?",
+        "answer": "A stroke-only icon is refused, because a font holds filled outlines. Outline the strokes in your drawing program first. A file over 10 MB, with more than 5,000 shapes or 60,000 path commands, is also refused as too detailed."
+      },
+      {
+        "question": "Are colors, text and images kept?",
+        "answer": "No. Strokes, text, pictures, colors, clipping and masks aren't a font's. A stroke is left out with a notice, so only the filled shapes become the glyph."
+      },
+      {
+        "question": "Do holes and overlapping shapes come out right?",
+        "answer": "Usually. Overlapping shapes all fill, and holes stay holes. When a shape is too complex to check in time, the page tells you gaps where outlines cross may fill in."
+      },
+      {
+        "question": "Can it make a whole alphabet?",
+        "answer": "No. You get one glyph on one code point from the shapes in the SVG. For a multi-glyph font, use a font editor such as FontForge."
+      },
+      {
+        "question": "Is the SVG uploaded or run?",
+        "answer": "Neither. The file stays in your browser, and nothing in it runs or loads: only the shapes' geometry is read, and a `<use>` can only draw a shape from the same file."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and TTF",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics format describing shapes, text, and embedded images. Vector geometry scales independently of resolution; embedded raster images retain their pixel limits.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting"
+        ]
+      },
+      "toFormat": {
+        "name": "TTF",
+        "fullName": "TrueType font",
+        "description": "An outline font format developed by Apple and licensed to Microsoft. It is supported by Windows, macOS, Linux and web browsers.",
+        "details": [
+          "quadratic curve outlines",
+          "hinting instructions",
+          "cross-platform"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SVG to TTF",
+      "points": [
+        "Prepare filled shapes; outline any strokes first.",
+        "The icon becomes one glyph on U+E000.",
+        "Colors, text, pictures, clipping and masks are not carried into the font."
+      ]
+    },
+    "guide": {
+      "title": "About SVG and TTF",
+      "markdown": "### What is an SVG file?\n\nSVG is an XML format for drawings. It describes shapes, text and embedded images, and the geometry scales without losing sharpness. A font outline is only a filled shape, so strokes, text, colors and masks have no place in it.\n\nThis page turns the filled shapes of one SVG into a single glyph. Prepare the icon as one simple filled drawing; the artboard sets the height the glyph gets.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Inkscape edits SVG natively, and FontForge opens the finished TrueType outlines.\n- **Web:** Chrome and Firefox display SVG.\n- **Mobile:** Safari displays SVG.\n- **Windows:** Windows Font Previewer shows a font before you install it.\n- **Mac:** Font Book installs and validates font files.\n- **Linux:** GNOME Fonts previews installed typefaces.\n\n### SVG and TTF compared\n\n- **What they hold**: an SVG holds drawing instructions. A TTF holds scalable character outlines in tagged tables, with glyph mappings, metrics and naming.\n- **Origin**: Apple developed TrueType and licensed it to Microsoft. The media type is font/ttf.\n- **Scale**: the font here is built at 1,000 units to the em, with the artboard (the viewBox, else width and height, else the drawing's bounds) at full height and 150 units below the baseline.\n- **Limits**: a glyph can have at most 65,535 points, and a drawing past that is refused as too detailed.\n\nThe icon lands on U+E000 in a font named after your file.\n\n### Other ways to convert SVG to TTF\n\n- **FontForge interface (Windows, Mac, Linux):** double-click a glyph slot, choose File > Import, change the format to SVG and pick the file. Drag the outline down to the baseline, scale it with Element > Transform, then use the Generate dialog and pick the True Type outline type.\n- **FontForge scripting:** `glyph.importOutlines` accepts svg files into the foreground layer, and `font.generate` takes its output type from the extension of the file name you give it.\n- **IcoMoon (web):** add SVGs in the Import panel, then open the Export panel, keep the Font format ticked and download the package. Code points are set in the Metadata tab of the Batch panel.\n\n### Problems with SVG files\n\n- **Thin lines disappear**: a stroke becomes nothing. Convert strokes to filled outlines first.\n- **Holes fill in**: a very complex shape can run past the page's time or room, and its crossing outlines then fill. Simplify the artwork.\n- **Typing a letter shows nothing**: the icon is on U+E000, not on a familiar key. Type that code point to see it.\n- **The font won't display**: a damaged font can fail to show; Font Book on a Mac validates font files.\n"
+    }
+  },
+  "xls-to-jpg": {
+    "seo": {
+      "title": "XLS to JPG: Turn an Excel Sheet Into an Image",
+      "h1": "XLS to JPG Converter",
+      "description": "Turn an Excel XLS sheet into a JPG: copy the cells as a picture in Excel, or save the workbook as .xlsx for the XLSX to JPG converter."
+    },
+    "tool": {
+      "subtitle": "Old .xls workbooks need Excel first. Here is how to get a JPG of your cells."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert an XLS file to JPG?",
+        "answer": "Not directly. This page decodes image files, and an XLS is a workbook of cells. From Excel, save a copy as .xlsx and run that through the XLSX to JPG converter, which draws each visible sheet that has values as a table image; a large sheet is cut to what fits, with a note."
+      },
+      {
+        "question": "How do I convert XLS to JPG for free?",
+        "answer": "Save a copy as .xlsx in a free program such as LibreOffice Calc, then use the XLSX to JPG converter on this site. With Excel, you can copy the cells as a picture instead, as the other ways to convert describe."
+      },
+      {
+        "question": "How do I convert XLS to JPEG?",
+        "answer": "JPG and JPEG are the same format, so the same steps give either. Choose JPEG when you save the picture."
+      },
+      {
+        "question": "Will the JPG keep my formulas?",
+        "answer": "No. A JPG holds pixels, so you get the values and formatting you see on screen. Keep the XLS if you still need the formulas."
+      },
+      {
+        "question": "Can one workbook give several images?",
+        "answer": "Yes, but each sheet or selected range becomes its own picture. Copy one range at a time. The XLSX to JPG converter makes one image per sheet, named after it."
+      },
+      {
+        "question": "How do I save just part of a sheet as an image?",
+        "answer": "Mark the cells, then use the Copy drop-down in the Clipboard group of the Home tab and pick Copy as Picture. After pasting, right-click the picture to Save as Picture."
+      },
+      {
+        "question": "Why is the text in my JPG blurry?",
+        "answer": "A big range squeezed into a small picture leaves too few pixels per letter. In the Copy Picture dialog, choose As shown on screen and Picture for the best quality, and copy a smaller range."
+      },
+      {
+        "question": "Should I keep the XLS file?",
+        "answer": "Yes. The picture can't be edited or recalculated, so the workbook stays your master copy."
+      }
+    ],
+    "aboutSection": {
+      "title": "XLS and JPG",
+      "fromFormat": {
+        "name": "XLS",
+        "fullName": "Microsoft Excel binary workbook",
+        "description": "A binary spreadsheet workbook format used by Microsoft Excel, holding worksheets, formulas, formatting, and charts.",
+        "details": [
+          "legacy binary format",
+          "maximum 65,536 rows and 256 columns per sheet",
+          "formulas and charts"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting XLS to JPG",
+      "points": [
+        "This page cannot open .xls files.",
+        "Save the workbook as .xlsx first, or copy a picture of the cells from Excel.",
+        "The JPG holds how the cells look, not their formulas."
+      ]
+    },
+    "guide": {
+      "title": "About XLS and JPG",
+      "markdown": "### What is an XLS file?\n\nXLS is the binary workbook format of Microsoft Excel. The Excel 97-2003 version uses BIFF8, and Excel 5.0/95 used a BIFF5 variant with the same ending. A sheet holds up to 65,536 rows and 256 columns, and current Excel versions show such a file with the Compatibility Mode label. Its media type is application/vnd.ms-excel.\n\nA workbook describes cells, not a picture. Before a JPG exists, you have to decide which cells it should show, since a sheet can run far past one screen. That is why the converter above can't do it alone: it reads image files, and XLS is not one. For a picture of every visible sheet, save the workbook as .xlsx and use the XLSX to JPG converter.\n\n### Programs that open XLS files\n\n- **Windows, Mac and Linux:** LibreOffice Calc reads Excel workbooks, including the legacy binary kind.\n- **Windows:** Microsoft Excel loads a legacy workbook when you use File > Open.\n- **Linux:** Gnumeric documents Excel import support.\n- **Web:** Google Sheets imports Excel files. Excel for the web turns a legacy XLS into an XLSX working copy.\n- **Mobile:** Numbers for iPhone imports .xls files, and Excel for Android and iOS opens a legacy XLS read-only.\n\n### XLS and JPG compared\n\n- **Contents**: XLS stores cells, formulas, formatting and charts. JPG stores a grid of pixels and nothing else.\n- **Compression**: JPG is lossy, so thin gridlines and small text can smear.\n- **Editing**: the image can't be recalculated or sorted.\n- **Layout**: the picture shows only the range you copy, so the columns and rows on screen decide what appears.\n\n### Other ways to convert XLS to JPG\n\n- **Excel and PowerPoint:** select the cells, pick Copy as Picture from the Copy drop-down of the Home tab. In the Copy Picture dialog set Appearance to As shown on screen and Format to Picture, then click OK. Paste into PowerPoint with Ctrl+V, right-click the pasted picture, choose Save as Picture and select JPEG as the file type. The result matches what the cells look like on screen.\n\n### Problems with XLS files\n\n- **Modern features go missing**: worksheet features can be lost when a workbook is saved as Excel 97-2003.\n- **Cells beyond the limits**: an XLS cannot hold cells outside its older row and column limits.\n- **Small text smears**: capture fewer cells per image instead of shrinking a large range.\n"
+    }
+  },
+  "xps-to-jpg": {
+    "seo": {
+      "title": "XPS to JPG: Render XPS Pages as Images",
+      "h1": "XPS to JPG Converter",
+      "description": "This page can't render XPS documents. Use MuPDF's mutool draw to write each page as a PNG, then turn the PNGs into JPG with ImageMagick."
+    },
+    "tool": {
+      "subtitle": "XPS is a fixed-layout document, not a picture. Here is how to get its pages as JPG images."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert XPS to JPG?",
+        "answer": "No. The converter reads image files, and an XPS is a document package of XML pages. Render it with MuPDF or a viewer that supports XPS instead."
+      },
+      {
+        "question": "How do I convert XPS to JPG?",
+        "answer": "With MuPDF installed, call mutool draw on the XPS with an output name like page-%d.png, and you get one PNG per page. Then turn each PNG into a JPG with ImageMagick."
+      },
+      {
+        "question": "Can mutool write JPEG directly?",
+        "answer": "No. Its documented image outputs are pbm, pgm, ppm, pam, png, pwg, pcl and ps. Draw PNG pages first, then convert each one."
+      },
+      {
+        "question": "How do I get every page of the XPS?",
+        "answer": "Put %d in the output name, as in page-%d.png, and mutool numbers one file per page."
+      },
+      {
+        "question": "What opens an XPS file?",
+        "answer": "SumatraPDF on Windows, Okular on Linux, and the MuPDF viewer on Windows, Mac and Linux. On a Mac, mutool draw renders its pages."
+      },
+      {
+        "question": "Why does renaming the file to .jpg not work?",
+        "answer": "Renaming only changes the label. The file is still a ZIP package of XML pages, and no image program can read it as a picture."
+      },
+      {
+        "question": "Will the text stay selectable in the JPG?",
+        "answer": "No. A JPG holds pixels, so the text becomes part of the picture. Keep the XPS if you need to search or copy from it."
+      },
+      {
+        "question": "How sharp will the JPG be?",
+        "answer": "As sharp as the resolution you render at. mutool draws at 72 dpi unless you set `-r`, so give it a higher number for small print."
+      }
+    ],
+    "aboutSection": {
+      "title": "XPS and JPG",
+      "fromFormat": {
+        "name": "XPS",
+        "fullName": "XML Paper Specification",
+        "description": "A fixed-layout document format associated with Microsoft. ECMA-388 defines the related OpenXPS specification; original XPS and OpenXPS should not be treated as identical variants.",
+        "details": [
+          "fixed page layout",
+          "ZIP package of XML",
+          "vector graphics"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting XPS to JPG",
+      "points": [
+        "This page cannot read XPS files.",
+        "mutool draw renders each page of an XPS as a numbered image.",
+        "The JPG holds pixels, so the text is no longer selectable."
+      ]
+    },
+    "guide": {
+      "title": "About XPS and JPG",
+      "markdown": "### What is an XPS file?\n\nXPS stands for XML Paper Specification. It is a fixed-layout format for electronic documents and printing, built from XML inside Open Packaging Conventions. Every page keeps its layout instead of reflowing, the document is a list of fixed documents and fixed pages, and fonts can be embedded. Its registered media type is application/vnd.ms-xpsdocument.\n\nThe converter above reads image files, so it cannot render an XPS. Use a program that understands XPS to draw the pages, then save them as JPGs.\n\n### Programs that open XPS files\n\n- **Windows, Mac and Linux:** the MuPDF viewer lists XPS among its supported formats.\n- **Windows:** SumatraPDF is a free Windows reader with XPS support.\n- **Mac:** `mutool draw` reads XPS pages for rendering.\n- **Linux:** Okular lists XPS among its document handlers.\n\n### XPS and JPG compared\n\n- **Layout**: XPS describes pages with fixed positions. JPG is one picture, so a multi-page XPS becomes one JPG per page.\n- **Text**: XPS keeps its text as text. In a JPG it is part of the pixels, so searching and copying stop working.\n- **Fonts**: an XPS can embed its fonts, so the page looks the same on any machine. A JPG has no fonts to lose.\n- **Compression**: JPG is lossy, so fine rules and small type need a high render resolution.\n\n### Other ways to convert XPS to JPG\n\n- **MuPDF and ImageMagick:** `mutool draw -r 150 -o page-%d.png document.xps` writes a PNG for every page at 150 dpi. Then run `magick page-1.png page-1.jpg` on each one you want. mutool cannot write JPEG itself, so the PNG step is needed.\n\n### Problems with XPS files\n\n- **Only one page came out**: use %d in the output name so every page gets a file.\n- **The text looks fuzzy**: render again with a higher `-r` value.\n- **A viewer won't open it**: use one that lists XPS support, such as SumatraPDF or MuPDF.\n- **Annotations or forms are missing**: viewer features differ by format, so don't assume PDF annotations or forms also work in XPS.\n- **You need to edit the pages**: an XPS page description is not the editable source, so keep the original authoring file.\n"
+    }
+  },
+  "3gp-to-mov": {
+    "seo": {
+      "title": "Convert 3GP to MOV Online (Free, No Upload)",
+      "h1": "3GP to MOV Converter",
+      "description": "Turn a .3gp phone clip into a .mov in your browser. The video is re-encoded as H.264 with AAC audio, and nothing is uploaded."
+    },
+    "tool": {
+      "subtitle": "Convert a 3GP phone video to a MOV with H.264 video and AAC audio, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert 3GP to MOV?",
+        "answer": "Choose the 3GP above and save the .mov when it finishes. FFmpeg runs in your browser, so the clip is never uploaded."
+      },
+      {
+        "question": "What video and audio does the MOV contain?",
+        "answer": "You get H.264 video with AAC sound. Both are re-encoded, even when the 3GP already held H.264."
+      },
+      {
+        "question": "Does the converter change the picture size or frame rate?",
+        "answer": "Yes, within limits. If the longer side passes 1920 pixels the frame shrinks to fit, and a rate over 30 frames a second is held at 30. Small frames stay as they are. An odd width or height loses 1 pixel, since both sides end on even numbers."
+      },
+      {
+        "question": "Does the converter limit the clip length?",
+        "answer": "Nothing here cuts off a clip or sets a timer. Longer videos just keep your device busy for longer."
+      },
+      {
+        "question": "Can I just rename the 3GP to MOV?",
+        "answer": "No. Renaming leaves the old 3GP contents in place, and the codecs inside, such as H.263 or AMR audio, may be ones your editor can't read. Converting writes new H.264 and AAC streams."
+      },
+      {
+        "question": "What about interlaced clips?",
+        "answer": "A deinterlace filter runs on any frames flagged as interlaced. Progressive clips pass through it unchanged."
+      },
+      {
+        "question": "Can I convert without re-encoding?",
+        "answer": "On a desktop, FFmpeg can rewrap the streams into a MOV without re-encoding; the command is under the other ways to convert. It only works when the codecs inside are ones MOV and your editor accept."
+      },
+      {
+        "question": "What plays a MOV file?",
+        "answer": "On Windows, Mac and Linux, mpv plays it, and Adobe Premiere imports it on Windows and Mac. Phones can use VLC for Android or iOS."
+      }
+    ],
+    "aboutSection": {
+      "title": "3GP and MOV",
+      "fromFormat": {
+        "name": "3GP",
+        "fullName": "3GPP multimedia",
+        "description": "A container format defined by the 3rd Generation Partnership Project for video on mobile phones. It is a simplified version of the MP4 container and keeps files small.",
+        "details": [
+          "MPEG-4-based container",
+          "H.263, H.264 and AAC or AMR audio",
+          "small files"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting 3GP to MOV",
+      "points": [
+        "The video is re-encoded as H.264 with AAC audio, not copied.",
+        "Frames above 1920 pixels or 30 fps are reduced.",
+        "A 3GP with only sound has no video to recover."
+      ]
+    },
+    "guide": {
+      "title": "About 3GP and MOV",
+      "markdown": "### What is a 3GP file?\n\nThe 3GP format comes from 3GPP, a specialization of ISO's media file layout, for messaging, downloads and packet-switched streaming on phones. A clip can combine video, speech, other sound and timed text. Video may be H.263, MPEG-4 Visual, AVC or HEVC, and sound may be an AMR variant or AAC. The extension doesn't tell you which a given clip uses, and a conforming parser may ignore boxes or codecs outside the spec. The media types are video/3gpp, and audio/3gpp for sound only.\n\nA MOV is QuickTime's own container. It keeps video, audio, text and timecode in separate tracks and can hold many codecs, ProRes among them. Changing the ending doesn't transcode anything or install a missing decoder, which is why a real conversion is the safer route when an editor refuses the clip.\n\n### Programs that open 3GP files\n\n- **Windows, Mac and Linux:** VLC lists 3GP among its inputs, and FFmpeg reads 3GP containers. For the finished MOV, mpv plays it on the desktop.\n\n### 3GP and MOV compared\n\n- **Purpose**: 3GP was built for small phone clips. MOV is a general container used in editing.\n- **Lineage**: 3GP is a simplified version of the MP4 container. MOV, the QuickTime container, is what MPEG-4's file format grew from.\n- **Codecs**: a 3GP can carry H.263 and AMR audio. This converter writes H.264 and AAC.\n- **Size**: the output keeps the frame size up to 1920 pixels and the frame rate up to 30 fps.\n\n### Other ways to convert 3GP to MOV\n\n- **FFmpeg transcode:** run `ffmpeg -i handset.3gp -c:v libx264 -c:a aac editable.mov` for new H.264 and AAC streams.\n- **FFmpeg remux:** run `ffmpeg -i handset.3gp -c copy rewrapped.mov` to rewrap the streams without re-encoding. It works only if the original codecs fit MOV and your editor.\n\n### Problems with 3GP files\n\n- **No video in the file**: a 3GP may be sound only, and there is nothing to recover.\n- **The editor rejects the MOV**: QuickTime containers can use codecs your editor lacks. Convert it, so the streams are H.264 and AAC.\n- **Renamed file won't open**: the old codecs are still inside. Convert instead of renaming.\n- **A MOV that stopped mid-write**: an ordinary MOV can be left unusable by a write that was cut short.\n"
+    }
+  }
+}
