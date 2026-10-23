@@ -4,21 +4,22 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildToolMetadata } from "@/lib/metadata";
+import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 
 const toolId = "html-to-markdown";
-// The H1 and the line under it.
-const title = "HTML to Markdown Converter";
+// The line under the H1, which the structured data repeats.
 const subtitle = "Paste HTML on the left and get clean Markdown on the right — instantly, in your browser.";
 
 export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
+  const heading = toolHeading(toolId);
+
   return (
     <main className="min-h-screen bg-background">
-      <StructuredData toolId={toolId} name={title} description={subtitle} />
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
 
-      <HtmlToMarkdownConverter title={title} subtitle={subtitle} />
+      <HtmlToMarkdownConverter heading={heading} subtitle={subtitle} />
 
       <HowToSection
         title="How to convert HTML to Markdown"
@@ -33,7 +34,7 @@ export default function Page() {
       <InfoArticleSection
         title="About HTML to Markdown conversion"
         markdown={[
-          "This converter turns full HTML documents or snippets into clean Markdown text, directly in your browser using the high-performance [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown) WebAssembly library.",
+          "This converter turns full HTML documents or snippets into clean Markdown text, directly in your browser using the high-performance [html-to-markdown](https://github.com/xberg-io/html-to-markdown) WebAssembly library.",
           "**Why convert HTML to Markdown?**",
           "Markdown is a lightweight, human-readable format widely used in documentation, README files, wikis, static site generators, and note-taking apps like Obsidian and Notion. Converting HTML to Markdown makes content easier to edit, diff, and version-control.",
           "**Privacy first**",

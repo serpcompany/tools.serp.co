@@ -1,0 +1,189 @@
+{
+  "tools": {
+    "png-to-epub": {
+      "methods": [
+        {
+          "app": "LibreOffice Writer",
+          "steps": "Choose Insert > Image to place the PNG, then File > Export As > Export as EPUB.",
+          "limits": "Choose fixed or reflowable layout deliberately; image pixels do not become editable paragraphs.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_epub_export.html",
+          "supportSource": "https://help.libreoffice.org/latest/en-US/text/shared/01/04140000.html"
+        },
+        {
+          "app": "Pandoc",
+          "steps": "Create page.md containing ![Image description](picture.png), then run pandoc page.md -o book.epub.",
+          "limits": "This builds an image-containing publication from Markdown; it does not recognize words in the image.",
+          "source": "https://pandoc.org/epub.html",
+          "supportSource": "https://pandoc.org/MANUAL.html"
+        },
+        {
+          "app": "Pages on Mac",
+          "steps": "Click the Insert Media button, choose Photos or Videos to pick the PNG, then choose File > Export To > EPUB.",
+          "limits": "The document type and export settings determine fixed or reflowable layout.",
+          "source": "https://support.apple.com/guide/pages/export-to-word-pdf-or-another-file-format-tance1161f26/mac",
+          "supportSource": "https://support.apple.com/guide/pages/add-an-image-tanb3bc78786/mac"
+        }
+      ]
+    },
+    "png-to-psd": {
+      "methods": [
+        {
+          "app": "Photopea",
+          "steps": "Choose File > Open and pick the PNG, then choose File > Save as PSD.",
+          "limits": "A flattened PNG has no hidden text or layers to restore.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick artwork.png artwork.psd.",
+          "limits": "A format change cannot separate baked-in objects.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "svg-to-webp": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick diagram.svg diagram.webp.",
+          "limits": "Its SVG renderer determines how the drawing looks.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Inkscape and cwebp",
+          "steps": "Export the SVG as PNG in Inkscape with File > Export PNG Image, choosing the area and size, then run cwebp -lossless diagram.png -o diagram.webp.",
+          "limits": "Two-stage raster workflow; cwebp does not read SVG directly.",
+          "source": "https://developers.google.com/speed/webp/docs/cwebp",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+        }
+      ]
+    },
+    "tiff-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick \"scan.tiff[0]\" scan.jpeg.",
+          "limits": "The bracketed number picks the image to read, starting at 0; use another number for another page.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "sips on Mac",
+          "steps": "Run sips -s format jpeg scan.tiff --out scan.jpg in Terminal.",
+          "limits": "The format option lists tiff and jpeg among its values.",
+          "source": "https://ss64.com/mac/sips.html"
+        }
+      ]
+    },
+    "avif-to-svg": {
+      "methods": [
+        {
+          "app": "avifdec and Inkscape",
+          "steps": "Run avifdec illustration.avif illustration.png, then bring the PNG into Inkscape with File > Import and choose to embed it.",
+          "limits": "The result contains a raster image unless you separately trace it.",
+          "source": "https://raw.githubusercontent.com/AOMediaCodec/libavif/main/doc/avifdec.1.md",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/import-pictures.html"
+        },
+        {
+          "app": "GIMP and Inkscape tracing",
+          "steps": "Open the AVIF in GIMP and use File > Export As to save a PNG; import that PNG in Inkscape, select it, choose Path > Trace Bitmap and click Ok.",
+          "limits": "The trace appears over the original bitmap.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick and Potrace",
+          "steps": "Run magick mark.avif mark.bmp, then potrace -s mark.bmp -o mark.svg.",
+          "limits": "Potrace takes bitmap input and has a black level cutoff setting.",
+          "source": "https://potrace.sourceforge.net/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "cdr-to-svg": {
+      "methods": [
+        {
+          "app": "CorelDRAW",
+          "steps": "Open the drawing and choose File > Export; pick SVG from the Save as type list, then set the compatibility, encoding and text options.",
+          "limits": "Objects with mesh fills or drop shadows are exported as bitmaps; text can be exported as characters or curves.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Scalable-Vector-Graphics-SVG.html",
+          "supportSource": "https://www.coreldraw.com/en/learn/tutorials/how-to-open-cdr-file/"
+        },
+        {
+          "app": "Inkscape",
+          "steps": "Open a supported CDR, then save and choose the .svg (Plain SVG) type.",
+          "limits": "Its documented import list names CorelDRAW 7–X4; not every newer drawing or effect is guaranteed.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/saving.html",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html"
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Run soffice --convert-to svg drawing.cdr.",
+          "limits": "LibreOffice imports CDR through libcdr; its filter list includes an SVG export filter.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/start_parameters.html",
+          "supportSource": "https://raw.githubusercontent.com/LibreOffice/core/master/writerperfect/source/draw/CDRImportFilter.cxx"
+        }
+      ]
+    },
+    "gif-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick \"reaction.gif[0]\" reaction.jpeg.",
+          "limits": "The bracketed number picks the frame to read, starting at 0.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Preview on Mac",
+          "steps": "Open the GIF, choose File > Export, choose JPEG from the Format pop-up menu, then click Save.",
+          "limits": "Open several files in one window and select them in the sidebar to convert together.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac",
+          "supportSource": "https://support.apple.com/guide/preview/view-an-animated-gifs-frames-prvw1016/mac"
+        }
+      ]
+    },
+    "jpeg-to-gif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG, choose File > Export As, export it as a GIF and confirm the options in the GIF Export dialog.",
+          "limits": "GIMP exports a GIF with at most 256 colors, which can change gradients.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick photo.jpeg photo.gif.",
+          "limits": "This gives a still GIF from a still image.",
+          "source": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "mp3-to-aiff": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i voice.mp3 -c:a pcm_s16be voice.aiff.",
+          "limits": "Decodes the MP3 to 16-bit big-endian PCM; it does not restore discarded source detail.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "Apple Music on Mac",
+          "steps": "Choose Music > Settings > Files > Import Settings and set Import Using to AIFF; select the songs, then File > Convert > Create AIFF Version.",
+          "limits": "The song takes up much more space and sounds the same as the MP3.",
+          "source": "https://support.apple.com/en-us/108961"
+        },
+        {
+          "app": "iTunes on Windows",
+          "steps": "Choose Edit > Preferences > General > Import Settings, set Import Using to AIFF Encoder, select the song, then File > Convert > Create AIFF Version.",
+          "limits": "Apple limits conversion of store purchases to iTunes Plus songs.",
+          "source": "https://support.apple.com/guide/itunes/convert-music-file-formats-itns2972/windows",
+          "supportSource": "https://support.apple.com/guide/itunes/choose-import-settings-itns2965/windows"
+        }
+      ]
+    }
+  }
+}

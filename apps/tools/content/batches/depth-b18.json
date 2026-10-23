@@ -1,0 +1,800 @@
+{
+  "avif-to-eps": {
+    "seo": {
+      "title": "Convert AVIF to EPS Online (Free)",
+      "h1": "AVIF to EPS Converter",
+      "description": "Turn an AVIF into an EPS for a print or layout workflow. The EPS holds the picture's pixels, not vector paths, and metadata is dropped. Free."
+    },
+    "tool": {
+      "subtitle": "Save an AVIF as an EPS file that print and layout programs can place."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to EPS?",
+        "answer": "Add the AVIF above and download the EPS when it finishes. Add several AVIFs and each one gets its own EPS. Illustrator can open an EPS or place it in a layout."
+      },
+      {
+        "question": "Will the EPS be a vector file?",
+        "answer": "No. The EPS carries the AVIF's pixels, and nothing is traced into paths. Enlarging it past the AVIF's size only enlarges those pixels."
+      },
+      {
+        "question": "Does the EPS keep a transparent background?",
+        "answer": "EPS cannot hold live transparency. Put the picture on the background you need before converting, or choose PNG, which keeps transparency here."
+      },
+      {
+        "question": "Will a 10-bit or HDR AVIF keep its extra depth?",
+        "answer": "No. The converter carries the pixels at 8 bits per channel, so the extra depth of a 10- or 12-bit AVIF is lost."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "The EPS comes from the first frame alone. An EPS describes one graphic, so the rest of the sequence has nowhere to go."
+      },
+      {
+        "question": "Is the EXIF or color profile copied over?",
+        "answer": "No. EXIF, XMP and ICC profile data are dropped because only pixels reach the EPS. If a printer needs a specific profile, assign it in your layout program."
+      },
+      {
+        "question": "Why does the page say my browser cannot open the AVIF?",
+        "answer": "AVIF is decoded by the browser itself. Without that decoder, the page asks you to try an up-to-date Chrome, Edge, Firefox or Safari."
+      },
+      {
+        "question": "Can I convert a very large AVIF?",
+        "answer": "The page checks the file's type but sets no cap on its size, and the work is done by your own device."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and EPS",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "A modern image format from the Alliance for Open Media that stores AV1-coded images in the HEIF container.",
+        "details": [
+          "Lossy and lossless",
+          "Transparency and HDR",
+          "Royalty-free",
+          "Up to 12 bits per channel"
+        ]
+      },
+      "toFormat": {
+        "name": "EPS",
+        "fullName": "Encapsulated PostScript",
+        "description": "An Adobe format from the late 1980s that describes one rectangular graphic in PostScript, used to place artwork in printed documents.",
+        "details": [
+          "One graphic per file",
+          "PostScript instructions",
+          "Vector and raster content",
+          "No live transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to EPS",
+      "points": [
+        "The EPS holds the AVIF's pixels, with no vector paths.",
+        "EPS has no live transparency.",
+        "Depth above 8 bits per channel is lost.",
+        "An animated AVIF gives its first frame.",
+        "EXIF, ICC and XMP data are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About AVIF files",
+      "markdown": "### What is an AVIF file?\n\nAVIF is the work of the Alliance for Open Media, a body founded in 2015 to build royalty-free media formats. Version 1.0.0 of its specification is dated 19 February 2019. AV1-coded pictures go into a HEIF container to make an AVIF, which supports lossy or lossless compression, transparency, image sequences and HDR color up to 12 bits per channel.\n\nExif, XMP and an ICC color profile can travel inside the file. The price is speed: AVIF pictures decode slowly, and encoding one can take several seconds. Its registered media type is image/avif.\n\n### Programs that open AVIF files\n\n- **Windows, Mac and Linux:** GIMP imports and exports AVIF from version 2.10.22, and ImageMagick reads it.\n- **Web:** Firefox 93 added AVIF decoding, following Chrome 85, and Chrome for Android decodes AVIF as well.\n- **Mobile:** Safari on iOS 16 added still AVIF images.\n\n### AVIF and EPS compared\n\n- **Age**: Adobe built EPS in the late 1980s so illustrators could place artwork in printed documents.\n- **Content**: an EPS describes one rectangular graphic in PostScript. It can mix vector drawing commands with raster pictures, and here it holds the raster picture from your AVIF.\n- **Transparency**: AVIF supports it, while live transparency does not exist in EPS.\n- **Reading it**: Illustrator opens or places an EPS, and ImageMagick needs Ghostscript to render one. Current macOS has no built-in EPS viewer.\n\nThe browser's own decoder reads the AVIF, and ImageMagick, loaded in the page, writes the EPS.\n\n### Other ways to convert AVIF to EPS\n\n- **GIMP:** read the AVIF in, then use File > Export As, naming the file so it ends in .eps. The EPS dialog sets the width, height and offsets, an Encapsulated PostScript checkbox, and an optional preview image.\n\n### Problems with AVIF files\n\n- **An older browser shows nothing**: serve a JPEG, PNG or WebP fallback beside the AVIF.\n- **GIMP will not open it**: the AVIF importer is missing from releases earlier than 2.10.22.\n- **Windows will not show it**: viewing .avif files needs Microsoft's AV1 Video Extension alongside its HEIF Image Extension.\n- **A 10-bit file on Android**: baseline 8-bit AVIF decoding is supported on phones and tablets from Android 12, and 10-bit decoding is optional."
+    }
+  },
+  "bmp-to-tga": {
+    "seo": {
+      "title": "Convert BMP to TGA Online (Free)",
+      "h1": "BMP to TGA Converter",
+      "description": "Save a BMP as a Targa (TGA) file for a game engine or video tool. It rebuilds the image from its pixels and drops metadata. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a BMP into a Targa file for texture and video tools."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BMP to TGA?",
+        "answer": "Add the BMP above and download the TGA when it is ready. Add several BMPs and each one is converted in turn and downloaded as its own TGA."
+      },
+      {
+        "question": "Will the TGA look sharper than my BMP?",
+        "answer": "No. A new format adds no detail, because the TGA only repeats the pixels the decoder read from your BMP."
+      },
+      {
+        "question": "Can I choose the color depth or RLE compression?",
+        "answer": "No. The page passes no settings to the converter. GIMP's Targa dialog lets you set RLE compression and the origin yourself."
+      },
+      {
+        "question": "What is the TGA file called?",
+        "answer": "The download is named after your BMP with the extension changed, so texture.bmp arrives as texture.tga."
+      },
+      {
+        "question": "Does the TGA keep the BMP's metadata or color profile?",
+        "answer": "No. The TGA is written from decoded pixels alone, so any profile or metadata stored in the BMP is not carried over."
+      },
+      {
+        "question": "What does \"Image decode failed\" mean?",
+        "answer": "Your browser could not read the file as a BMP picture, so no TGA was made. Try opening the BMP in an image program; if it opens there, save a fresh copy and convert that."
+      },
+      {
+        "question": "Does the BMP get sent anywhere?",
+        "answer": "No. A Web Worker in your browser reads the BMP and writes the TGA, and no server sees either file."
+      },
+      {
+        "question": "Does converting change my BMP?",
+        "answer": "No. Your BMP is not touched; the page hands you a separate TGA."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and TGA",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format from Microsoft, used on Windows and OS/2, that usually stores pixels uncompressed.",
+        "details": [
+          "Mostly uncompressed",
+          "Windows and OS/2 origin",
+          "Version 5 adds alpha and ICC"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision Targa",
+        "description": "A raster format tied to Truevision video boards, supporting RGB, indexed-color and grayscale images.",
+        "details": [
+          "RGB, indexed and grayscale",
+          "24-bit and 32-bit variants",
+          "Optional alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to TGA",
+      "points": [
+        "The TGA is written from the BMP's pixels after your browser decodes it.",
+        "The page has no depth or compression setting.",
+        "EXIF data, color profiles and XMP are dropped.",
+        "Each BMP gives its own download, named after it with a .tga extension."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nBMP is a bitmap family that Microsoft controls, first used on Windows and OS/2. Pixels in a BMP usually sit uncompressed, and lossless compression is an option. Version 5 of the format arrived with Windows 98 in 1998, and from then on a BMP can include an ICC profile and an alpha channel.\n\nScreen captures from Windows and its system graphics are the usual places a BMP turns up. Nothing editable survives in a BMP, such as vector shapes or live typography; it is just the finished picture. Its registered media type is image/bmp.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** Open BMP files with ImageMagick, or with XnView MP, which also supports the format but wants a license for company use.\n- **Web:** Firefox shows BMP pictures in a tab, and Mozilla's compatibility table lists Chrome as a supporting browser.\n\n### BMP and TGA compared\n\n- **Background**: Targa is a raster format tied to Truevision video boards, and video editing and game development still use it.\n- **Color modes**: it holds RGB, indexed-color and grayscale images.\n- **Compression**: Targa offers optional run-length encoding to cut storage, where a BMP normally stays uncompressed.\n- **Alpha**: transparency in a Targa comes from the extra eight bits of a 32-bit file, so RGB artwork saved at 24 bits has none.\n- **Names**: ImageMagick groups ICB, VDA and VST files with Targa.\n- **Tools**: GIMP's Targa plug-in loads and exports it, ImageMagick reads and writes it, and Photoshop offers Targa save options.\n\nThe browser decodes the BMP, then ImageMagick inside the page encodes the Targa from the resulting pixels.\n\n### Other ways to convert BMP to TGA\n\n- **ImageMagick:** run `magick texture.bmp texture.tga`. ImageMagick's format table lists BMP and TGA as both readable and writable.\n- **GIMP:** load the BMP, then choose File > Export As and save under a name with the .tga ending. The Targa dialog has an RLE compression checkbox and an Origin choice, which sets the order the pixel data is stored in and does not change how the image looks.\n\n### Problems with BMP files\n\n- **Large files**: uncompressed pixels fill disk space quickly, so share a PNG or JPEG instead.\n- **An older program rejects it**: a program that expects an older bitmap header may need ImageMagick's BMP3 or BMP2 output instead of the default version.\n- **You wanted editable shapes or text**: those were never stored in the BMP, and a converter cannot bring back vectors or type."
+    }
+  },
+  "bmp-to-tif": {
+    "seo": {
+      "title": "Convert BMP to TIF Online (Free)",
+      "h1": "BMP to TIF Converter",
+      "description": "Save a BMP as a TIFF for scanning, print or archive workflows. The TIFF is built from the BMP's pixels, with metadata dropped. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a BMP into a TIFF without installing anything."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BMP to TIFF?",
+        "answer": "Add the BMP above and download the TIFF when it finishes. Each file you add gives its own TIFF, and your BMP is left unchanged."
+      },
+      {
+        "question": "Does the TIFF keep all of the BMP's detail?",
+        "answer": "No quality value is set, and each channel is carried at 8 bits through the converter. A new format does not add detail the BMP never had."
+      },
+      {
+        "question": "Will the TIFF be smaller than the BMP?",
+        "answer": "The page has no compression setting. To choose one, export from GIMP, whose TIFF dialog has a compression list, or run ImageMagick with -compress LZW."
+      },
+      {
+        "question": "Should I use the .tif or .tiff extension?",
+        "answer": "The download keeps your BMP's name and uses .tif as the extension. The two extensions name one format, registered as image/tiff."
+      },
+      {
+        "question": "Is the TIFF a multi-page file?",
+        "answer": "No. The converter reads one image, so the TIFF holds one picture. TIFF itself can hold several images, which is why some programs show a page list."
+      },
+      {
+        "question": "Does the TIFF keep the BMP's color profile?",
+        "answer": "No. Only pixels are written, so the ICC profile a version 5 BMP can store does not reach the TIFF."
+      },
+      {
+        "question": "Is there a size limit for the BMP?",
+        "answer": "The page sets no general file-size limit. It checks the file's format, not its size."
+      },
+      {
+        "question": "Does the BMP leave my computer?",
+        "answer": "No, the file stays on your device; your browser tab does both the decoding and the encoding, with no upload step."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and TIFF",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format from Microsoft that usually stores pixels uncompressed.",
+        "details": [
+          "Mostly uncompressed",
+          "Version 5 adds alpha and ICC",
+          "Windows and OS/2 origin"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A tag-based raster wrapper developed by Aldus and Microsoft, with revision 6.0 published in 1992.",
+        "details": [
+          "Several compression methods",
+          "Several color representations",
+          "Can hold many images"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to TIFF",
+      "points": [
+        "The TIFF is written from the BMP's pixels after your browser decodes them.",
+        "The page has no compression setting.",
+        "ICC profiles, EXIF data and XMP are dropped.",
+        "Each BMP gives one single-image TIFF, downloaded as its own file."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nBorn on Windows and OS/2, BMP is a bitmap family that Microsoft controls. A typical file stores its pixels uncompressed, though lossless compression is part of the format. Version 5, released alongside Windows 98 in 1998, can carry an ICC profile and an alpha channel.\n\nBMP files mostly appear as Windows screen captures or system graphics. It keeps only pixels, with no editable vector shapes or live text. Its registered media type is image/bmp.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** ImageMagick can read a BMP. XnView MP includes BMP in its format list too, and business use of XnView MP is licensed.\n- **Web:** In Firefox a BMP displays as ordinary browser content, and Mozilla's compatibility table credits Chrome with BMP support.\n\n### BMP and TIFF compared\n\n- **Design**: tags organize a TIFF, which lets a single file choose among several compression methods and ways of representing color. A BMP is far simpler.\n- **Authors**: Aldus and Microsoft developed TIFF, and revision 6.0 came out in 1992. Adobe controls the specification today.\n- **Names**: both .tif and .tiff mean the same format, typed image/tiff.\n- **Uses**: scanned document sequences benefit from a TIFF's room for many images, and high-bit-depth imaging and preservation masters are among its established uses.\n- **Ceiling**: classic TIFF caps a file at about 4 GB because its offsets are 32 bits wide. BigTIFF extends those fields.\n- **Tools**: GIMP imports TIFF, and ImageMagick reads and writes it.\n\nImageMagick in the page writes the TIFF from pixels your browser has already decoded from the BMP.\n\n### Other ways to convert BMP to TIFF\n\n- **ImageMagick:** run `magick bitmap.bmp -compress LZW bitmap.tif`. ImageMagick lists BMP and TIFF as both readable and writable, and its -compress option takes LZW as a value.\n- **GIMP:** bring in the BMP, use File > Export As, and finish the name with .tif. The dialog lists the compression options None, LZW, Pack Bits, Deflate and JPEG; the documentation calls LZW lossless.\n\n### Problems with BMP files\n\n- **Disk space**: uncompressed pixels pile up quickly. PNG or JPEG is more practical when you only need to share a picture.\n- **A legacy tool rejects the header**: for a program that wants an older header, ImageMagick's BMP3 or BMP2 formats can be used in place of the default one.\n- **Vectors and type are missing**: a BMP holds only pixels, so nothing editable sits behind them."
+    }
+  },
+  "bmp-to-webp": {
+    "seo": {
+      "title": "Convert BMP to WebP Online (Free)",
+      "h1": "BMP to WebP Converter",
+      "description": "Turn a BMP into a WebP, with transparency kept and metadata dropped. Add several files at once and each downloads on its own. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a BMP into a WebP in your browser, with transparency kept."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BMP to WebP?",
+        "answer": "Add the BMP above and download the WebP when it is done. Each BMP gives its own WebP, and the BMP itself is left unchanged."
+      },
+      {
+        "question": "Can I choose lossy or lossless WebP?",
+        "answer": "No. The page has no quality or lossless setting. GIMP's WebP export has a Lossless checkbox and quality sliders, and ImageMagick takes -define webp:lossless=true."
+      },
+      {
+        "question": "Does the WebP keep transparency?",
+        "answer": "Yes, WebP is one of the outputs that keep it here. Version 5 BMPs can record an alpha channel, and a BMP without one has nothing to keep."
+      },
+      {
+        "question": "Does the WebP keep the BMP's color profile or metadata?",
+        "answer": "No. Only decoded pixels reach the WebP, so ICC profiles and other metadata are dropped, even though WebP itself can hold them."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "No size cap is built into the page. A WebP image can be at most 16383 x 16383 pixels."
+      },
+      {
+        "question": "What is the WebP file called?",
+        "answer": "The file name carries over and the extension turns into .webp, so panel.bmp is saved as panel.webp."
+      },
+      {
+        "question": "What if the BMP will not decode?",
+        "answer": "The page reports \"Image decode failed.\" when your browser's decoder cannot read the file. Open the BMP in an image program to see whether it is damaged."
+      },
+      {
+        "question": "Is my BMP uploaded?",
+        "answer": "No. The conversion runs in a Web Worker in your browser, and on the main thread if the worker fails. No server receives the file."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and WebP",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format from Microsoft that usually stores pixels uncompressed.",
+        "details": [
+          "Mostly uncompressed",
+          "Windows and OS/2 origin",
+          "No vector shapes"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "Google's open image format, announced on 30 September 2010 and documented in RFC 9649 in November 2024.",
+        "details": [
+          "Lossy and lossless",
+          "Transparency and animation",
+          "Up to 16383 x 16383 pixels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to WebP",
+      "points": [
+        "The WebP is written from the BMP's pixels after your browser decodes them.",
+        "The page has no quality or lossless setting.",
+        "Transparency is kept.",
+        "ICC profiles, EXIF data and XMP are dropped."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nBMP is a Microsoft-controlled family that Windows and OS/2 used from the start. Pixels usually sit in the file with no compression, although a lossless scheme is allowed. Version 5, from 1998 and the Windows 98 release, brought an alpha channel and an ICC profile.\n\nBMP is a familiar sight among Windows screenshots and system artwork. Its registered media type is image/bmp, and it holds no editable shapes or live typography.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** BMP is readable in ImageMagick, and XnView MP supports it as well, though a license applies to companies.\n- **Web:** Mozilla's compatibility table lists Chrome as supporting BMP, and Firefox displays the pictures too.\n\n### BMP and WebP compared\n\n- **Origin**: WebP was announced by Google on 30 September 2010 and written up as RFC 9649 in November 2024. Lossy WebP is based on VP8 video coding.\n- **Modes**: WebP has lossy and lossless compression, and both support transparency and animation.\n- **Metadata**: a WebP can hold an ICC profile and Exif and XMP metadata.\n- **Where it opens**: Edge 18, Chrome 17, Safari 14 and Firefox 65 all display lossy WebP. Android decodes it from 4.0, Photoshop opens and saves it from version 23.2, and GIMP has since 2.10.\n\nOn this page the browser decodes the BMP, and the WebP is written from those pixels with no quality setting.\n\n### Other ways to convert BMP to WebP\n\n- **ImageMagick:** run `magick panel.bmp -define webp:lossless=true panel.webp` for a lossless file. ImageMagick lists both BMP and WebP as readable and writable.\n- **GIMP:** import the BMP, select File > Export As and enter a name with the .webp ending. The dialog has a Lossless checkbox, which turns off the Image quality and Alpha quality settings.\n- **ImageMagick plus cwebp:** first run `magick panel.bmp panel-stage.png`, then `cwebp -q 85 panel-stage.png -o panel.webp`. The -q value runs from 0 to 100.\n\n### Problems with BMP files\n\n- **Heavy files**: left uncompressed, a BMP can run large, and PNG or JPEG may be more practical to distribute.\n- **A legacy program refuses it**: if software wants an older header, use ImageMagick's BMP3 or BMP2 format instead of the default version.\n- **Nothing editable inside**: a BMP carries pixels only, with no vector shapes or live text."
+    }
+  },
+  "bmp-to-xbm": {
+    "seo": {
+      "title": "Convert BMP to XBM Online (Free)",
+      "h1": "BMP to XBM Converter",
+      "description": "Convert a BMP into an XBM, the black-and-white bitmap stored as C source. Color artwork is reduced to two tones, so use a simple icon. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a BMP into an XBM black-and-white bitmap."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BMP to XBM?",
+        "answer": "Add the BMP above and download the XBM when it finishes. Add several BMPs and each becomes its own XBM, with no merging. Open an XBM in a text editor to read its C code."
+      },
+      {
+        "question": "Why is my XBM only black and white?",
+        "answer": "XBM images are monochrome, so color artwork ends up as black and white. The page has no threshold setting, so start from a high-contrast image or prepare it in an editor first."
+      },
+      {
+        "question": "What is the hotspot in an XBM?",
+        "answer": "Coordinates for the active point of pointer artwork, which an XBM export may include. GIMP lets you set them when you export."
+      },
+      {
+        "question": "Does the XBM keep transparency?",
+        "answer": "An XBM stores only black and white, with no alpha channel of its own. GIMP can write the alpha channel to a separate mask file if your workflow needs one."
+      },
+      {
+        "question": "Will it keep my photo's detail?",
+        "answer": "No. Two tones cannot show photo detail, so use XBM for icons, cursors and simple shapes."
+      },
+      {
+        "question": "Does my BMP's metadata survive?",
+        "answer": "No. Only decoded pixels reach the XBM, so metadata such as EXIF, ICC and XMP does not come along."
+      },
+      {
+        "question": "What is the XBM file called?",
+        "answer": "The name stays and the ending becomes .xbm, which turns mark.bmp into mark.xbm."
+      },
+      {
+        "question": "Why does the page say the image failed to decode?",
+        "answer": "Your browser's image decoder was given the BMP first and could not read it, so no XBM was written. Check that the file opens in another program."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and XBM",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format from Microsoft that usually stores pixels uncompressed.",
+        "details": [
+          "Mostly uncompressed",
+          "Color and grayscale",
+          "Windows and OS/2 origin"
+        ]
+      },
+      "toFormat": {
+        "name": "XBM",
+        "fullName": "X BitMap",
+        "description": "A monochrome image stored as readable C source, historically used for icons and pointer artwork in the X graphical environment.",
+        "details": [
+          "Black and white only",
+          "Plain-text C source",
+          "Optional hotspot"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to XBM",
+      "points": [
+        "XBM is monochrome, so colors and grays are reduced to black and white.",
+        "The page has no threshold control.",
+        "The output is C source text.",
+        "EXIF data, color profiles and XMP are dropped."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nMicrosoft owns the BMP bitmap family, which began on Windows and OS/2. Each pixel is normally written out in full with no compression, and a lossless option exists. The 1998 version 5, which came in with Windows 98, adds room for an ICC profile and an alpha channel.\n\nMost BMP files turn up among Windows screenshots and built-in system images. A BMP carries pixels only, so there are no vector shapes or live text to edit, and image/bmp is its registered media type.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** Both ImageMagick and XnView MP handle BMP input, and XnView MP requires a license for company use.\n- **Web:** Firefox and Chrome both show BMP images, according to Mozilla's browser compatibility table.\n\n### BMP and XBM compared\n\n- **Storage**: XBM saves the image as readable C source, not a conventional binary picture.\n- **Color**: the picture is monochrome, black and white, so color artwork loses its colors on export.\n- **Uses**: it began as icon and pointer artwork for the X graphical environment.\n- **Extras**: an export may include hotspot coordinates, and an alpha channel can go to a separate mask file. The older X10 variant writes short integers instead of bytes.\n- **Size**: the C text can take more room than a binary encoding of the same image.\n\nAfter the browser has decoded the BMP, ImageMagick in the same page turns the pixels into the XBM.\n\n### Other ways to convert BMP to XBM\n\n- **ImageMagick:** run `magick mark.bmp -threshold 50% mark.xbm`. The -threshold option sets pixels above the threshold to the maximum and the rest to the minimum, so the picture ends up black and white.\n- **GIMP:** start from the BMP, then File > Export As with .xbm as the name's ending. GIMP exports XBM only from an image with 8 bits per channel, and the dialog offers an identifier prefix, hot spot values, a comment and an extra mask file.\n- **Pillow:** open the BMP with Image.open, call convert(\"1\") on it, then save it with a file name ending in .xbm. Pillow reads and writes X bitmap files in mode 1, and the default conversion to mode 1 dithers the picture.\n\n### Problems with BMP files\n\n- **Bulk**: an uncompressed BMP can take a lot of room, and PNG or JPEG may suit distribution better.\n- **Header trouble**: some older programs expect a different bitmap header, which ImageMagick's BMP3 and BMP2 formats provide.\n- **No vectors**: a BMP stores only pixels, so no converter can recover shapes or type from it."
+    }
+  },
+  "cr3-to-pdf": {
+    "seo": {
+      "title": "Convert CR3 to PDF Online (Free)",
+      "h1": "CR3 to PDF Converter",
+      "description": "Turn a Canon CR3 RAW photo into a one-page PDF the size of the picture, to proof or send. It runs in your browser. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Canon CR3 photo into a one-page PDF you can send or proof."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CR3 to PDF?",
+        "answer": "Drop the CR3 into the box above and download the PDF that appears. ImageMagick runs inside your browser tab, so nothing is uploaded, and every CR3 you add gives its own PDF."
+      },
+      {
+        "question": "How large is the PDF page?",
+        "answer": "There is one page, as large as the picture. A pixel counts as a point, there is no margin, and no A4 or Letter sheet is involved, so a viewer scales a big photo down to fit."
+      },
+      {
+        "question": "Is there a quality setting for the picture?",
+        "answer": "No quality setting applies, because the picture goes into the PDF losslessly as a PNG."
+      },
+      {
+        "question": "Can I put several CR3 photos into one PDF?",
+        "answer": "No. One CR3 gives one PDF and each downloads separately. Merge them in a PDF tool after downloading."
+      },
+      {
+        "question": "Is the RAW data inside the PDF?",
+        "answer": "No. The page is drawn from the developed picture's pixels alone, so neither the sensor data nor the shooting details come along. Keep the CR3 to process it again or read its settings."
+      },
+      {
+        "question": "Is my CR3 changed?",
+        "answer": "No. A new PDF is created for you, and the CR3 stays untouched."
+      },
+      {
+        "question": "What if the page says the RAW file may be incomplete?",
+        "answer": "That message means the file ends before its picture does. Copy the CR3 from the card again and retry."
+      },
+      {
+        "question": "Why does a CR3 from a brand-new camera fail?",
+        "answer": "Support is decided by the camera model together with the RAW library version the reader uses. If the page reports that the picture could not be decoded, check Canon's own software for your model."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR3 and PDF",
+      "fromFormat": {
+        "name": "CR3",
+        "fullName": "Canon Raw 3",
+        "description": "Canon's camera RAW format, used by EOS cameras released since 2018, built on a QuickTime-style container.",
+        "details": [
+          "Sensor data",
+          "Needs processing",
+          "Canon cameras since 2018"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "Adobe's document format, standardized as ISO 32000, that shows or prints the same way anywhere.",
+        "details": [
+          "Fixed pages",
+          "Embedded images",
+          "Standardized"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CR3 to PDF",
+      "points": [
+        "The PDF has one page, as large as the picture, holding the developed photo.",
+        "It is a rendered picture, not RAW data.",
+        "Each CR3 gives its own PDF; several files are never merged."
+      ]
+    },
+    "guide": {
+      "title": "About CR3 files",
+      "markdown": "### What is a CR3 file?\n\nCanon uses the .CR3 extension for camera RAW images and ties it to EOS cameras released since 2018. A RAW file records sensor data, which needs image processing before ordinary delivery. Canon says Compact RAW reaches smaller files than its normal RAW option through lossy compression.\n\nWhen you shoot RAW+JPEG, the camera makes two separate files that carry the same image number. Where CR2 is built on TIFF and CRW on CIFF, CR3 follows QuickTime, and no rename of the suffix can convert between them.\n\n### Programs that open CR3 files\n\n- **Windows, Mac and Linux:** RawTherapee 5.8 introduced CR3 decoding but lacked CR3 metadata, and darktable 3.8 added CR3 support, depending on the camera and its dependencies.\n- **Windows and Mac:** Canon's Digital Photo Professional works on the Canon RAW images it supports.\n- **Mobile:** Camera RAW editing is available in Adobe Lightroom for mobile on iOS and Android, given supported camera files and premium access. It needs supported camera files and premium access.\n\n### CR3 and PDF compared\n\n- **Origin**: John Warnock's Camelot project at Adobe began in 1991 and had become PDF by 1992.\n- **Contents**: a mix of text, vector art and raster pictures alongside links, bookmarks, form fields and annotations.\n- **Pictures**: a PDF can compress an image losslessly with Flate, or with JPEG.\n- **Standard**: PDF 1.7 became ISO 32000-1 in 2008.\n\nHere ImageMagick, running in your browser, reads the CR3. The page then sets the developed picture on a single PDF page, one pixel to a point and without margins. The picture is embedded as a lossless PNG, so there is no quality setting, and each CR3 gets its own PDF.\n\n### Other ways to convert CR3 to PDF\n\n- **darktable and GIMP:** export a TIFF from darktable by choosing file on disk as target storage and TIFF as file format. Open that TIFF in GIMP and export it to a name ending in .pdf.\n- **Canon Digital Photo Professional and ImageMagick:** select the CR3, choose File > Batch process, save as TIFF and click Execute. Then run `magick developed.tif proof.pdf`. ImageMagick lists TIFF and PDF as readable and writable, and its PDF support requires Ghostscript.\n\n### Problems with CR3 files\n\n- **Your camera is newer than your software**: a Digital Photo Professional build from before your camera may not understand its RAW files.\n- **Third-party support varies by model**: check the exact camera before relying on a program.\n- **Metadata missing in RawTherapee 5.8**: pixels decode, but the metadata does not, and the release notes explain how to pick an input profile manually.\n- **The file ends early**: the page reports that the RAW file may be incomplete, so copy it again from the card. Copy it again from the card."
+    }
+  },
+  "cr3-to-tiff": {
+    "seo": {
+      "title": "Convert CR3 to TIFF Online (Free)",
+      "h1": "CR3 to TIFF Converter",
+      "description": "Convert a Canon CR3 RAW photo to TIFF for editing or archiving. The TIFF is a finished picture, not RAW data. Runs in your browser. Free."
+    },
+    "tool": {
+      "subtitle": "Turn a Canon CR3 RAW photo into a TIFF for editing or archiving."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CR3 to TIFF?",
+        "answer": "Add the CR3 and save the TIFF when it appears. The conversion runs through ImageMagick in your browser tab, so no upload takes place. Several CR3 files run one after another, and each TIFF downloads on its own."
+      },
+      {
+        "question": "Is the TIFF still RAW?",
+        "answer": "No. A RAW file records sensor data that needs processing, while the TIFF is a finished picture. Keep the CR3 if you want to develop it again."
+      },
+      {
+        "question": "Can I choose bit depth or compression?",
+        "answer": "The page has no setting for either. darktable's export module lets you set bit depth and profile, so use it when you need a particular one."
+      },
+      {
+        "question": "Can I use this page for a CR2 or CRW file?",
+        "answer": "No. This page reads CR3. A CR2 is TIFF-based and a CRW is CIFF-based, so changing the suffix does not turn one into another."
+      },
+      {
+        "question": "Why does it call my CR3 incomplete?",
+        "answer": "The reader reached the end of the file before the picture data finished, so it cannot build the TIFF. Re-copy the original from the card and add it again."
+      },
+      {
+        "question": "What does the too large message mean?",
+        "answer": "The converter refuses a RAW file, or a picture the file declares, that is too large for it to hold."
+      },
+      {
+        "question": "Is a CR3 from a brand-new camera supported?",
+        "answer": "Coverage varies by camera model and by which version of the RAW library powers the reader. If the picture cannot be decoded, check whether Canon's own software lists your model."
+      },
+      {
+        "question": "Does the conversion change my CR3?",
+        "answer": "No. You download a new TIFF and the CR3 stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR3 and TIFF",
+      "fromFormat": {
+        "name": "CR3",
+        "fullName": "Canon Raw 3",
+        "description": "Canon's camera RAW format for EOS cameras released since 2018.",
+        "details": [
+          "Sensor data",
+          "Needs processing",
+          "Compact RAW option"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A tag-based raster wrapper developed by Aldus and Microsoft, with revision 6.0 published in 1992 and now controlled by Adobe.",
+        "details": [
+          "Several compression methods",
+          "Several color representations",
+          "Can hold many images"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CR3 to TIFF",
+      "points": [
+        "The TIFF is a finished picture, not RAW data.",
+        "The page has no depth, profile or compression settings.",
+        "A CR3 the reader cannot decode is reported as damaged, incomplete or unsupported."
+      ]
+    },
+    "guide": {
+      "title": "About CR3 files",
+      "markdown": "### What is a CR3 file?\n\nCR3 is the extension Canon uses for camera RAW images, tied to EOS cameras released since 2018. It stores sensor data, so the picture needs image processing before ordinary delivery. Compact RAW produces smaller files than the normal RAW option, using lossy compression.\n\nA CR3 is QuickTime-based, CR2 is TIFF-based and CRW is CIFF-based, so renaming a file never turns it into one of the others. Processing a RAW file into another format can leave the original RAW unchanged.\n\n### Programs that open CR3 files\n\n- **Windows, Mac and Linux:** darktable has read CR3 since version 3.8 when camera and dependencies allow, and RawTherapee decodes it from version 5.8, without CR3 metadata in that first release.\n- **Windows and Mac:** Digital Photo Professional is Canon's program for supported Canon RAW files.\n- **Mobile:** On iOS and Android, Lightroom for mobile edits camera RAW if the camera files are supported and premium access is in place.\n\n### CR3 and TIFF compared\n\n- **History**: Aldus and Microsoft developed TIFF, revision 6.0 came out in 1992, and Adobe controls it today.\n- **Flexibility**: compression and color representation both come in several varieties inside TIFF's tag-based wrapper.\n- **Naming**: .tif and .tiff name one format, typed image/tiff.\n- **Contents**: one TIFF can hold many images.\n- **Limit**: BigTIFF extends the offset fields that confine classic TIFF, which uses 32 bits, to roughly 4 GB.\n\nImageMagick, running in your browser, reads the CR3 and writes the TIFF. The page sets no bit depth, profile or compression.\n\n### Other ways to convert CR3 to TIFF\n\n- **Canon Digital Photo Professional:** pick the CR3 images and open File > Batch process. Set TIFF as the output, then click Execute.\n- **darktable:** with the CR3 open in darktable, go to the export module, select file on disk as storage target and TIFF as format. Check the bit depth and profile settings, then export.\n\n### Problems with CR3 files\n\n- **A new camera's file is refused**: your copy of Digital Photo Professional may be too old to read RAW from a newer body.\n- **Third-party support is model by model**: check the exact camera.\n- **No CR3 metadata in RawTherapee 5.8**: only pixels were decoded, and selecting an input profile by hand is the workaround its release notes describe.\n- **A cut-off file**: the reader flags it as possibly incomplete, and a fresh copy from the card is the remedy.\n- **A very large picture**: the too large to convert here message covers a RAW file, or the picture it declares, beyond what the converter handles."
+    }
+  },
+  "crw-to-jpg": {
+    "seo": {
+      "title": "Convert CRW to JPG Online (Free)",
+      "h1": "CRW to JPG Converter",
+      "description": "Convert an old Canon CRW RAW photo to a JPG you can share or print. It runs in your browser, so the file stays on your device. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a Canon CRW RAW photo from an older camera to a JPG."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CRW to JPG?",
+        "answer": "Add the CRW and save the JPG it produces. ImageMagick runs in your browser, so the file never leaves your device. A batch converts one file at a time."
+      },
+      {
+        "question": "Which Canon cameras make CRW files?",
+        "answer": "Older ones, such as the EOS Digital Rebel, which records its RAW images as CRW. CRW is built on CIFF, a different structure from the TIFF-based CR2 and the QuickTime-based CR3 of later cameras."
+      },
+      {
+        "question": "Is the JPG as good as the RAW?",
+        "answer": "No. JPG is lossy and keeps 8 bits per channel, while a RAW file keeps the sensor data. Keep the CRW if you may want to process it again."
+      },
+      {
+        "question": "Can I set the JPG quality?",
+        "answer": "No, the page sets none. If you need a particular quality, process the file in Canon's Digital Photo Professional and export from there."
+      },
+      {
+        "question": "Can I rename a CRW to CR2 to open it?",
+        "answer": "No. CRW, CR2 and CR3 use different structures, and changing the suffix does not translate between them."
+      },
+      {
+        "question": "Does a CRW contain a preview?",
+        "answer": "A CRW can carry metadata and an embedded preview, but neither replaces decoding the RAW picture. This page converts the RAW picture itself."
+      },
+      {
+        "question": "What if the page says the file is damaged or incomplete?",
+        "answer": "The reader says so when the picture data cannot be decoded or the file ends before its picture does. Try the original from the card instead of a copy."
+      },
+      {
+        "question": "How do I read the shot details of a CRW?",
+        "answer": "Use ExifTool, which can read the tags and structure inside a CRW. Keep the original CRW alongside the JPG."
+      }
+    ],
+    "aboutSection": {
+      "title": "CRW and JPG",
+      "fromFormat": {
+        "name": "CRW",
+        "fullName": "Canon Raw (CIFF)",
+        "description": "An older Canon camera RAW format built on the Camera Image File Format, a hierarchy of directories of records.",
+        "details": [
+          "CIFF structure",
+          "Older Canon cameras",
+          "Not TIFF-based"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy image format for photographs, standardized as ITU-T T.81 in 1992 and ISO/IEC 10918-1 in 1994.",
+        "details": [
+          "Lossy",
+          "8 bits per channel",
+          "Opens everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CRW to JPG",
+      "points": [
+        "The JPG is a finished picture, not RAW data.",
+        "The CRW is read in the browser, so nothing is uploaded.",
+        "A damaged or unsupported file is reported rather than guessed at."
+      ]
+    },
+    "guide": {
+      "title": "About CRW files",
+      "markdown": "### What is a CRW file?\n\nCRW is a Canon camera RAW format built on CIFF, short for Camera Image File Format. The header specifies the byte order and points to a root directory, and the records inside are organized in a hierarchy of directories. Canon's EOS Digital Rebel is one camera that records its RAW images as CRW.\n\nStructurally, CRW differs from CR2, which is TIFF-based, and from QuickTime-based CR3.\n\n### Programs that open CRW files\n\n- **Windows, Mac and Linux:** ImageMagick is a free command-line reader that lists CRW as read-only. ExifTool inspects CRW and CIFF structure and tags, but is not a photo editor.\n- **Windows and Mac:** Adobe Camera Raw has a camera table naming the older Canon models it supports and the version each needs. Canon Digital Photo Professional lists .CRW among its Canon RAW image types.\n\n### CRW and JPG compared\n\n- **Origin**: the committee that wrote JPEG began work in 1986, ITU-T T.81 appeared in 1992 and ISO/IEC 10918-1 in 1994.\n- **Method**: after dividing the picture into 8x8 pixel blocks, baseline JPEG applies a discrete cosine transform and Huffman coding.\n- **Depth**: 8 bits for every channel, with no alpha channel.\n- **Size**: ordinary settings leave an image at a tenth to a twentieth of its uncompressed size.\n- **Reach**: every major browser displays a JPG, and cameras and scanners build it in.\n- **Names**: .jpg and .jpeg are the same format, registered as image/jpeg.\n\nImageMagick, running in the page, decodes the CRW picture. The JPG is then written from it, with no quality setting from this page.\n\n### Other ways to convert CRW to JPG\n\n- **ImageMagick:** run `magick older-canon.crw older-canon.jpg`. In its format table, CRW is marked read-only and JPEG read and write.\n- **Canon Digital Photo Professional:** with the CRW selected, choose File > Batch process, pick JPEG and finish with Execute.\n\n### Problems with CRW files\n\n- **Support depends on the model**: RAW support varies with the camera and with the library version bundled in each program.\n- **A preview is not the photo**: metadata and an embedded preview do not replace decoding the RAW picture.\n- **A renamed file fails**: CRW, CR2 and CR3 are separate structures.\n- **Cut-off copies**: the reader says when the file ends early or is damaged, so retry with the original from the card.\n- **A very large picture**: anything beyond what the converter can hold is reported as too large for it."
+    }
+  },
+  "cur-to-gif": {
+    "seo": {
+      "title": "Convert CUR to GIF Online (Free)",
+      "h1": "CUR to GIF Converter",
+      "description": "Turn a Windows cursor (CUR) into a GIF you can view or share. The GIF keeps the picture, not the hotspot, and drops transparency. Free."
+    },
+    "tool": {
+      "subtitle": "Turn a Windows CUR cursor into a GIF picture."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CUR to GIF?",
+        "answer": "Put the CUR in the box above and save the GIF it produces. Your browser decodes the cursor and ImageMagick in the page writes the GIF. A batch of cursors is converted one by one."
+      },
+      {
+        "question": "Does the GIF keep the cursor's hotspot?",
+        "answer": "No. The hotspot is the pixel that acts as the pointer's active point, and a GIF has nowhere to store it. Only the picture is kept."
+      },
+      {
+        "question": "Does the GIF keep the transparent area?",
+        "answer": "No. On this page only PNG and WebP outputs retain transparency, so the cursor's see-through area does not reach the GIF. Look at the result on a plain background before you use it."
+      },
+      {
+        "question": "What if my CUR holds several sizes?",
+        "answer": "A CUR can embed several images at different sizes, each with its own hotspot. The page writes one still GIF and has no setting to pick a size."
+      },
+      {
+        "question": "Will an animated cursor become an animated GIF?",
+        "answer": "No. An animated input gives only its first frame here, so you get one still picture."
+      },
+      {
+        "question": "Why do the colors look different?",
+        "answer": "A GIF palette holds at most 256 colors, so smooth gradients and soft shadows can show banding."
+      },
+      {
+        "question": "Can I use the GIF as a cursor again?",
+        "answer": "No. A GIF has no hotspot, so it cannot act as a pointer. Keep the original CUR for that."
+      },
+      {
+        "question": "Is a CUR just an ICO with another name?",
+        "answer": "They are related, but only a CUR records where the active point of the pointer sits, and an ICO does not, so the two are not interchangeable."
+      }
+    ],
+    "aboutSection": {
+      "title": "CUR and GIF",
+      "fromFormat": {
+        "name": "CUR",
+        "fullName": "Windows cursor",
+        "description": "The Windows cursor container. It is related to ICO but adds coordinates for the active pointer location, called the hotspot.",
+        "details": [
+          "Hotspot per image",
+          "May hold several sizes",
+          "Related to ICO"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "CompuServe's 1987 image format with LZW compression and a palette of up to 256 colors; GIF89a added animation timing and transparency.",
+        "details": [
+          "256-color palette",
+          "One transparent color",
+          "Animation capable"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CUR to GIF",
+      "points": [
+        "The GIF holds the cursor's picture, not its hotspot.",
+        "Transparency is not kept on this page.",
+        "The result is one still frame."
+      ]
+    },
+    "guide": {
+      "title": "About CUR files",
+      "markdown": "### What is a CUR file?\n\nCUR is the Windows cursor container. It resembles ICO, but a CUR also stores the coordinates of the pointer's active location, called the hotspot. A single CUR can embed images of several sizes, each with hotspot information of its own.\n\nAnimated cursors belong to ANI, which is a separate workflow from ordinary CUR files. Because CUR is specialized for pointer assets, a conventional image format suits a picture you only want to view or share.\n\n### Programs that open CUR files\n\n- **Windows, Mac and Linux:** ImageMagick reads CUR, which makes it a way to inspect or render cursor images.\n- **Windows:** Visual Studio Image Editor handles cursor resources, but a 32-bit image can only be viewed, not edited.\n- **Mac and Linux:** XnView MP lists CUR among its supported formats. Private and educational use is free.\n\n### CUR and GIF compared\n\n- **Origin**: CompuServe introduced GIF in 1987. The GIF89a version, dated July 1990, added transparency, frame timing, comments and application data.\n- **Compression**: lossless LZW, for which Unisys began charging license fees in 1994.\n- **Palette**: each image uses at most 256 colors.\n- **Transparency**: a GIF marks one palette color as fully clear and has no partial transparency.\n- **Motion**: many images fit in one GIF, and the delay between them is set in hundredths of a second.\n- **Reach**: every major browser displays it, and its media type is image/gif.\n\nOnce the browser has decoded the CUR, ImageMagick in the page encodes the GIF. The page sets no quality of its own.\n\n### Other ways to convert CUR to GIF\n\n- **ImageMagick:** run `magick pointer.cur pointer.gif`.\n- **Pillow:** open the file with Image.open and save it with a .gif name. Pillow lists CUR as read-only, and its decoder reads the largest cursor. Animated cursors are not supported.\n- **ImageMagick and GIMP:** run `magick pointer.cur pointer.png`, open the PNG in GIMP and export it as GIF. The dialog offers Interlace and Save comment, and GIMP exports a maximum of 256 colors.\n\n### Problems with CUR files\n\n- **Clicks land off target**: when the hotspot is misplaced, a click lands away from the point the pointer seems to indicate, so check each frame's coordinates.\n- **Resized cursors misalign**: every embedded size needs its own valid hotspot, and coordinates copied blindly between sizes can leave the pointer misaligned.\n- **Soft edges turn blocky**: a GIF cannot keep partial opacity, and its 256-color palette can change gradients."
+    }
+  },
+  "docx-to-svg": {
+    "seo": {
+      "title": "Convert DOCX to SVG Online (Free)",
+      "h1": "DOCX to SVG Converter",
+      "description": "Turn each page of a Word document into an SVG. Every SVG wraps a picture of the page, so the text is not editable. Free, runs in your browser."
+    },
+    "tool": {
+      "subtitle": "Turn each page of a Word document into an SVG picture."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert DOCX to SVG?",
+        "answer": "Add the DOCX above and download the SVG files when they are ready. A document of several pages gives one SVG per page, named like report_page1 and report_page2."
+      },
+      {
+        "question": "Can I change the words inside the SVG?",
+        "answer": "No. Each SVG is the rendered page picture wrapped, not text or vector paths. Keep the DOCX for editing."
+      },
+      {
+        "question": "What page size is used if my DOCX names none?",
+        "answer": "A file with no page size becomes US Letter with 1-inch margins."
+      },
+      {
+        "question": "Why does the layout differ from Word?",
+        "answer": "Fonts the browser does not have fall back to its default, which can move lines and page breaks. Page breaks follow the file, and text that overflows a page is split between paragraphs or table rows."
+      },
+      {
+        "question": "Why is a picture missing?",
+        "answer": "The file links to the picture without holding it, and nothing is loaded from outside. Embed the image in the document, then convert again."
+      },
+      {
+        "question": "Why are my numbered lists different?",
+        "answer": "List numbers are written out as text. Lists numbered in CJK, Hebrew or other scripts come out with decimal numbers instead."
+      },
+      {
+        "question": "What happens to HTML pasted inside the DOCX?",
+        "answer": "An altChunk, which is HTML inside the file, is left out of the pages."
+      },
+      {
+        "question": "Do tables keep their header rows across pages?",
+        "answer": "Yes. A table that runs onto the next page continues with its header rows and its columns."
+      }
+    ],
+    "aboutSection": {
+      "title": "DOCX and SVG",
+      "fromFormat": {
+        "name": "DOCX",
+        "fullName": "Microsoft Word document",
+        "description": "An Office Open XML word-processing document, a ZIP-based package with the default format of Word since 2007.",
+        "details": [
+          "Editable text",
+          "Styles and media",
+          "ZIP-based package"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An open W3C XML standard for two-dimensional graphics as shapes, text and embedded images.",
+        "details": [
+          "Shapes and text",
+          "Embedded images",
+          "Plain-text XML"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DOCX to SVG",
+      "points": [
+        "Each page becomes its own SVG, wrapping a picture of that page.",
+        "The text is not editable, and the picture does not become vector paths.",
+        "Missing fonts fall back, and unembedded pictures do not load."
+      ]
+    },
+    "guide": {
+      "title": "About DOCX files",
+      "markdown": "### What is a DOCX file?\n\nA DOCX is an Office Open XML word-processing file, the default for new Word documents since Word 2007. WordprocessingML describes the main text and formatting, inside a ZIP package that follows the Open Packaging Conventions.\n\nThe package keeps images, styles and properties as separate parts, which means document.xml on its own does not rebuild the document. The format is specified as ECMA-376 and ISO/IEC 29500.\n\n### Programs that open DOCX files\n\n- **Windows, Mac and Linux:** LibreOffice Writer opens and saves Word DOCX, though some formatting attributes may differ.\n- **Windows:** Microsoft Word is the native editor.\n- **Mac:** Apple Pages opens DOCX, with warnings for missing fonts or formatting differences.\n- **Linux:** ONLYOFFICE Desktop Editors is a free editor that opens DOCX.\n- **Web:** Word for the web opens DOCX in the browser, and so does Apple's iCloud site, which uploads and opens Word documents.\n- **Mobile:** Word for Android opens DOCX, and Apple's iPhone and iPad app opens Word documents too.\n\n### DOCX and SVG compared\n\n- **Standard**: SVG is an open W3C standard. The W3C made SVG 1.0 a Recommendation in 2001, followed by SVG 1.1 in 2003.\n- **Nature**: an XML language that describes shapes, text and embedded images, drawn at any size without losing sharpness.\n- **Editing**: an SVG is plain text, so a text editor can open and search it.\n- **Here**: the SVG wraps a picture of the page, so it keeps how the DOCX looks, not how it is built.\n\nThe document is laid out by a renderer inside a sandbox in your browser, so nothing is fetched from outside. Where text runs past a page, it breaks between paragraphs or table rows, and the header and footer repeat.\n\n### Other ways to convert DOCX to SVG\n\n- **LibreOffice Writer and pdf2svg:** load the DOCX into Writer, then export a PDF through File > Export As > Export as PDF. Next run `pdf2svg writer-copy.pdf writer-page.svg 1` to turn page 1 of that PDF into an SVG; the last argument takes a page number or all. Writer may change the layout on import.\n\n### Problems with DOCX files\n\n- **The layout shifts in another program**: a DOCX opened elsewhere can lose formatting attributes during import.\n- **Fonts are missing**: Pages shows the document differently without them, and this page falls back to the browser's default font.\n- **Pictures are gone**: a linked image that is not embedded cannot load, so embed it first.\n- **Pasted HTML disappears**: content inside an altChunk is left out of the pages.\n- **Numbering looks different**: list numbers are written as text, and CJK or Hebrew numbering comes out as decimal."
+    }
+  }
+}

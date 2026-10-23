@@ -1,0 +1,383 @@
+{
+  "tools": {
+    "mp4-to-ogv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i input.mp4 -c:v libtheora -c:a libvorbis output.ogv",
+          "limits": "FFmpeg has to be configured with libtheora and libvorbis support.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "VLC media player",
+          "steps": "vlc sample.mp4 --sout=\"#transcode{acodec=vorb,vcodec=theo}:std{access=file,mux=ogg,dst=sample_new.ogv}\"",
+          "limits": "The manual explains the container must change because theo and vorb are not compatible with MP4; it names the output sample_new.ogg, and .ogv is the recommended video extension.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/advanced/transcode/transcode_and_save.html"
+        },
+        {
+          "app": "ffmpeg2theora",
+          "steps": "ffmpeg2theora input.mp4 -o output.ogv",
+          "limits": "Converts any media file ffmpeg can decode; without -o the output is named after the input with .ogv.",
+          "source": "https://dokk.org/manpages/debian/11/ffmpeg2theora/ffmpeg2theora.1.en"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "MP4 file format version 2 is ISO/IEC 14496-14:2003.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml"
+        },
+        {
+          "fact": "Ogg video uses video/ogg and the .ogv extension.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334.html"
+        },
+        {
+          "fact": "Ogg is a multimedia container maintained by Xiph.Org.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "MP4 is built on the ISO Base Media File Format, grew out of QuickTime, commonly holds H.264 with AAC and can carry AV1, VP9, MP3 and Opus; every major browser plays it.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "MP4's registered media types are video/mp4 and audio/mp4.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        },
+        {
+          "fact": "Xiph recommends .ogv for Ogg video.",
+          "source": "https://wiki.xiph.org/MIME_Types_and_File_Extensions"
+        },
+        {
+          "fact": "Android plays HEVC video in MP4 files from version 5.0.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        }
+      ]
+    },
+    "png-to-avif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Export As (Shift+Ctrl+E), then export the image as AVIF.",
+          "limits": "GIMP added AVIF import and export in release 2.10.22; older releases lack it.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.png output.avif",
+          "limits": "The formats page lists AVIF as read and write; magick identify -list format shows which formats a copy supports.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "libavif avifenc",
+          "steps": "avifenc -q 80 input.png output.avif",
+          "limits": "Accepts PNG input; -q sets quality on the tool's own scale; --lossless sets lossless defaults and emits warnings when settings or input do not allow it.",
+          "source": "https://raw.githubusercontent.com/AOMediaCodec/libavif/main/apps/avifenc.c"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "PNG became a W3C Recommendation in October 1996, was issued as RFC 2083 and ISO/IEC 15948, uses lossless DEFLATE, and supports 1 to 16 bits per sample with optional alpha.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "The third edition of PNG became a W3C Recommendation on 24 June 2025, adds cICP for HDR and allows Exif in an eXIf chunk; software that cannot animate shows the default image of an APNG.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "PNG's registered media types are image/png and image/apng.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        },
+        {
+          "fact": "macOS saves screenshots as PNG files by default.",
+          "source": "https://support.apple.com/guide/mac-help/take-a-screenshot-mh26782/mac"
+        },
+        {
+          "fact": "AVIF stores AV1 images within HEIF and can include image sequences.",
+          "source": "https://aomediacodec.github.io/av1-avif/"
+        },
+        {
+          "fact": "Chrome 85 added AVIF decoding.",
+          "source": "https://developer.chrome.com/blog/new-in-chrome-85"
+        },
+        {
+          "fact": "Firefox 93 added AVIF image support.",
+          "source": "https://www.mozilla.org/en-US/firefox/93.0/releasenotes/"
+        },
+        {
+          "fact": "Safari on iOS 16 added still AVIF images.",
+          "source": "https://webkit.org/blog/13152/webkit-features-in-safari-16-0/"
+        },
+        {
+          "fact": "Android 12 and later support baseline 8-bit AVIF decoding.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        },
+        {
+          "fact": "Older browsers may fail to display AVIF; supply a JPEG, PNG or WebP fallback.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "PNG carries no known royalty-bearing patents and every major browser displays it.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        }
+      ]
+    },
+    "png-to-docx": {
+      "methods": [
+        {
+          "app": "Microsoft Word",
+          "steps": "Insert > Pictures > This Device, select the picture, then File > Save a Copy and update the name and file type.",
+          "limits": "The help page covers pictures in general and shows Save a Copy with an editable file type.",
+          "source": "https://support.microsoft.com/en-us/word/training/insert-pictures",
+          "supportSource": "https://support.microsoft.com/en-us/office/save-a-document-b7f55d8c-d714-4892-8fde-853a82419027"
+        },
+        {
+          "app": "LibreOffice Writer",
+          "steps": "Choose Insert > Image, leave Link unchecked, insert the picture, then File > Save As and pick Word 2010-365 Document (.docx) as the file type.",
+          "limits": "A linked bitmap is reloaded whenever the document loads; saving to an external file type can lose some formatting.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/swriter/guide/insert_graphic_dialog.html",
+          "supportSource": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "DOCX is a ZIP-based Open XML package with document and media parts.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "PNG pixel data differs from document text and layout; PNG was a W3C Recommendation from October 1996 and is ISO/IEC 15948.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "PNG uses lossless DEFLATE, stores 1 to 16 bits per sample with optional alpha, starts with a fixed signature and is built from chunks.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "macOS saves screenshots as PNG files by default.",
+          "source": "https://support.apple.com/guide/mac-help/take-a-screenshot-mh26782/mac"
+        },
+        {
+          "fact": "Layer offsets may differ between GIMP and other applications; PNG compression setting does not reduce fidelity; camera tags and profiles are optional in GIMP exports.",
+          "source": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        },
+        {
+          "fact": "PNG carries no known royalty-bearing patents and every major browser displays it.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "The third edition of PNG became a W3C Recommendation on 24 June 2025 and allows Exif in an eXIf chunk.",
+          "source": "https://www.w3.org/TR/png-3/"
+        }
+      ]
+    },
+    "pptx-to-jpg": {
+      "methods": [
+        {
+          "app": "PowerPoint for Windows",
+          "steps": "Select a slide, File > Save As (Save a Copy on OneDrive or SharePoint), choose JPEG in the Save as Type list, Save, then Just This One or All Slides.",
+          "limits": "Each slide is saved as a separate file when you choose All Slides.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/save-a-slide-as-an-image-or-as-a-separate-presentation-file"
+        },
+        {
+          "app": "PowerPoint for Mac",
+          "steps": "Open the slide in Normal view, File > Export, choose JPEG, Save Current Slide Only, optionally set width and height, Export.",
+          "limits": "Exports the current slide only.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/save-a-slide-as-an-image-or-as-a-separate-presentation-file"
+        },
+        {
+          "app": "Keynote for Mac",
+          "steps": "File > Export To > Images, choose the slides, select an image format, Save, choose a location, Export.",
+          "limits": "Keynote opens .pptx and .ppt files; the help page does not list the image formats.",
+          "source": "https://support.apple.com/guide/keynote/export-to-powerpoint-or-another-file-format-tana0d19882a/mac",
+          "supportSource": "https://support.apple.com/guide/keynote/open-or-close-a-presentation-tan72232b56/mac"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "PPTX is PowerPoint's ordinary presentation type; macro-enabled presentations use .pptm; saving as an image flattens slide objects; saving as an older format can affect features.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+        },
+        {
+          "fact": "PresentationML stores presentation content in an Office Open XML package; slides and relationships occupy separate parts; notes and slide masters have their own parts.",
+          "source": "https://learn.microsoft.com/en-us/office/open-xml/presentation/structure-of-a-presentationml-document"
+        },
+        {
+          "fact": "The media type is application/vnd.openxmlformats-officedocument.presentationml.presentation.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+        },
+        {
+          "fact": "JPEG does not retain layers or alpha.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "fact": "Missing fonts can change the way a presentation displays; PowerPoint supports embedding eligible fonts.",
+          "source": "https://support.microsoft.com/en-us/office/fonts/benefits-of-embedding-custom-fonts"
+        }
+      ]
+    },
+    "psd-to-jpeg": {
+      "methods": [
+        {
+          "app": "Photopea",
+          "steps": "File > Open the PSD, then File > Export As > JPG.",
+          "limits": "The Save for Web window lets you choose the output format and the resolution.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        },
+        {
+          "app": "XnConvert",
+          "steps": "Drag the PSD into the Input tab, choose the target format and a destination folder on the Output tab, then click Convert.",
+          "limits": "The page names PSD as a format XnConvert can read; the progress report lists any files that failed.",
+          "source": "https://www.xnview.com/en/batch-image-converter/",
+          "supportSource": "https://www.xnview.com/en/image-formats/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick 'input.psd[0]' output.jpeg",
+          "limits": "[0] selects the first image of a file that holds several; quote the name because the brackets are special shell characters.",
+          "source": "https://usage.imagemagick.org/files/#read_mods"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "PSD is Adobe Photoshop's native format; signature 8BPS; image resources and layer information in separate sections; pixel data raw, RLE or ZIP; sample depths of 1, 8, 16 or 32 bits; 30,000 pixels per side, PSB raises it.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "The registered PSD media type is image/vnd.adobe.photoshop.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.adobe.photoshop"
+        },
+        {
+          "fact": "JPEG is lossy and cannot retain alpha or multiple layers.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "xcf-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the XCF; choose Export from the File menu to write a JPEG; a dialog lets you set the quality.",
+          "limits": "Exporting does not save changes to the XCF; save the project separately.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.xcf -background white -flatten output.jpg",
+          "limits": "-flatten composites the images onto a canvas in the background color; inspect the rendering against GIMP.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "GIMP uses Save for XCF and Export for distribution formats.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "XCF does not preserve undo history and is not an interchange format.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "JPEG export is lossy and cannot store a layer stack.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "3gp-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i input.3gp -vn -c:a libmp3lame -b:a 192k output.mp3",
+          "limits": "Needs a decodable audio stream; -vn excludes video.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "3GP can hold sound, video and timed text.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3839.html"
+        },
+        {
+          "fact": "3GPP permits AMR and AAC streams and uses ISO base media structure.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "MP3 uses lossy audio coding.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml"
+        }
+      ]
+    },
+    "aifc-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i input.aifc -b:a 192k -c:a libmp3lame output.mp3",
+          "limits": "AIFF-C reading still depends on the compression type inside the file.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/aiffdec.c"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "AIFF-C extended the AIFF family for compressed audio in August 1991.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "AIFC may also contain uncompressed samples and marker information.",
+          "source": "https://docs.python.org/3.12/library/aifc.html"
+        }
+      ]
+    },
+    "asf-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i input.asf -c:v libx264 -c:a aac -movflags +faststart output.mp4",
+          "limits": "Transcodes the selected video and sound; inspect multiple streams instead of assuming all are preserved.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "ASF is Microsoft's wrapper for several kinds of audio and video streams.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "The codec, rather than the container extension, determines media decoding requirements.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        }
+      ]
+    },
+    "cur-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick 'input.cur[0]' output.png",
+          "limits": "An index in square brackets selects an image from a multi-image file, counted from zero.",
+          "source": "https://usage.imagemagick.org/files/#read_mods",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "from PIL import Image; Image.open('input.cur').save('output.png')",
+          "limits": "Pillow reads CUR and does not write it; animated cursors are not supported.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "CUR uses per-image hotspots and may contain several image sizes.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "PNG supports an alpha channel and lossless image coding.",
+          "source": "https://www.w3.org/TR/png-3/"
+        }
+      ]
+    }
+  }
+}

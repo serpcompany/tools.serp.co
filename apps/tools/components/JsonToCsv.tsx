@@ -6,24 +6,22 @@ import { Button } from "@serp-tools/ui/components/button";
 import { Badge } from "@serp-tools/ui/components/badge";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
-import { ToolVideoPanel } from "@/components/ToolVideoPanel";
 import { beginToolRun } from "@/lib/telemetry";
 
 type Props = {
   toolId?: string;
-  // The H1 and the line under it, which the page's structured data repeats.
-  title: string;
+  // The page's H1 (toolHeading, lib/metadata.ts) and the line under it
+  // (content.tool.subtitle), so content:apply reaches them.
+  heading: string;
   subtitle: string;
-  videoEmbedId?: string;
 };
 
-export default function JsonToCsv({ toolId, title, subtitle, videoEmbedId }: Props) {
+export default function JsonToCsv({ toolId, heading, subtitle }: Props) {
   const [jsonInput, setJsonInput] = useState("");
   const [csvOutput, setCsvOutput] = useState("");
   const [error, setError] = useState("");
   const [stats, setStats] = useState({ rows: 0, columns: 0 });
   const [adsVisible, setAdsVisible] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(false);
 
   const convertJsonToCsv = () => {
     setError("");
@@ -35,7 +33,6 @@ export default function JsonToCsv({ toolId, title, subtitle, videoEmbedId }: Pro
     }
 
     if (!adsVisible) setAdsVisible(true);
-    if (!videoPlaying) setVideoPlaying(true);
     const inputBytes = new Blob([jsonInput]).size;
     const run = beginToolRun({
       toolId: toolId ?? "json-to-csv",
@@ -116,7 +113,6 @@ export default function JsonToCsv({ toolId, title, subtitle, videoEmbedId }: Pro
       { id: 4, name: "Alice Brown", email: "alice@example.com", age: 28, city: "Houston" }
     ];
     setJsonInput(JSON.stringify(sample, null, 2));
-    if (!videoPlaying) setVideoPlaying(true);
   };
 
   const adSlotPrefix = toolId ?? "json-to-csv";
@@ -130,7 +126,7 @@ export default function JsonToCsv({ toolId, title, subtitle, videoEmbedId }: Pro
       hero={
         <div>
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight mb-4">{title}</h1>
+            <h1 className="text-4xl font-bold tracking-tight mb-4">{heading}</h1>
             <p className="text-lg text-gray-600">{subtitle}</p>
           </div>
 
@@ -157,12 +153,7 @@ export default function JsonToCsv({ toolId, title, subtitle, videoEmbedId }: Pro
                 </div>
                 <textarea
                   value={jsonInput}
-                  onChange={(e) => {
-                    if (!videoPlaying && e.target.value.trim()) {
-                      setVideoPlaying(true);
-                    }
-                    setJsonInput(e.target.value);
-                  }}
+                  onChange={(e) => setJsonInput(e.target.value)}
                   placeholder='[{"name": "John", "age": 30}, {"name": "Jane", "age": 25}]'
                   className="w-full h-96 p-4 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                   spellCheck={false}
@@ -220,12 +211,6 @@ export default function JsonToCsv({ toolId, title, subtitle, videoEmbedId }: Pro
               Convert JSON to CSV
             </Button>
           </div>
-
-          {videoEmbedId && (
-            <div className="mt-10">
-              <ToolVideoPanel embedId={videoEmbedId} autoplay={videoPlaying} />
-            </div>
-          )}
 
           {/* Features */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -68,6 +68,9 @@ and other entries end in `/`. `/sitemap-categories.xml` lists every numbered
 page of every category. Deployed environments write their canonical
 origin, local runs the request origin. `/sitemap.xml` and retired names
 (`/sitemap-0.xml`, `/tools-index.xml`, `/tools-0.xml`) 308 into the tree.
+While a Tool has a how-to video, the pages sitemap also lists `/videos/` and
+the watch pages, and `/sitemap-videos.xml` comes last in the index
+([videos.md](videos.md)).
 
 ## Rendering and shared page behavior
 
@@ -87,11 +90,22 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   the same target format and the other shared-format Tools. The same source and
   same target groups share the places; the others fill what is left. Which
   Tools fill a group's places is fixed per page by a hash of the two Tool ids;
-  they show sorted by id. Lander, table converter and transcription pages
-  render no such section. Every converter and compressor page is on a list
-  another page renders, except table converter pages with a "More Table
-  Converters" section (87 of the 88; `/html-to-markdown/` has none): each of
-  those links the other 87, so one of them on a list reaches them all.
+  they show sorted by id. Table converter and transcription pages render no
+  such section. Every converter and compressor page is on a list another page
+  renders, except table converter pages with a "More Table Converters" section
+  (87 of the 88; `/html-to-markdown/` has none): each of those links the other
+  87, so one of them on a list reaches them all.
+- Lander pages (`DownloaderPageTemplate`) render the same section with 8
+  other active Landers, adult-site and mainstream mixed (owner decision on
+  #349, 2026-10-19). In id order the Landers form a ring, and each lists the
+  Landers a fixed stride apart (their number divided by 9, rounded down), so
+  every Lander is on exactly 8 Landers' lists, beside its category page.
+  Adding or retiring one Lander shifts the ring, so most lists change
+  (retiring TellaTV, #321, changed 256 of the other 291); that is expected. Run
+  `node scripts/lander-links.mjs --base-url <url> --min 3` in `apps/tools`
+  against a production build or the site to count each Lander's followed
+  incoming links from the sitemap's pages; a local `cf:build` is nofollow
+  and credits none.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - Every live Tool page and Lander carries one
@@ -104,14 +118,19 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   batch PNG pages. Where a client component draws the H1, the page passes it
   in, so the markup and the H1 are one string. The "coming soon" editors,
   the uncatalogued table pages (#221), the homepage and the category pages
-  have none. `lib/structured-data.test.mjs` follows each page's components
-  and fails when a live Tool page renders none or more than one. A page
+  have none; the watch pages and `/videos/` carry only their own video
+  markup ([videos.md](videos.md)). `lib/structured-data.test.mjs` follows
+  each page's components, counting every `JsonLd` script, and fails when a
+  live Tool page renders none or more than one, or another page renders
+  any beyond the watch pages' and `/videos/`'s one. A page
   imports `StructuredData` after its own component, because the tool sweep
   files a page under its first `@/components` import; the test checks that
   too. It has no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup:
   Lander reviews have no verifiable source, FAQ rich results are limited to
   government and health sites, and HowTo rich results are retired. It has no
-  `BreadcrumbList` either, because no page shows a breadcrumb trail.
+  `BreadcrumbList` either, because these pages show no breadcrumb trail, and
+  a converter page's how-to video has its `VideoObject` on its watch page
+  instead ([videos.md](videos.md)).
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
   footer without an intentional product-specific reason.
@@ -131,7 +150,8 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 ## Titles, descriptions and share images
 
 `lib/metadata.ts` builds the Tool, category, `/categories/` and `/brands/`
-pages' metadata, and `lib/table-convert.ts` the table converters'. Both use
+pages' metadata, `lib/table-convert.ts` the table converters', and
+`lib/videos.ts` the watch pages' and `/videos/`'s. All use
 `lib/page-metadata.ts`, which also holds the homepage's and the root layout's
 and reads no registry. A page sets only its own title: the layout's template
 adds " | SERP Tools". The homepage sets its full title, and keeps its
@@ -139,6 +159,11 @@ slashless canonical and `og:url` in `app/page.tsx`. Every public `page.tsx`
 exports its own metadata; the layout's neutral `SERP Tools` defaults reach only
 the noindex 404s and the internal dashboard.
 
+- A converter or compressor's title and H1 follow its keyword through
+  `content.seo`, or else the default, "Convert WebP to PNG Online (Free)" and
+  "WebP to PNG Converter", generated by `toolSeo`. Its copy is written and
+  checked as [converter-copy.md](converter-copy.md) says. Transcription Tools
+  are left out (`isTranscriptionTool`).
 - A description is at most 160 characters. It starts with the curated
   subtitle or the registry description, cut at a sentence, then adds true
   facts while it is under 120: whether the converter page keeps the file in

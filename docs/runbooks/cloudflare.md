@@ -68,6 +68,20 @@ environment from its branch: a push to `staging` deploys Staging, and a push to
   environment smoke check through the Worker's `*.workers.dev` host.
 - Staging also runs the browser smoke test ([browser-smoke.md](browser-smoke.md)).
   Production doesn't, because the test records real tool runs.
+- Last, in both environments, "Check the Google tags GTM loads"
+  (`audit:google-tags`) checks the GTM container the site loads (#346 F1). It
+  reads the container's `gtm.js` and requests `gtag/js` for each id the
+  container loads: each Google tag's Tag ID (`G-`, `GT-`, `AW-` or `DC-`) and
+  each `gtag/js` snippet in a Custom HTML tag. It fails naming any that
+  doesn't answer 200, and fails if `gtm.js` doesn't. Google answers 200 for
+  ids it doesn't know, so this catches a tag Google refuses, not a typo; a GA4
+  Event tag loads no script and isn't checked. No answer, or a 5xx, 408 or
+  429, for either file only warns, as do a container whose tags can't be read
+  and a Tag ID set from a variable other than a Constant.
+- **When only that step fails, the release is fine** (it already deployed)
+  **and the tag must be fixed in Tag Manager.** Don't roll back or revert the
+  code: fix the tag, confirm with `pnpm -C apps/tools audit:google-tags`, then
+  re-run the workflow. The step runs last for this reason.
 - Only the migrate and deploy steps see the `CLOUDFLARE_API_TOKEN` repository
   secret (an account-owned SERP token for Workers, D1 and the `serp.co` zone's
   Workers routes).
@@ -77,7 +91,9 @@ Cloudflare Workers Builds was disconnected from the production Worker on
 2026-10-06, after the first promotion deployed Production through this workflow
 (#188); the staging Worker never had it. This workflow is the only deploy path.
 
-Promote only a commit whose staging Deploy run passed:
+Promote only a commit whose staging Deploy run passed. A run that failed
+only at "Check the Google tags GTM loads" passes once the tag is fixed and
+the run re-run:
 
 ```bash
 git fetch origin && gh run list --workflow deploy.yml --branch staging --commit "$(git rev-parse origin/staging)"
@@ -85,7 +101,7 @@ git push origin origin/staging:main
 ```
 
 The promotion push needs the owner's bypass on the `main` ruleset (#188). If a
-production deploy turns out bad, roll back with
+production deploy turns out bad (not just its Google tag step), roll back with
 `pnpm -C apps/tools exec wrangler rollback --env production`. Rollback doesn't
 undo migrations, so a migration must keep working with the previous version of
 the code. A hotfix is a PR into `main`; merge `main` back into `staging` right
@@ -152,6 +168,24 @@ isn't an active Tool, and a page rendered for a URL with a query string
 (Next.js writes the query into the page). Each is answered as usual and not
 stored; after a query, the next request for the bare path stores the page.
 URLs that match no route share one cached not-found page.
+
+A stored page is answered before Next.js runs (`enableCacheInterception` in
+`apps/tools/open-next.config.ts`), with `x-opennext-cache: HIT` and
+`cache-control: s-maxage=31536000, stale-while-revalidate=2592000`. Next.js
+holds the lifetime of a page that isn't built ahead, such as every `[tool]`
+page, only in the memory of the isolate that rendered it. Without
+interception, every other isolate treated the stored page as stale one second
+after it was stored: it answered `x-nextjs-cache: STALE` with no
+`cache-control`, rendered the page again, and failed to queue a revalidation,
+as no queue is configured (#347). A page that isn't stored yet, and a 404,
+still reach Next.js.
+
+The `stale-while-revalidate=2592000` is OpenNext's fixed value, and browsers
+get it too. They ignore `s-maxage`, so a returning visitor's browser may show
+its own copy of a page once after a deploy, and the next load is current. A
+page's first answer after a deploy comes from Next.js (`x-nextjs-cache: MISS`)
+with `s-maxage=31536000` alone, so a `render-snapshot` diff of a cold build
+against a warm one shows `cache-control` changes that aren't regressions.
 
 Page requests don't reach Next.js with their query in the first place:
 requests that arrive while a page renders share that render, so a cache rule

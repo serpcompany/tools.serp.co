@@ -1,0 +1,260 @@
+{
+  "tools": {
+    "csv-to-pdf": {
+      "methods": [
+        {
+          "app": "LibreOffice Calc",
+          "steps": "File > Open; review Text Import; File > Export As > Export as PDF.",
+          "limits": "Import delimiters and export page range require review.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+          ]
+        },
+        {
+          "app": "Microsoft Excel",
+          "steps": "Data > From Text/CSV; inspect imported columns; File > Save As; choose PDF.",
+          "limits": "Print area and inferred data types can change the report.",
+          "source": "https://support.microsoft.com/en-us/office/collab-files/save-or-convert-to-pdf-or-xps-in-office-desktop-apps",
+          "supportSources": [
+            "https://support.microsoft.com/en-us/excel/get-started/import-or-export-text-txt-or-csv-files"
+          ]
+        },
+        {
+          "app": "Apple Numbers",
+          "steps": "Open the CSV; Adjust Import Settings if needed; File > Export To > PDF.",
+          "limits": "Spreadsheet import and page layout must be checked.",
+          "source": "https://support.apple.com/en-gu/guide/numbers/tan3b922d4ad/mac",
+          "supportSources": [
+            "https://support.apple.com/guide/numbers/import-an-excel-or-text-file-tan9f3c54bdc/mac"
+          ]
+        }
+      ]
+    },
+    "psd-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PSD; File > Export As; set the JPEG Quality level; progressive is an Advanced Option.",
+          "limits": "",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+            "https://www.gimp.org/release-notes/gimp-2.10.html"
+          ]
+        },
+        {
+          "app": "Photopea",
+          "steps": "File > Open; File > Export As > JPG.",
+          "limits": "The output is a flat image.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.psd output.jpg",
+          "limits": "A layered PSD can write one JPG per layer.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "cr2-to-jpg": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Import and select the CR2; export module: target storage file on disk, file format JPEG; start export.",
+          "limits": "",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSources": [
+            "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick cr2:portrait.cr2 portrait.jpg",
+          "limits": "CR2 needs the explicit cr2: specifier.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "svg-to-pdf": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "File > Save a Copy; choose Portable Document Format (*.pdf); embed fonts for searchable text.",
+          "limits": "",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-pdf.html"
+        },
+        {
+          "app": "CairoSVG",
+          "steps": "cairosvg drawing.svg -o drawing.pdf",
+          "limits": "Text and font support is limited; animation and scripting are not implemented.",
+          "source": "https://cairosvg.org/documentation/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick diagram.svg diagram.pdf",
+          "limits": "PDF support requires Ghostscript.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "tif-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the TIFF; File > Export As; set the JPEG Quality level.",
+          "limits": "Export formats other than XCF lose some image properties.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+            "https://www.gimp.org/release-notes/gimp-2.10.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick scan.tif scan-copy.jpg",
+          "limits": "",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "m4v-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i library.m4v -c copy library-remux.mp4",
+          "limits": "Stream copy may fail if the container needs information the source lacks; default selection picks one video, one audio and one subtitle stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open Source; keep the default Fast 1080p30 preset; set destination under To; Start.",
+          "limits": "This re-encodes the video.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportSources": [
+            "https://handbrake.fr/docs/en/latest/technical/source-formats.html",
+            "https://handbrake.fr/docs/en/latest/technical/containers.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Media > Convert/Save; Add the M4V; set Destination file; choose profile Video - H.264 + MP3 (MP4); Start.",
+          "limits": "The profile's audio codec is MP3.",
+          "source": "https://vlc-user-documentation.readthedocs.io/en/latest/tipsandtricks/",
+          "supportSources": [
+            "https://raw.githubusercontent.com/videolan/vlc/3.0.x/modules/gui/qt/components/sout/profiles.hpp"
+          ]
+        }
+      ]
+    },
+    "mov-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i interview.mov -vn -c:a pcm_s16le interview-audio.wav",
+          "limits": "Without -map, FFmpeg picks the audio stream itself.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Import the MOV (FFmpeg library needed except on Mac); File > Export Audio; Save as type WAV; Signed 16-bit PCM encoding.",
+          "limits": "Import depends on the FFmpeg library being installed.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/faq_opening_and_saving_files.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Media > Convert/Save; Add the MOV; Profile Audio - CD; .wav destination; Start.",
+          "limits": "The profile writes 16-bit PCM, stereo, 44,100 Hz.",
+          "source": "https://vlc-user-documentation.readthedocs.io/en/latest/tipsandtricks/",
+          "supportSources": [
+            "https://raw.githubusercontent.com/videolan/vlc/3.0.x/modules/gui/qt/components/sout/profiles.hpp"
+          ]
+        }
+      ]
+    },
+    "dng-to-jpg": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Select the DNG; export module; target storage file on disk; format JPEG; start export.",
+          "limits": "Non-Bayer sensors are not decoded, except Fujifilm X-Trans.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSources": [
+            "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          ]
+        }
+      ]
+    },
+    "ico-to-png": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Open the ICO; File > Export As; choose PNG and set its options.",
+          "limits": "GIMP's ICO loader is a file plug-in; the PNG dialog offers compression, interlacing and metadata options.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-png-export.html",
+            "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-ico/ico.c"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick application.ico icon-copy.png",
+          "limits": "The formats list marks ICO as readable.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "mp4-to-ogg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i lecture.mp4 -vn -c:a libvorbis -q:a 5 lecture-sound.ogg",
+          "limits": "Needs libvorbis compiled into the build; without -map, FFmpeg picks the audio stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "Import the MP4 (FFmpeg library needed except on Mac); File > Export Audio; Ogg Vorbis; quality slider.",
+          "limits": "Import depends on the FFmpeg library being installed on Windows and Linux.",
+          "source": "https://manual.audacityteam.org/man/ogg_vorbis_export_options.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html",
+            "https://manual.audacityteam.org/man/faq_opening_and_saving_files.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Media > Convert/Save; Add the MP4; Profile Audio - Vorbis (OGG); .ogg destination; Start.",
+          "limits": "The profile writes 128 kbps stereo at 44,100 Hz with video disabled.",
+          "source": "https://vlc-user-documentation.readthedocs.io/en/latest/tipsandtricks/",
+          "supportSources": [
+            "https://raw.githubusercontent.com/videolan/vlc/3.0.x/modules/gui/qt/components/sout/profiles.hpp"
+          ]
+        }
+      ]
+    }
+  }
+}

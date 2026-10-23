@@ -1,0 +1,1178 @@
+{
+  "status": {
+    "complete": true,
+    "formatsDone": [
+      "png",
+      "jpg",
+      "jfif",
+      "webp",
+      "heic",
+      "avif",
+      "pdf",
+      "svg",
+      "gif",
+      "mp4",
+      "mov",
+      "m4a",
+      "mp3"
+    ],
+    "toolsDone": [
+      "image-to-pdf",
+      "png-to-pdf",
+      "jpeg-to-pdf",
+      "heic-to-jpg",
+      "png-to-jpg",
+      "jpg-to-png",
+      "jpeg-to-jpg",
+      "jfif-to-jpg",
+      "pdf-to-png",
+      "mp4-to-gif",
+      "video-to-gif",
+      "compress-jpg",
+      "compress-jpeg",
+      "mov-to-mp4",
+      "m4a-to-mp3",
+      "webp-to-jpg",
+      "avif-to-jpg",
+      "avif-to-png",
+      "svg-to-png",
+      "png-to-svg"
+    ],
+    "remaining": "Nothing: each of the 20 pilot Tools has at least 3 verified methods. Left out because no primary source confirms them: Preview (Mac) opening WebP or AVIF (Apple's page on converting image files with Preview names only the formats it exports), and Photoshop opening SVG or AVIF (Adobe's Photoshop format list names neither). filetypes.io could not be reached (DNS fails), so no facts came from it. 'supportSource' on a method is an added optional field: the page that shows the app reads the input format when 'source' gives only the menu path."
+  },
+  "formats": {
+    "png": {
+      "background": [
+        {
+          "fact": "PNG was created as a patent-free successor to GIF.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "In October 1996 PNG became the first format published as a W3C Recommendation, and it was later issued as RFC 2083 and as ISO/IEC 15948:2004.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "The third edition of the PNG specification became a W3C Recommendation on 24 June 2025.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "PNG compression is always lossless, using the DEFLATE method (LZ77 plus Huffman coding).",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "A PNG file starts with a fixed signature and is then built from chunks, such as IHDR for the header, IDAT for image data and IEND to close the file.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "PNG supports indexed, grayscale and truecolor images with 1 to 16 bits per sample, plus an optional alpha channel for per-pixel transparency.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
+        },
+        {
+          "fact": "The current specification covers animated PNG (APNG); software that cannot animate shows the default still image instead.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "The third edition adds HDR support through the cICP chunk and allows Exif metadata in an eXIf chunk.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "Every major browser displays PNG, and it carries no known royalty-bearing patents.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "PNG's registered media types are image/png and, for animated files, image/apng.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        },
+        {
+          "fact": "macOS saves screenshots as PNG files by default.",
+          "source": "https://support.apple.com/guide/mac-help/take-a-screenshot-mh26782/mac"
+        }
+      ]
+    },
+    "jpg": {
+      "background": [
+        {
+          "fact": "JPEG is named after the Joint Photographic Experts Group, the committee that wrote it; work began in 1986.",
+          "source": "https://jpeg.org/jpeg/index.html"
+        },
+        {
+          "fact": "The core standard was published as ITU-T T.81 in 1992 and as ISO/IEC 10918-1 in 1994.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+        },
+        {
+          "fact": "Baseline JPEG is lossy: it splits the image into 8x8 pixel blocks, applies a discrete cosine transform and then Huffman coding.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+        },
+        {
+          "fact": "Typical JPEG settings shrink an image to between a tenth and a twentieth of its uncompressed size.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+        },
+        {
+          "fact": "JPEG stores 8 bits per color channel and has no alpha channel, so it cannot hold transparency.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "JPEG also offers a progressive mode, where a coarse version of the image appears first and sharpens as more data loads.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+        },
+        {
+          "fact": "Quality is usually set on a 0 to 100 scale; GIMP defaults to 85, and the same number can mean different quality in different programs.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "fact": "The .jpg and .jpeg extensions name the same format, and JPEG cannot store layers.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "fact": "JPEG's US patents expired on 27 October 2006, and every major browser displays it.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "JPEG is built into most digital cameras and scanners.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+        },
+        {
+          "fact": "The registered media type for JPEG is image/jpeg.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "jfif": {
+      "background": [
+        {
+          "fact": "JFIF (JPEG File Interchange Format) is a minimal wrapper that lets JPEG image data be exchanged between programs and platforms.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "JFIF was first written by Eric Hamilton at C-Cube Microsystems; version 1.02 dates from 1992.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "JFIF was later standardised as ITU-T T.871 (approved May 2011) and ISO/IEC 10918-5.",
+          "source": "https://www.itu.int/rec/T-REC-T.871-201105-I/en"
+        },
+        {
+          "fact": "Most files people call JPEGs are JFIF files.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "A JFIF file begins with the JPEG start-of-image marker followed straight away by an APP0 segment labelled JFIF.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "JFIF can carry a small embedded thumbnail of the image.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "JFIF files may use the extensions .jpg, .jpeg, .jpe, .jfi, .jfif or .jif.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "A .jfif file has the same media type as any JPEG: image/jpeg.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        }
+      ]
+    },
+    "webp": {
+      "background": [
+        {
+          "fact": "WebP is an image format developed by Google and released as open source.",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "Google announced WebP on 30 September 2010. Its lossy compression is based on VP8, the video codec Google released as open source in May 2010, applying VP8's intra-frame coding to still images.",
+          "source": "https://blog.chromium.org/2010/09/webp-new-image-format-for-web.html"
+        },
+        {
+          "fact": "VP8 came from On2 Technologies: RFC 6386, the VP8 specification, is written around On2's reference VP8 decoder.",
+          "source": "https://www.rfc-editor.org/rfc/rfc6386.html#section-6"
+        },
+        {
+          "fact": "WebP was documented in RFC 9649 in November 2024, which also registers the image/webp media type.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9649.html"
+        },
+        {
+          "fact": "A WebP file is a RIFF container.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9649.html"
+        },
+        {
+          "fact": "Lossy WebP uses VP8 intra-frame (key frame) coding; lossless WebP uses a separate method built on LZ77, prefix codes and a color cache.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9649.html"
+        },
+        {
+          "fact": "Google reports lossless WebP files about 26% smaller than PNG, and lossy WebP about 30% smaller than JPEG on average.",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "WebP supports transparency and animation in both lossy and lossless files.",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "A WebP image can be at most 16383 x 16383 pixels.",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "WebP can hold an ICC color profile and Exif and XMP metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000577.shtml"
+        },
+        {
+          "fact": "Lossy WebP displays in Chrome 17+, Edge 18+, Firefox 65+ and Safari 14+ (iOS 14 and macOS Big Sur onward).",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "Android decodes WebP from version 4.0, and lossless or transparent WebP from 4.2.1.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        },
+        {
+          "fact": "On Windows, Microsoft's WebP Image Extension lets File Explorer and Photos open WebP images.",
+          "source": "https://apps.microsoft.com/detail/9pg2dk419drg"
+        },
+        {
+          "fact": "Photoshop opens and saves WebP natively from version 23.2; GIMP has supported it since 2.10.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/image-file-formats-supported-in-photoshop.html"
+        },
+        {
+          "fact": "WhatsApp's animated stickers are WebP files: on iOS stickers are PNG or WebP, with animated stickers in WebP only, and on Android every sticker is WebP.",
+          "source": "https://github.com/WhatsApp/stickers/blob/main/iOS/README.md",
+          "supportSource": "https://github.com/WhatsApp/stickers/blob/main/Android/README.md"
+        },
+        {
+          "fact": "XnView MP reads and writes WebP, and is free for private or educational use (a company needs a license).",
+          "source": "https://www.xnview.com/en/image_formats/",
+          "supportSource": "https://www.xnview.com/en/xnviewmp/"
+        }
+      ]
+    },
+    "heic": {
+      "background": [
+        {
+          "fact": "HEIF (High Efficiency Image File Format) is MPEG-H Part 12, ISO/IEC 23008-12, developed within MPEG; its first edition was published in 2017.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000525.shtml"
+        },
+        {
+          "fact": "HEIF is a container rather than a codec; HEIC is the HEIF variant whose images are coded with HEVC (H.265).",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000525.shtml"
+        },
+        {
+          "fact": "A HEIF file can hold several images, image sequences, an alpha channel as an auxiliary image, high bit depths, and Exif or XMP metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000525.shtml"
+        },
+        {
+          "fact": "Apple uses HEIF for photos from iOS 11 and macOS High Sierra 10.13, capturing it on iPhone 7 and later.",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "fact": "Apple says HEIF gives better compression than JPEG.",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "fact": "On iPhone, Settings > Camera > Formats switches between High Efficiency (HEIF) and Most Compatible (JPEG).",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "fact": "When photos are copied from an iPhone over USB, they may be converted to JPEG automatically unless Keep Originals is chosen in Photos settings.",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "fact": "Safari displays HEIC images from version 17.0.",
+          "source": "https://webkit.org/blog/14445/webkit-features-in-safari-17-0/"
+        },
+        {
+          "fact": "Android decodes HEIF from version 9 and, on devices that support it, encodes it from version 10.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        },
+        {
+          "fact": "Windows needs Microsoft's HEIF Image Extension plus the HEVC Video Extensions to open .heic and .heif files.",
+          "source": "https://apps.microsoft.com/detail/9pmmsr1cgpwg"
+        },
+        {
+          "fact": "In the Microsoft Store the HEIF Image Extensions are free and the HEVC Video Extensions cost $0.99; Photos needs both to open HEIC.",
+          "source": "https://support.microsoft.com/en-us/windows/apps/photos/photos-app-video-editor-error-can-t-view-this-file-type"
+        },
+        {
+          "fact": "Photoshop opens HEIC on macOS 10.13 or later, and on Windows only once both Microsoft codecs are installed.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/image-file-formats-supported-in-photoshop.html"
+        },
+        {
+          "fact": "The registered media types are image/heic and image/heif.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "avif": {
+      "background": [
+        {
+          "fact": "AVIF (AV1 Image File Format) comes from the Alliance for Open Media; version 1.0.0 of its specification is dated 19 February 2019.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
+        },
+        {
+          "fact": "The Alliance for Open Media was founded in 2015 to build royalty-free media formats, and published the AV1 video codec in 2018.",
+          "source": "https://aomedia.org/about/story/"
+        },
+        {
+          "fact": "An AVIF file stores AV1-coded images inside the HEIF container.",
+          "source": "https://aomediacodec.github.io/av1-avif/"
+        },
+        {
+          "fact": "An image item in AVIF's Baseline profile is at most 8,192 pixels wide, 4,352 high and 8,912,896 pixels in all; a larger picture is stored as a grid of such images.",
+          "source": "https://aomediacodec.github.io/av1-avif/#baseline-profile"
+        },
+        {
+          "fact": "AVIF supports lossy and lossless compression, transparency, image sequences and up to 12 bits per channel for HDR and wide color gamut.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
+        },
+        {
+          "fact": "AVIF can carry Exif, XMP and an ICC color profile.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
+        },
+        {
+          "fact": "AVIF is royalty-free.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
+        },
+        {
+          "fact": "AVIF images are slow to decode, and encoding one can take several seconds.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
+        },
+        {
+          "fact": "AVIF displays in Chrome 85+, Firefox 93+, Safari 16.1+ and Edge 121+, and does not render progressively.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "Android decodes AVIF from version 12.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        },
+        {
+          "fact": "On Windows, viewing .avif files needs Microsoft's AV1 Video Extension alongside the HEIF Image Extension.",
+          "source": "https://apps.microsoft.com/detail/9pmmsr1cgpwg"
+        },
+        {
+          "fact": "GIMP has imported and exported AVIF since version 2.10.22 (October 2020).",
+          "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "fact": "AVIF's registered media type is image/avif.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "pdf": {
+      "background": [
+        {
+          "fact": "PDF was created by Adobe; John Warnock's Camelot project began in 1991 and had become PDF by 1992.",
+          "source": "https://www.adobe.com/acrobat/about-adobe-pdf.html"
+        },
+        {
+          "fact": "The goal was a file that captures a document from any application and shows or prints it the same way anywhere.",
+          "source": "https://www.adobe.com/acrobat/about-adobe-pdf.html"
+        },
+        {
+          "fact": "PDF's imaging model comes from PostScript and does not depend on the device or resolution.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000030.shtml"
+        },
+        {
+          "fact": "PDF 1.7 became the ISO 32000-1 standard in 2008, and PDF 2.0 became ISO 32000-2 in 2017.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000030.shtml"
+        },
+        {
+          "fact": "To look the same everywhere, a PDF needs its fonts embedded.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000030.shtml"
+        },
+        {
+          "fact": "A PDF can mix text, vector graphics and raster images, and can include links, bookmarks, form fields, annotations and media.",
+          "source": "https://www.adobe.com/acrobat/about-adobe-pdf.html"
+        },
+        {
+          "fact": "Images inside a PDF can be compressed with lossless methods such as Flate or with JPEG.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000030.shtml"
+        },
+        {
+          "fact": "Specialised subsets exist, such as PDF/A for archiving, PDF/X for printing and PDF/UA for accessibility.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000030.shtml"
+        },
+        {
+          "fact": "Acrobat can export each page of a PDF to JPEG, PNG or TIFF.",
+          "source": "https://helpx.adobe.com/acrobat/desktop/save-export-documents/convert-to-other-formats/pdfs-to-image-formats.html"
+        },
+        {
+          "fact": "PDF's registered media type is application/pdf.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "svg": {
+      "background": [
+        {
+          "fact": "SVG (Scalable Vector Graphics) is an open W3C standard; SVG 1.0 became a Recommendation in 2001 and SVG 1.1 in 2003.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000020.shtml"
+        },
+        {
+          "fact": "SVG is an XML language that describes two-dimensional graphics as shapes, text and embedded images.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG"
+        },
+        {
+          "fact": "Because shapes are stored as instructions, an SVG can be drawn at any size without losing sharpness.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG"
+        },
+        {
+          "fact": "SVG files are plain text, so they can be edited in a text editor and searched, indexed and compressed.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG"
+        },
+        {
+          "fact": "SVG works with CSS and JavaScript, so it can be styled, scripted and animated.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG"
+        },
+        {
+          "fact": "SVG supports clipping paths, masks and filter effects.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000020.shtml"
+        },
+        {
+          "fact": "An SVG can be shown on its own or placed inside an HTML page.",
+          "source": "https://www.w3.org/TR/SVG2/"
+        },
+        {
+          "fact": "A gzip-compressed SVG uses the .svgz extension.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "Every major browser displays SVG.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "SVG's registered media type is image/svg+xml.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "gif": {
+      "background": [
+        {
+          "fact": "GIF was introduced by CompuServe in 1987.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "The GIF89a version, dated July 1990, added extensions for transparency, frame timing, comments and application data.",
+          "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+        },
+        {
+          "fact": "GIF compresses images losslessly with LZW coding.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "Each GIF image uses a palette of at most 256 colors.",
+          "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+        },
+        {
+          "fact": "Transparency in a GIF works by marking one palette color as fully transparent; there is no partial transparency.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "A GIF can hold many images, and the delay between them is set in hundredths of a second, which is how GIF animation works.",
+          "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+        },
+        {
+          "fact": "Unisys began charging license fees for LZW in 1994; the US patent ran out in 2003 and the European and Japanese ones in 2004.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000133.shtml"
+        },
+        {
+          "fact": "Every major browser displays GIF.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "GIMP can export a multi-layer image as an animated GIF and set it to loop forever.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        },
+        {
+          "fact": "GIF's registered media type is image/gif.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "mp4": {
+      "background": [
+        {
+          "fact": "MP4 is the MPEG-4 Part 14 file format, ISO/IEC 14496-14, first published in 2003.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml"
+        },
+        {
+          "fact": "MP4 is built on the ISO Base Media File Format, which grew out of Apple's QuickTime format.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "An MP4 file is made of nested boxes, the same idea QuickTime calls atoms.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml"
+        },
+        {
+          "fact": "MP4 is a container: it commonly holds H.264 (AVC) video with AAC audio, and can also carry codecs such as AV1, VP9, MP3 and Opus.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "Every major browser plays MP4.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "Video MP4 files use .mp4 or .m4v; audio-only MPEG-4 files often use .m4a.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "Android plays HEVC video in MP4 files from version 5.0.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        },
+        {
+          "fact": "MP4's registered media types are video/mp4 and audio/mp4.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "mov": {
+      "background": [
+        {
+          "fact": "MOV is Apple's QuickTime file format, introduced in 1991 and brought to Windows in 1994.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000052.shtml"
+        },
+        {
+          "fact": "QuickTime files use the .mov or .qt extension.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000052.shtml"
+        },
+        {
+          "fact": "A QuickTime file is built from objects called atoms, and software can skip atoms it does not recognise.",
+          "source": "https://developer.apple.com/documentation/quicktime-file-format"
+        },
+        {
+          "fact": "The QuickTime format was the basis for the MPEG-4 file format, but MOV and MP4 are separate formats and are not interchangeable.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "A MOV file can hold video such as H.264, ProRes or Motion JPEG and audio such as AAC or uncompressed PCM.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000052.shtml"
+        },
+        {
+          "fact": "Mac screen recordings are saved as MOV files.",
+          "source": "https://support.apple.com/guide/mac-help/take-a-screenshot-mh26782/mac"
+        },
+        {
+          "fact": "Browser support for MOV is limited, and Apple itself now generally uses MP4.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        },
+        {
+          "fact": "MOV's registered media type is video/quicktime.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    },
+    "m4a": {
+      "background": [
+        {
+          "fact": "M4A is the extension for MPEG-4 files that hold only audio; Apple adopted it for unprotected music files.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml"
+        },
+        {
+          "fact": "Most M4A files contain AAC audio, which is defined in MPEG-4 Part 3 (ISO/IEC 14496-3).",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000114.shtml"
+        },
+        {
+          "fact": "AAC is lossy and was designed to sound better than MP3 at the same bitrate.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+        },
+        {
+          "fact": "AAC handles sample rates from 8 to 96 kHz and bitrates up to 512 kbps.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+        },
+        {
+          "fact": "Apple used AAC for songs sold through iTunes.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000114.shtml"
+        },
+        {
+          "fact": "Every major browser plays AAC audio in an MP4 container.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+        },
+        {
+          "fact": "Android plays AAC in .m4a files on every version.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        },
+        {
+          "fact": "The media type for M4A files is audio/mp4.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+        }
+      ]
+    },
+    "mp3": {
+      "background": [
+        {
+          "fact": "MP3 is MPEG-1 Audio Layer III, standardised as ISO/IEC 11172-3 in 1993 and extended by ISO/IEC 13818-3 in 1995.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml"
+        },
+        {
+          "fact": "MP3 was developed at Fraunhofer IIS from the late 1980s, with other members of the MPEG audio group.",
+          "source": "https://www.iis.fraunhofer.de/en/ff/amm/consumer-electronics/mp3.html"
+        },
+        {
+          "fact": "MP3 is lossy: it uses a model of human hearing to discard sound listeners are unlikely to notice.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml"
+        },
+        {
+          "fact": "At 128 kbit/s an MP3 is roughly one eleventh the size of the same audio on a CD.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml"
+        },
+        {
+          "fact": "In MPEG-1 mode, MP3 bitrates run from 32 to 320 kbps at 32, 44.1 or 48 kHz; the MPEG-2 and MPEG-2.5 modes add lower bitrates and sample rates.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+        },
+        {
+          "fact": "Song titles and other tags are stored in separate ID3 structures inside the file.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000105.shtml"
+        },
+        {
+          "fact": "The MP3 patent licensing programme ended on 23 April 2017.",
+          "source": "https://www.iis.fraunhofer.de/en/ff/amm/consumer-electronics/mp3.html"
+        },
+        {
+          "fact": "Every major browser plays MP3.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+        },
+        {
+          "fact": "MP3's registered media type is audio/mpeg.",
+          "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+        }
+      ]
+    }
+  },
+  "tools": {
+    "image-to-pdf": {
+      "methods": [
+        {
+          "app": "Finder Create PDF (Mac)",
+          "steps": "Select the images, Control-click them, then choose Quick Actions > Create PDF.",
+          "limits": "Pages follow the order the files were selected in.",
+          "source": "https://support.apple.com/guide/mac-help/combine-files-into-a-pdf-mchl21ac2368/mac"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick PDF from the Format pop-up menu and click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose PDF.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "Adobe Acrobat (Windows, Mac)",
+          "steps": "Choose File > Create > PDF from File, select the image, then click Open.",
+          "limits": "Acrobat accepts BMP, JPEG, GIF, TIFF, PNG, PCX, RLE and DIB images.",
+          "source": "https://helpx.adobe.com/acrobat/desktop/create-documents/create-pdfs/convert-to-pdf.html",
+          "supportSource": "https://helpx.adobe.com/acrobat/desktop/create-documents/create-pdfs/pdf-conversion-supported-file-formats.html"
+        }
+      ]
+    },
+    "png-to-pdf": {
+      "methods": [
+        {
+          "app": "Finder Create PDF (Mac)",
+          "steps": "Select the images, Control-click them, then choose Quick Actions > Create PDF.",
+          "limits": "Pages follow the order the files were selected in.",
+          "source": "https://support.apple.com/guide/mac-help/combine-files-into-a-pdf-mchl21ac2368/mac"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick PDF from the Format pop-up menu and click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose PDF.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "Adobe Acrobat (Windows, Mac)",
+          "steps": "Choose File > Create > PDF from File, select the image, then click Open.",
+          "limits": "Acrobat accepts BMP, JPEG, GIF, TIFF, PNG, PCX, RLE and DIB images.",
+          "source": "https://helpx.adobe.com/acrobat/desktop/create-documents/create-pdfs/convert-to-pdf.html",
+          "supportSource": "https://helpx.adobe.com/acrobat/desktop/create-documents/create-pdfs/pdf-conversion-supported-file-formats.html"
+        }
+      ]
+    },
+    "jpeg-to-pdf": {
+      "methods": [
+        {
+          "app": "Finder Create PDF (Mac)",
+          "steps": "Select the images, Control-click them, then choose Quick Actions > Create PDF.",
+          "limits": "Pages follow the order the files were selected in.",
+          "source": "https://support.apple.com/guide/mac-help/combine-files-into-a-pdf-mchl21ac2368/mac"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick PDF from the Format pop-up menu and click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose PDF.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "Adobe Acrobat (Windows, Mac)",
+          "steps": "Choose File > Create > PDF from File, select the image, then click Open.",
+          "limits": "Acrobat accepts BMP, JPEG, GIF, TIFF, PNG, PCX, RLE and DIB images.",
+          "source": "https://helpx.adobe.com/acrobat/desktop/create-documents/create-pdfs/convert-to-pdf.html",
+          "supportSource": "https://helpx.adobe.com/acrobat/desktop/create-documents/create-pdfs/pdf-conversion-supported-file-formats.html"
+        }
+      ]
+    },
+    "webp-to-jpg": {
+      "methods": [
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick JPG as the format, then click Export.",
+          "limits": "Photoshop 23.2 or later opens WebP natively; older versions need Google's WebPShop plug-in.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html",
+          "supportSource": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/image-file-formats-supported-in-photoshop.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .jpg name, then click Export.",
+          "limits": "GIMP 2.10 or later opens WebP.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://www.gimp.org/release-notes/gimp-2.10.html"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.webp output.jpg.",
+          "limits": "Reading WebP needs an ImageMagick build that includes the WebP delegate library.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "heic-to-jpg": {
+      "methods": [
+        {
+          "app": "Finder Quick Actions (Mac)",
+          "steps": "Control-click the file, choose Quick Actions > Convert Image, then choose JPEG and a size.",
+          "limits": "On some macOS versions the command sits under Quick Actions > More.",
+          "source": "https://support.apple.com/guide/mac-help/perform-quick-actions-in-the-finder-on-mac-mchl97ff9142/mac"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick JPEG from the Format pop-up menu and click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Photos (Mac)",
+          "steps": "Select the photos, choose File > Export > Export Photos, then set Photo Kind to JPEG.",
+          "source": "https://support.apple.com/guide/photos/export-photos-videos-slideshows-and-memories-pht6e157c5f/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose JPEG.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "iPhone camera settings",
+          "steps": "Go to Settings > Camera > Formats and choose Most Compatible so new photos are taken as JPEG.",
+          "limits": "This changes future photos only; existing HEIC photos stay as they are.",
+          "source": "https://support.apple.com/en-us/116944"
+        }
+      ]
+    },
+    "png-to-jpg": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick JPEG from the Format pop-up menu and click Save.",
+          "limits": "JPEG has no transparency, so transparent areas are filled in.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Finder Quick Actions (Mac)",
+          "steps": "Control-click the file, choose Quick Actions > Convert Image, then choose JPEG and a size.",
+          "limits": "On some macOS versions the command sits under Quick Actions > More.",
+          "source": "https://support.apple.com/guide/mac-help/perform-quick-actions-in-the-finder-on-mac-mchl97ff9142/mac"
+        },
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick JPG as the format, then click Export.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .jpg name, then click Export.",
+          "limits": "JPEG cannot keep transparency.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "Paint (Windows)",
+          "steps": "Open the image and save a copy, choosing JPEG as the file type.",
+          "limits": "Microsoft's Paint page lists PNG, JPEG, BMP and GIF among the save formats but gives no menu path.",
+          "source": "https://www.microsoft.com/windows/paint"
+        }
+      ]
+    },
+    "jpg-to-png": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick PNG from the Format pop-up menu and click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Finder Quick Actions (Mac)",
+          "steps": "Control-click the file, choose Quick Actions > Convert Image, then choose PNG and a size.",
+          "limits": "On some macOS versions the command sits under Quick Actions > More.",
+          "source": "https://support.apple.com/guide/mac-help/perform-quick-actions-in-the-finder-on-mac-mchl97ff9142/mac"
+        },
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick PNG as the format, then click Export.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .png name, then click Export.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "Paint (Windows)",
+          "steps": "Open the image and save a copy, choosing PNG as the file type.",
+          "limits": "Microsoft's Paint page lists PNG, JPEG, BMP and GIF among the save formats but gives no menu path.",
+          "source": "https://www.microsoft.com/windows/paint"
+        }
+      ]
+    },
+    "jpeg-to-jpg": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick JPEG from the Format pop-up menu and click Save.",
+          "limits": "Re-exporting re-compresses the image.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick JPG as the format, then click Export.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .jpg name, then click Export.",
+          "limits": "Every JPEG save re-compresses the image.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        }
+      ]
+    },
+    "jfif-to-jpg": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick JPEG from the Format pop-up menu and click Save.",
+          "limits": "A JFIF file is already JPEG data, so exporting re-compresses it.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick JPG as the format, then click Export.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .jpg name, then click Export.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        }
+      ]
+    },
+    "pdf-to-png": {
+      "methods": [
+        {
+          "app": "Adobe Acrobat (Windows, Mac)",
+          "steps": "Open the PDF, select Convert in the global bar, choose Image format > PNG, select Convert to PNG, then save.",
+          "limits": "Each page is saved as its own image.",
+          "source": "https://helpx.adobe.com/acrobat/desktop/save-export-documents/convert-to-other-formats/pdfs-to-image-formats.html"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the file, choose File > Export, then pick PNG from the Format pop-up menu and click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose PNG.",
+          "limits": "You set the image resolution when exporting a PDF to an image.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the PDF, choose the pages and resolution in the PDF Import dialog, then choose File > Export As, give the file a .png name and click Export.",
+          "limits": "Set Open pages as to Images to get each page as its own image; transparent areas stay transparent unless Fill transparent areas with white is checked.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/import-file-formats.html"
+        }
+      ]
+    },
+    "avif-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .jpg name, then click Export.",
+          "limits": "GIMP 2.10.22 or later opens AVIF.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.avif output.jpg.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "avifdec from libavif (command line)",
+          "steps": "Run avifdec input.avif output.jpg; -q sets the JPEG quality, 90 by default.",
+          "limits": "Only the first frame of an image sequence is decoded unless --index names another frame, or all of them.",
+          "source": "https://github.com/AOMediaCodec/libavif/blob/main/doc/avifdec.1.md"
+        }
+      ]
+    },
+    "avif-to-png": {
+      "methods": [
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, give the file a .png name, then click Export.",
+          "limits": "GIMP 2.10.22 or later opens AVIF.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.avif output.png.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "avifdec from libavif (command line)",
+          "steps": "Run avifdec input.avif output.png; -d sets 8 or 16 bits per channel.",
+          "limits": "Only the first frame of an image sequence is decoded unless --index names another frame, or all of them.",
+          "source": "https://github.com/AOMediaCodec/libavif/blob/main/doc/avifdec.1.md"
+        }
+      ]
+    },
+    "mp4-to-gif": {
+      "methods": [
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Import > Video Frames to Layers, then in Window > Timeline create a frame animation from the layers, and save it with File > Export > Save for Web (Legacy) as a GIF.",
+          "limits": "Photoshop imports MP4 only when a compatible codec is installed; long videos may not import in full.",
+          "source": "https://www.adobe.com/learn/photoshop/web/make-animated-gif",
+          "supportSource": "https://helpx.adobe.com/photoshop/desktop/add-video-and-animation/create-animation-frames/supported-video-and-image-sequence-formats.html"
+        },
+        {
+          "app": "Microsoft Clipchamp (Windows, web)",
+          "steps": "Add the video to a project, click Export at the top right, then choose GIF.",
+          "limits": "The GIF option is only offered for videos of 15 seconds or less.",
+          "source": "https://support.microsoft.com/en-us/clipchamp/exporting-and-saving-a-video-in-clipchamp",
+          "supportSource": "https://support.microsoft.com/en-us/clipchamp/video-file-formats-supported-by-clipchamp"
+        },
+        {
+          "app": "FFmpeg (command line, any platform)",
+          "steps": "Run ffmpeg -i input.mp4 output.gif to encode the video with the animated GIF muxer.",
+          "limits": "GIF frame delays cannot be shorter than one hundredth of a second; the output loops forever unless -loop is set.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html#gif-2"
+        }
+      ]
+    },
+    "video-to-gif": {
+      "methods": [
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Import > Video Frames to Layers, then in Window > Timeline create a frame animation from the layers, and save it with File > Export > Save for Web (Legacy) as a GIF.",
+          "limits": "Photoshop imports MP4, MOV, AVI and MPEG video when compatible codecs are installed; long videos may not import in full.",
+          "source": "https://www.adobe.com/learn/photoshop/web/make-animated-gif",
+          "supportSource": "https://helpx.adobe.com/photoshop/desktop/add-video-and-animation/create-animation-frames/supported-video-and-image-sequence-formats.html"
+        },
+        {
+          "app": "Microsoft Clipchamp (Windows, web)",
+          "steps": "Add the video to a project, click Export at the top right, then choose GIF.",
+          "limits": "The GIF option is only offered for videos of 15 seconds or less.",
+          "source": "https://support.microsoft.com/en-us/clipchamp/exporting-and-saving-a-video-in-clipchamp",
+          "supportSource": "https://support.microsoft.com/en-us/clipchamp/video-file-formats-supported-by-clipchamp"
+        },
+        {
+          "app": "FFmpeg (command line, any platform)",
+          "steps": "Run ffmpeg -i input.mp4 output.gif to encode the video with the animated GIF muxer.",
+          "limits": "GIF frame delays cannot be shorter than one hundredth of a second; the output loops forever unless -loop is set.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html#gif-2"
+        }
+      ]
+    },
+    "compress-jpg": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the image, choose File > Export, choose JPEG and drag the Quality slider down, then click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Photos (Mac)",
+          "steps": "Select the photos, choose File > Export > Export Photos, set Photo Kind to JPEG and lower JPEG Quality or Size.",
+          "source": "https://support.apple.com/guide/photos/export-photos-videos-slideshows-and-memories-pht6e157c5f/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose JPEG and drag the Size slider.",
+          "limits": "The Size slider applies to HEIC and JPEG exports.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, name the file .jpg, then lower Quality in the JPEG export dialog (default 85).",
+          "limits": "Every save re-compresses the image and loses some detail.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick JPG as the format, then click Export.",
+          "limits": "Lower the Quality setting to shrink the file.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html"
+        }
+      ]
+    },
+    "compress-jpeg": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the image, choose File > Export, choose JPEG and drag the Quality slider down, then click Save.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "Photos (Mac)",
+          "steps": "Select the photos, choose File > Export > Export Photos, set Photo Kind to JPEG and lower JPEG Quality or Size.",
+          "source": "https://support.apple.com/guide/photos/export-photos-videos-slideshows-and-memories-pht6e157c5f/mac"
+        },
+        {
+          "app": "Preview (iPhone, iOS 26)",
+          "steps": "Open the file, tap the actions button next to its name, tap Export, then choose JPEG and drag the Size slider.",
+          "limits": "The Size slider applies to HEIC and JPEG exports.",
+          "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Choose File > Export As, name the file .jpg, then lower Quality in the JPEG export dialog (default 85).",
+          "limits": "Every save re-compresses the image and loses some detail.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "Adobe Photoshop (Windows, Mac)",
+          "steps": "Choose File > Export > Export As, pick JPG as the format, then click Export.",
+          "limits": "Lower the Quality setting to shrink the file.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/fine-tune-your-export-settings-using-the-export-as-option.html"
+        }
+      ]
+    },
+    "mov-to-mp4": {
+      "methods": [
+        {
+          "app": "VLC (Windows, Mac, Linux)",
+          "steps": "Select Media > Convert/Save, click Add and pick the file, then choose an MP4 profile from the Profile menu, set the Destination file and click Start.",
+          "limits": "VLC's guide does not list its profiles by name.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSource": "https://www.videolan.org/vlc/features.html"
+        },
+        {
+          "app": "FFmpeg (command line, any platform)",
+          "steps": "Run ffmpeg -i input.mov -c copy output.mp4 to move the streams into an MP4 container without re-encoding.",
+          "limits": "Stream copy can fail when the MOV holds a codec MP4 cannot carry; drop -c copy to re-encode instead.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Microsoft Clipchamp (Windows, web)",
+          "steps": "Add the MOV to a project, click Export at the top right, then pick a resolution; the video is saved as MP4.",
+          "limits": "Clipchamp re-encodes the video.",
+          "source": "https://support.microsoft.com/en-us/clipchamp/exporting-and-saving-a-video-in-clipchamp",
+          "supportSource": "https://support.microsoft.com/en-us/clipchamp/video-file-formats-supported-by-clipchamp"
+        }
+      ]
+    },
+    "m4a-to-mp3": {
+      "methods": [
+        {
+          "app": "Apple Music (Mac)",
+          "steps": "In Music > Settings > Files > Import Settings, set Import Using to MP3 Encoder, select the songs, then choose File > Convert > Create MP3 Version.",
+          "limits": "Converting one lossy format to another loses some quality, and protected AAC purchases cannot be converted.",
+          "source": "https://support.apple.com/en-us/108961"
+        },
+        {
+          "app": "iTunes (Windows)",
+          "steps": "Choose Edit > Preferences, click General, then Import Settings, and set Import Using to MP3 Encoder; then select the songs and choose File > Convert > Create MP3 Version.",
+          "limits": "Converting between compressed formats such as AAC and MP3 can lower sound quality, and iTunes Store purchases convert only if they are iTunes Plus songs.",
+          "source": "https://support.apple.com/guide/itunes/convert-music-file-formats-itns2972/windows",
+          "supportSource": "https://support.apple.com/guide/itunes/choose-import-settings-itns2965/windows"
+        },
+        {
+          "app": "VLC (Windows, Mac, Linux)",
+          "steps": "Select Media > Convert/Save, click Add and pick the file, then choose an MP3 audio profile from the Profile menu, set the Destination file and click Start.",
+          "limits": "VLC's guide does not list its profiles by name.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSource": "https://www.videolan.org/vlc/features.html"
+        },
+        {
+          "app": "FFmpeg (command line, any platform)",
+          "steps": "Run ffmpeg -i input.m4a -c:a libmp3lame output.mp3.",
+          "limits": "MP3 encoding needs an FFmpeg build that includes the LAME library.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame"
+        }
+      ]
+    },
+    "svg-to-png": {
+      "methods": [
+        {
+          "app": "Inkscape (Windows, Mac, Linux)",
+          "steps": "Open the SVG and choose File > Export (Shift+Ctrl+E). On the Single File tab, pick Document, Page, Selection or Custom as the area, set the image size or DPI, choose PNG from the format menu, then click Export.",
+          "limits": "This is the Export dialog of Inkscape 1.2 and later; older versions have File > Export PNG Image instead. Its Background Color option sets what fills transparent areas.",
+          "source": "https://gitlab.com/inkscape/inkscape/-/blob/1.4.x/share/ui/dialog-export.glade",
+          "supportSource": "https://gitlab.com/inkscape/inkscape/-/blob/1.4.x/share/keys/inkscape.xml"
+        },
+        {
+          "app": "Adobe Illustrator (Windows, Mac)",
+          "steps": "Open the SVG, choose File > Export > Export As, pick PNG as the format and click Export, then set the resolution and background color.",
+          "limits": "The Background Color option keeps transparency or fills it with white or black.",
+          "source": "https://helpx.adobe.com/illustrator/using/exporting-artwork.html",
+          "supportSource": "https://helpx.adobe.com/illustrator/kb/supported-file-formats-illustrator.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the SVG, choose File > Export As, give the file a .png name, then click Export.",
+          "limits": "GIMP is a raster editor, so it opens the SVG as a pixel image.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-using-paths-and-svg.html"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.svg output.png.",
+          "limits": "ImageMagick draws SVG with Inkscape, RSVG or its own MSVG renderer.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "png-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape (Windows, Mac, Linux)",
+          "steps": "Choose File > Import to bring in the PNG, select it, then choose Path > Trace Bitmap (Shift+Alt+B) and pick a mode such as Brightness cutoff.",
+          "limits": "Tracing redraws the image as shapes rather than copying it, and works best on simple, high-contrast artwork.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html"
+        },
+        {
+          "app": "Adobe Illustrator (Windows, Mac)",
+          "steps": "Choose File > Place to add the PNG, open Window > Image Trace and pick a preset, then save the result as SVG.",
+          "limits": "The trace replaces the placed image, and tracing time depends on the image's resolution.",
+          "source": "https://helpx.adobe.com/illustrator/desktop/manage-objects/traces-mockups-symbols/trace-images-to-convert-raster-into-vector-artwork.html",
+          "supportSource": "https://helpx.adobe.com/illustrator/kb/supported-file-formats-illustrator.html"
+        },
+        {
+          "app": "Potrace (command line, Windows, Mac, Linux)",
+          "steps": "Save a BMP copy of the PNG, then run potrace -s input.bmp -o output.svg.",
+          "limits": "Potrace reads PBM, PGM, PPM and BMP but not PNG, and traces in black and white at a cutoff set with -k (0.5 by default).",
+          "source": "https://potrace.sourceforge.net/"
+        }
+      ]
+    }
+  }
+}

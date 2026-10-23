@@ -1,0 +1,254 @@
+{
+  "tools": {
+    "docx-to-tiff": {
+      "methods": [
+        {
+          "app": "LibreOffice Writer and Ghostscript",
+          "steps": "Open the DOCX in Writer, File > Export As > Export as PDF, then gs -sDEVICE=tiff24nc -r300 -o 'report-%03d.tif' report.pdf",
+          "limits": "Two-stage pipeline; tiff24nc writes 24-bit RGB and %03d numbers the page files. Run locally on a sample PDF.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export.html",
+          "supportingSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html",
+            "https://ghostscript.readthedocs.io/en/latest/Use.html",
+            "https://ghostscript.readthedocs.io/en/latest/Devices.html"
+          ]
+        },
+        {
+          "app": "Pages and ImageMagick",
+          "steps": "In Pages on Mac, File > Open the DOCX, File > Export To > PDF, then magick -density 200 report.pdf report.tiff",
+          "limits": "ImageMagick reads PDF through Ghostscript. Run locally on a sample PDF.",
+          "source": "https://support.apple.com/guide/pages/export-to-word-pdf-or-another-file-format-tance1161f26/mac",
+          "supportingSources": [
+            "https://support.apple.com/en-us/105050",
+            "https://imagemagick.org/command-line-processing/",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "dss-to-mp3": {
+      "methods": [
+        {
+          "app": "Switch",
+          "steps": "Add the DSS file (Add button or File > Add); choose MP3 in the Output Format field; click Convert.",
+          "limits": "DSS input is listed among the formats only the paid Switch Plus supports, and in its trial.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportingSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html"
+          ]
+        },
+        {
+          "app": "Audio Converter Plus",
+          "steps": "Drag the DSS file in; choose MP3 in the Output Format menu; set the folder with Browse; click Convert.",
+          "limits": "Windows desktop program.",
+          "source": "https://www.abyssmedia.com/audioconverter/dss-to-mp3.shtml",
+          "supportingSources": []
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i memo.dss -c:a libmp3lame -b:a 160k memo.mp3",
+          "limits": "FFmpeg decodes DSS Standard Play. Run locally on the sample DSS fixture.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "dst-to-jpeg": {
+      "methods": [
+        {
+          "app": "Ink/Stitch and GIMP",
+          "steps": "In Inkscape with Ink/Stitch: File > Open the DST (Manual Stitch Mode), File > Export PNG Image; open the PNG in GIMP, File > Export As with a .jpg extension.",
+          "limits": "Embroidery interpretation then PNG/JPEG stages; JPEG contains no stitch instructions.",
+          "source": "https://inkstitch.org/docs/import-export/",
+          "supportingSources": [
+            "https://inkstitch.org/docs/file-formats/",
+            "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "Wilcom Library and ImageMagick",
+          "steps": "Select the design in My Designs, more actions menu (3 dots), Capture Design Bitmap; download the PNG; magick sample.png approval.jpeg",
+          "limits": "Library account required. Run the magick command locally.",
+          "source": "https://help.wilcom.com/portal/en/kb/wilcom-international/wilcom-library/browse-view-designs/articles/capture-design-bitmap",
+          "supportingSources": [
+            "https://wilcom.com/resources/blog/embroidery-design-management-10-key-library-features",
+            "https://imagemagick.org/command-line-processing/",
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "pyembroidery",
+          "steps": "import pyembroidery; p = pyembroidery.read_dst('sample.dst'); pyembroidery.write_png(p, 'sample.png'); then open the PNG in GIMP and File > Export As with a .jpg extension.",
+          "limits": "README documents read_dst and write_png.",
+          "source": "https://github.com/EmbroidePy/pyembroidery",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        }
+      ]
+    },
+    "exr-to-jpeg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the EXR; File > Export As; end the file name in .jpeg; Export; set the quality in the JPEG dialog.",
+          "limits": "GIMP 2.10 added high-bit-depth EXR import. JPEG cannot hold the EXR channel and depth structure.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+            "https://www.gimp.org/release-notes/gimp-2.10.html"
+          ]
+        },
+        {
+          "app": "OpenImageIO",
+          "steps": "oiiotool lighting.exr -o review.jpg",
+          "limits": "-o writes the format of the file name; --colorconvert converts between color spaces.",
+          "source": "https://openimageio.readthedocs.io/en/latest/oiiotool.html",
+          "supportingSources": []
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick lighting.exr -quality 91 review.jpeg",
+          "limits": "Sets the JPEG quality; run locally on the sample EXR. The formats page lists EXR and JPEG as read and write.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "flac-to-wma": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i album.flac -b:a 160k -c:a wmav2 album.wma",
+          "limits": "wmav2 is Windows Media Audio 2, not WMA Lossless. Run locally on the sample FLAC.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "WavePad for Windows",
+          "steps": "Open the FLAC (File > Open); File > Save As; pick WMA.",
+          "limits": "WavePad opens FLAC on Windows and Mac but saves WMA on Windows only.",
+          "source": "https://help.nchsoftware.com/help/en/wavepad/win/files.html",
+          "supportingSources": [
+            "https://www.nch.com.au/wavepad/kb/1414.html"
+          ]
+        }
+      ]
+    },
+    "flv-to-mpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i lesson.flv -c:a mp2 -c:v mpeg2video -q:v 4 lesson.mpeg",
+          "limits": "general.html lists FLV, MPEG-PS, MPEG-2 video and MP2 for encoding and decoding; -q is the fixed quality scale option. Run locally on the sample FLV.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "flv-to-swf": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i legacy.flv -ar 44100 -c:a libmp3lame -c:v flv legacy.swf",
+          "limits": "The SWF muxer supports FLV1 video and MP3 audio at 11025, 22050 or 44100 Hz (swfenc.c). Run locally on the sample FLV.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/swfenc.c",
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ]
+    },
+    "gif-to-jxl": {
+      "methods": [
+        {
+          "app": "cjxl",
+          "steps": "cjxl -d 0 loop.gif loop.jxl",
+          "limits": "Man page: accepts GIF input, compresses an image or animation, -d 0 is mathematically lossless. Ran locally on a generated GIF, exit 0.",
+          "source": "https://github.com/libjxl/libjxl/blob/main/doc/man/cjxl.txt",
+          "supportingSources": []
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the GIF; File > Export As; name the file .jxl; Export; the dialog has a Lossless checkbox.",
+          "limits": "JPEG XL export page: .jxl extension starts the export and the dialog has a Lossless checkbox.",
+          "source": "https://docs.gimp.org/3.2/en/file-jpegxl-export.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.2/en/file-gif-export.html"
+          ]
+        }
+      ]
+    },
+    "gif-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i drawing.gif -an -c:v libx264 -crf 20 drawing.mkv",
+          "limits": "Ran locally on a generated GIF, exit 0, one H.264 video stream, same duration. general.html lists GIF animation and Matroska as encode and decode, libx264 as the H.264 encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Shotcut",
+          "steps": "Open the GIF; click Export; click Advanced; in Format / Codec set the container to mkv; export.",
+          "limits": "Forum page lists mkv among container choices in Advanced Format / Codec. Features page lists GIF among supported image formats.",
+          "source": "https://forum.shotcut.org/t/creating-export-presets/12954",
+          "supportingSources": [
+            "https://shotcut.org/features/"
+          ]
+        },
+        {
+          "app": "ImageMagick and FFmpeg",
+          "steps": "magick sequence.gif -coalesce 'frame-%04d.png'; ffmpeg -framerate 10 -i 'frame-%04d.png' -c:v libx264 frames.mkv",
+          "limits": "Ran both commands locally, exit 0. -coalesce documented on the command-line-options page; -framerate on the image2 demuxer in ffmpeg-formats. Replaces the GIF's own delays with one fixed rate.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "gif-to-tif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the GIF; File > Export As; export it as a TIFF; in the TIFF dialog set Compression and tick Save layers to store each layer as its own page.",
+          "limits": "TIFF export page documents Compression and Save layers (each layer a separate page, from the bottom). Export As menu path from the Export As page.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.2/en/file-tiff-export.html",
+            "https://docs.gimp.org/3.0/en/file-tiff-export.html"
+          ]
+        },
+        {
+          "app": "IrfanView",
+          "steps": "Open the GIF; File > Save As; pick TIF as the format; tick Show format options dialog to set its options.",
+          "limits": "Format matrix shows GIF and TIF both read and save. FAQ describes File > Save As and the Show format options dialog checkbox.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportingSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,19 +1,13 @@
 import CharacterCounter from "@/components/CharacterCounter";
 import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildToolMetadata } from "@/lib/metadata";
+import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 import { toolContent } from '@/lib/tool-content';
-import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "character-counter";
-// The H1 and the line under it.
-const title = "Character Counter";
-const subtitle = "Count characters, words, sentences, and paragraphs instantly";
 
 export const generateMetadata = () => buildToolMetadata(toolId);
 
@@ -23,17 +17,16 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
-  const videoEmbedId = getEnabledVideoEmbedId({
-    tool: content.tool,
-    videoSection: content.videoSection,
-  });
+  // The H1 and the line under it, which the structured data repeats.
+  const heading = toolHeading(toolId);
+  const subtitle = content.tool.subtitle;
 
   return (
     <main className="min-h-screen bg-background">
-      <StructuredData toolId={toolId} name={title} description={subtitle} />
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
 
       {/* Custom Character Counter Component */}
-      <CharacterCounter title={title} subtitle={subtitle} videoEmbedId={videoEmbedId} />
+      <CharacterCounter heading={heading} subtitle={subtitle} />
 
       {/* Related Tools Section - Character counter doesn't have from/to formats */}
 
@@ -50,12 +43,6 @@ export default function Page() {
 
       {/* FAQs Section */}
       {content.faqs && <FAQSection faqs={content.faqs} />}
-
-      {/* Blog Articles Section */}
-      {content.blogPosts && <BlogSection blogPosts={content.blogPosts} />}
-
-      {/* Changelog Section */}
-      {content.changelog && <ChangelogSection changelog={content.changelog} />}
 
       {/* All tools link hub */}
       <ToolsLinkHub />

@@ -1,0 +1,158 @@
+{
+  "tools": {
+    "mp4-to-m4r": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i clip.mp4 -b:a 192k -c:a aac -vn -f ipod tone.m4r.",
+          "limits": "The ipod format holds only audio streams.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "GarageBand for iPhone with audio extraction",
+          "steps": "Extract WAV using ffmpeg -i clip.mp4 -vn sound.wav. In GarageBand tap the Loops Browser button, tap Files, then Browse items from the Files app, and drag the file all the way to the left in Tracks view. Tap Share, then Ringtone, enter a name and tap Export.",
+          "limits": "Ringtones can be up to 30 seconds long.",
+          "source": "https://support.apple.com/en-us/120692"
+        },
+        {
+          "app": "WavePad (Windows) with WAV intermediate",
+          "steps": "Extract WAV using FFmpeg, open it in WavePad and save the result as M4R.",
+          "limits": "NCH lists M4R saving only on Windows.",
+          "source": "https://www.nch.com.au/wavepad/kb/1414.html"
+        }
+      ]
+    },
+    "mp4-to-m4v": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i source.mp4 -c copy -f mp4 output.m4v.",
+          "limits": "Copies the streams; the codecs inside stay as they are.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Rename a copy",
+          "steps": "Make a duplicate and change its .mp4 ending to .m4v.",
+          "limits": "The HandBrake page says MP4 and M4V are the same file apart from the extension, and that QuickTime-based apps need .m4v for an MP4 with AC3 pass-through, SRT subtitles or chapter markers.",
+          "source": "https://handbrake.fr/docs/en/1.6.0/technical/containers.html"
+        }
+      ]
+    },
+    "mp4-to-vob": {
+      "methods": [
+        {
+          "app": "FFmpeg DVD target (NTSC)",
+          "steps": "Run ffmpeg -i movie.mp4 -target ntsc-dvd dvd-video.vob.",
+          "limits": "FFmpeg sets the codecs and bitrates for the standard.",
+          "source": "https://ffmpeg.org/ffmpeg-all.html"
+        },
+        {
+          "app": "FFmpeg DVD target (PAL)",
+          "steps": "Run ffmpeg -i movie.mp4 -target pal-dvd dvd-video.vob.",
+          "limits": "FFmpeg accepts the pal-, ntsc- and film- prefixes.",
+          "source": "https://ffmpeg.org/ffmpeg-all.html"
+        }
+      ]
+    },
+    "mpeg-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i footage.mpeg -c:a aac -c:v libx264 delivery.mov.",
+          "limits": "Re-encodes the video and audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mpg-to-gif": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i source.mpg animation.gif.",
+          "limits": "A single command with no palette step; this page generates a palette first.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mts-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i camera.mts -c:v libx264 -c:a aac clip.mov.",
+          "limits": "Re-encodes the video and audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg (stream copy)",
+          "steps": "Run ffmpeg -i camera.mts -c copy clip.mov.",
+          "limits": "A stream the MOV can't hold may be dropped or carried as data without an error; the interlacing is kept.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "raf-to-jpg": {
+      "methods": [
+        {
+          "app": "FUJIFILM X RAW STUDIO",
+          "steps": "On the camera choose SET UP > USB RAW CONVERSION and connect it; in the software choose the Source Image Folder, select RAW files in Thumbnail View, adjust Conversion Settings and click Convert.",
+          "limits": "Output is JPEG or TIFF in the same folder; the connected camera must be the model that took the photos.",
+          "source": "https://www.fujifilm-x.com/en-us/stories/fujifilm-x-raw-studio-features-users-guide/"
+        },
+        {
+          "app": "darktable",
+          "steps": "Select the images, open the export module, set target storage to file on disk, choose JPEG as the file format and click export.",
+          "limits": "Check camera and recording-mode support first.",
+          "source": "https://docs.darktable.org/usermanual/development/en/overview/workflow/export/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick photo.raf delivery.jpg.",
+          "limits": "Needs a build whose RAF decoder supports that camera; the formats page lists RAF as readable.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "svg-to-html": {
+      "methods": [
+        {
+          "app": "Text editor: inline SVG",
+          "steps": "Paste the entire SVG file into the body of an HTML document, keep the viewBox, save as .html and open it in a browser.",
+          "limits": "The drawing becomes part of the page; MDN describes viewBox and preserveAspectRatio for scaling.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG/Guides/SVG_in_HTML"
+        },
+        {
+          "app": "Text editor: CSS background",
+          "steps": "Give an element a size and set its background-image property to url(\"logo.svg\").",
+          "limits": "Drawn as an image, an SVG has JavaScript disabled and can't load external resources, except through data: URLs.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG/Guides/SVG_as_an_image"
+        }
+      ]
+    },
+    "txt-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick text:notes.txt notes.png.",
+          "limits": "The default canvas is a letter-size page of 612x792 pixels; long lines aren't wrapped, and too many lines give several pages and images.",
+          "source": "https://usage.imagemagick.org/text/"
+        }
+      ]
+    },
+    "wav-to-aiff": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i session.wav -c:a pcm_s16be listening.aiff.",
+          "limits": "Writes 16-bit PCM in a big-endian AIFF.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Load the WAV, open the Export Audio dialog, choose AIFF (Apple/SGI) signed 16-bit PCM, which has no options, and save.",
+          "limits": "AIFF files are capped at 4 GB.",
+          "source": "https://manual.audacityteam.org/man/export_formats_supported_by_audacity.html"
+        }
+      ]
+    }
+  }
+}

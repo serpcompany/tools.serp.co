@@ -1,0 +1,815 @@
+{
+  "docx-to-tiff": {
+    "seo": {
+      "title": "Convert DOCX to TIFF: One Image Per Page",
+      "h1": "DOCX to TIFF Converter",
+      "description": "Convert a Word DOCX to TIFF in your browser: each page becomes its own LZW-compressed image, and nothing is uploaded. Free, no sign-up.",
+      "howToHeading": "How to convert DOCX to TIFF"
+    },
+    "tool": {
+      "subtitle": "Turn each page of a Word document into its own TIFF image."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a DOCX to TIFF?",
+        "answer": "Add the DOCX to the page and download the TIFF files. The conversion runs in your browser, so nothing is uploaded."
+      },
+      {
+        "question": "Does the page make a single multipage TIFF?",
+        "answer": "No. Each page is saved as a separate TIFF named after the file and the page number, such as report_page1. The format allows several images in one file, but the page writes them one by one."
+      },
+      {
+        "question": "How big are the page images?",
+        "answer": "Each page is drawn at twice its size in points, so a US Letter page is 1224x1584 pixels. No side goes past 4096 pixels."
+      },
+      {
+        "question": "Is the TIFF compressed?",
+        "answer": "Yes, with LZW, which is lossless. Nothing about the drawn page is lost to the compression."
+      },
+      {
+        "question": "Why do my fonts look different?",
+        "answer": "The browser has only its own fonts, and a font it lacks falls back to its default. That can move line and page breaks, so compare the pages with the document in Word."
+      },
+      {
+        "question": "Why is a picture missing?",
+        "answer": "A picture the DOCX links to, without holding it, is not loaded, so the page shows nothing there. Embed the picture in the document and convert again."
+      },
+      {
+        "question": "Is the Word text still editable or searchable?",
+        "answer": "No. The TIFF is a picture of each page, so the text cannot be edited, selected or searched. Keep the DOCX for that."
+      },
+      {
+        "question": "How are numbered lists and unsized pages handled?",
+        "answer": "List numbers are written out as text. Numbering in other scripts, such as CJK or Hebrew, comes out as decimal numbers. A file that sets no page size is laid out as US Letter with 1-inch margins."
+      }
+    ],
+    "aboutSection": {
+      "title": "DOCX and TIFF",
+      "fromFormat": {
+        "name": "DOCX",
+        "fullName": "Microsoft Word document",
+        "description": "An Office Open XML word-processing document in a ZIP-based package. It holds editable text, styles and images rather than a finished page.",
+        "details": [
+          "ECMA-376 and ISO/IEC 29500",
+          "ZIP-based package",
+          "default in Word since 2007"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A tag-based raster container published by Aldus and Microsoft. It can use several compression methods and hold more than one image.",
+        "details": [
+          "raster container",
+          "several compression methods",
+          "can hold multiple images",
+          "common for scanned documents"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DOCX to TIFF",
+      "points": [
+        "Every page becomes its own TIFF; there is no multipage file.",
+        "Fonts the browser lacks fall back to its default, and pictures the file only links to are not loaded.",
+        "The TIFF is a picture of the page and holds no editable text.",
+        "Several DOCX files can be chosen at once; each one gives its own page images."
+      ]
+    },
+    "guide": {
+      "title": "About DOCX files",
+      "markdown": "### What is a DOCX file?\n\nDOCX is the Office Open XML word-processing format, specified as ECMA-376 and ISO/IEC 29500. Microsoft Word has used it by default for new documents since Word 2007. A DOCX is a ZIP-based package: WordprocessingML holds the text and formatting, while images, styles, properties and relationships sit in separate parts. It stores an editable document, not a finished page.\n\n### Programs that open DOCX files\n\n- **Windows, Mac and Linux:** LibreOffice Writer opens and saves DOCX, though some formatting attributes may differ.\n- **Windows:** Microsoft Word.\n- **Mac:** Apple Pages, which can warn about missing fonts and formatting differences.\n- **Linux:** ONLYOFFICE Desktop Editors, a free desktop editor.\n- **Web:** Pages for iCloud and Word for the web.\n- **Mobile:** Word for Android, and Pages for iPhone and iPad.\n\n### DOCX and TIFF compared\n\nA DOCX flows its text into pages when it is opened. A TIFF is a raster image format first published by Aldus, with many compression options and room for several images in one file. It is common for scanning, archiving and document imaging.\n\nYour browser lays out the document and draws every page as its own image, so a file with several pages gives several TIFFs. Pages break where the file says and where text runs past the page height, between paragraphs or table rows. The header and footer repeat on each page. A table that crosses a break continues on the next page with its header rows, and a merged cell that spans the break carries on empty. HTML embedded in the file as an altChunk is left out, and the page tells you what was left out.\n\n### Other ways to convert DOCX to TIFF\n\n- **LibreOffice Writer and Ghostscript:** open the DOCX in Writer and use File > Export As > Export as PDF, and after that run `gs -sDEVICE=tiff24nc -r300 -o 'report-%03d.tif' report.pdf`. The tiff24nc device writes 24-bit RGB, and `%03d` numbers the page files report-001.tif, report-002.tif and so on.\n- **Pages and ImageMagick:** in Pages on a Mac choose File > Open, select the DOCX and click Open. Then choose File > Export To > PDF and save it. Run `magick -density 200 report.pdf report.tiff`. ImageMagick reads PDF through Ghostscript.\n\n### Problems with DOCX files\n\n- **Formatting changes in another program:** a DOCX opened in another word processor can lose formatting attributes on import. Compare the result with the document in Word.\n- **A different look in Pages:** missing fonts can change how the document appears. Install the fonts the document uses.\n- **Reading only document.xml:** unzipping a DOCX and taking that one part does not reproduce the document, because images, styles and relationships are separate parts. Open the whole file in a word processor instead.\n"
+    }
+  },
+  "dss-to-mp3": {
+    "seo": {
+      "title": "Convert DSS to MP3: Dictation to Audio",
+      "h1": "DSS to MP3 Converter",
+      "description": "Convert an Olympus or OM SYSTEM DSS dictation recording to MP3 in your browser, where FFmpeg decodes the speech. Free, no sign-up, no upload.",
+      "howToHeading": "How to convert DSS to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn a DSS dictation recording into an MP3 you can play anywhere."
+    },
+    "faqs": [
+      {
+        "question": "Are DSS and DS2 the same file?",
+        "answer": "No. DSS Classic uses .dss, while DSS Pro uses .ds2 and adds encryption and more index marks. This page's file picker takes .dss files."
+      },
+      {
+        "question": "Which bitrate does the MP3 use?",
+        "answer": "The encoder is asked for 192 kbps, and the page has no quality choice. Below 32 kHz the MP3 format cannot reach that rate: a 16 to 24 kHz source tops out at 160 kbps, and an 8 to 12 kHz one at 64 kbps. The sample rate is not changed."
+      },
+      {
+        "question": "Can converting make the speech clearer?",
+        "answer": "No. MP3 is lossy, and a conversion cannot add detail the dictation recording does not have."
+      },
+      {
+        "question": "Will I get a transcript?",
+        "answer": "No. The result is an audio file. Turning speech into text is a separate job."
+      },
+      {
+        "question": "Does the MP3 keep the recording's tags?",
+        "answer": "The page does not remove them. Global tags in the recording are copied across by FFmpeg because an MP3 can hold them. What a DSS holds depends on the recorder."
+      },
+      {
+        "question": "Why did the converter say FFmpeg failed?",
+        "answer": "The message means FFmpeg could not finish the conversion. Open the recording in the vendor's player to see whether the file itself is damaged."
+      },
+      {
+        "question": "Can I convert several dictations at once?",
+        "answer": "Yes. Pick as many recordings as you like. They are processed in sequence, and every one downloads separately as an MP3."
+      },
+      {
+        "question": "Is my dictation uploaded?",
+        "answer": "No. The conversion runs inside a WebAssembly build of FFmpeg in your browser tab, so the audio stays on your device. Longer recordings simply take more time."
+      }
+    ],
+    "aboutSection": {
+      "title": "DSS and MP3",
+      "fromFormat": {
+        "name": "DSS",
+        "fullName": "Digital Speech Standard",
+        "description": "An audio format used in professional dictation. DSS Classic uses .dss; DSS Pro uses .ds2 and adds encryption and more index marks.",
+        "details": [
+          "professional dictation",
+          "insert and overwrite recording",
+          "Classic .dss, Pro .ds2"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format that plays on almost any device.",
+        "details": [
+          "lossy compression",
+          "plays almost everywhere",
+          "audio only"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DSS to MP3",
+      "points": [
+        "The MP3 is encoded with libmp3lame, and the page has no quality choice.",
+        "Only the sound is kept; the output is audio, not a transcript.",
+        "The file picker takes .dss files.",
+        "Several DSS files can be chosen at once; each one gives its own MP3."
+      ]
+    },
+    "guide": {
+      "title": "About DSS files",
+      "markdown": "### What is a DSS file?\n\nDigital Speech Standard is an audio format used in professional dictation. Olympus, Philips and Grundig developed it for digital dictation recorders, and it is designed for voice rather than music. It compresses recordings into compact files, and the dictation workflow supports insert and overwrite recording. Two variants matter: DSS Classic recordings use the .dss extension, while DSS Pro recordings use .ds2 and add encryption and more index marks. A recorder setting therefore decides which one you have.\n\n### Programs that open DSS files\n\n- **Windows, Mac and Linux:** FFmpeg decodes DSS Standard Play.\n- **Windows:** OM SYSTEM DSS Player Standard, a dictation and transcription application from the vendor, and Olympus Dictation Management System R7, whose Dictation Module opens DSS and DSS Pro recordings.\n- **Mac:** DSS Player for Mac, which the vendor manual documents for DSS and DSS Pro playback.\n\n### DSS and MP3 compared\n\n- **Purpose:** DSS belongs to dictation and transcription. MP3 is a general lossy audio format that plays almost everywhere.\n- **Extensions:** .dss for Classic, .ds2 for Pro, and .mp3 for MP3.\n- **Carried over:** the sound, as MP3 audio.\n\nThe page uses an FFmpeg build for WebAssembly. libmp3lame writes the MP3 and asks for 192 kbps, and any video stream is dropped. A low-rate dictation gets a lower bitrate than that, because MP3 cannot reach it at low sample rates. The command maps nothing by hand, leaving FFmpeg to choose the streams.\n\n### Other ways to convert DSS to MP3\n\n- **Switch (NCH):** add the DSS file with the Add button or File > Add, set the Output Format field to MP3, and press Convert. DSS input is among the formats that need the paid Switch Plus or its trial.\n- **Audio Converter Plus (Windows):** drag the recording in, choose MP3 in the Output Format menu, set the output folder with Browse and click Convert.\n- **FFmpeg:** run `ffmpeg -i memo.dss -c:a libmp3lame -b:a 160k memo.mp3` to pick your own bitrate. FFmpeg decodes DSS Standard Play.\n\n### Problems with DSS files\n\n- **The recording will not play:** open it in the OM SYSTEM or Olympus player that came with the recorder to see whether the file is damaged.\n- **The sound is thin:** DSS compresses speech heavily, so any copy starts from limited quality.\n"
+    }
+  },
+  "dst-to-jpeg": {
+    "seo": {
+      "title": "DST to JPEG: This Page Cannot Convert DST",
+      "h1": "DST to JPEG Converter",
+      "description": "This page can't turn a DST embroidery file into a JPEG: it has no stitch reader. Draw the design in Ink/Stitch, then save a JPEG from it.",
+      "howToHeading": "How to convert DST to JPEG"
+    },
+    "tool": {
+      "subtitle": "This page can't draw DST stitches; render the design elsewhere, then save a JPEG."
+    },
+    "faqs": [
+      {
+        "question": "Does this page turn a DST into a JPEG?",
+        "answer": "No. The browser's image decoder is what the page uses, and it cannot read stitch files, so no JPEG comes out. Draw the design in one of the programs in the guide first."
+      },
+      {
+        "question": "Why is a DST not an ordinary picture?",
+        "answer": "It stores stitch coordinates and machine commands, such as thread changes, not colored pixels. A program must interpret the stitches to draw them."
+      },
+      {
+        "question": "Why are my preview thread colors wrong?",
+        "answer": "A plain DST holds no thread palette, so the program that draws it picks the colors. An external thread list is needed for the real ones."
+      },
+      {
+        "question": "How do I make a JPEG of an embroidery design?",
+        "answer": "Open the DST in a program that draws stitches, such as Ink/Stitch, export a PNG, then save it as a JPEG in an image editor. The guide lists the steps."
+      },
+      {
+        "question": "Can a JPEG be sewn like the DST?",
+        "answer": "No. A JPEG has no stitch positions, order or machine commands. Keep the DST for production."
+      },
+      {
+        "question": "Does enlarging a DST add detail?",
+        "answer": "No. Enlarging a basic DST spreads the existing stitches without adding any. Resize the design in embroidery software."
+      },
+      {
+        "question": "Which program can show a DST?",
+        "answer": "Ink/Stitch for Inkscape reads DST on Windows, Mac and Linux. pyembroidery reads it from Python and has no viewer window."
+      },
+      {
+        "question": "Is a JPEG good enough for a customer approval?",
+        "answer": "It shows how the design should look, but its colors come from whatever palette the program assigned, and it is not a sew-out. Check the thread assignments first."
+      }
+    ],
+    "aboutSection": {
+      "title": "DST and JPEG",
+      "fromFormat": {
+        "name": "DST",
+        "fullName": "Tajima embroidery",
+        "description": "An embroidery stitch file whose coordinates tell a machine how to move and sew. It is not a pixel image.",
+        "details": [
+          "machine stitch coordinates",
+          "thread changes and machine actions",
+          "no thread palette in a basic DST"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format for photographs and previews.",
+        "details": [
+          "pixel-based",
+          "lossy compression",
+          "8 bits per channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DST to JPEG",
+      "points": [
+        "This page has no embroidery reader, so it does not give you a JPEG from a DST.",
+        "Draw the stitches in a program such as Ink/Stitch first.",
+        "A JPEG preview carries no stitch order or sewable coordinates.",
+        "A plain DST has no thread palette, so preview colors can be wrong."
+      ]
+    },
+    "guide": {
+      "title": "About DST files",
+      "markdown": "### What is a DST file?\n\nDST is an embroidery file that represents machine stitches rather than a pixel image. Its stitch coordinates tell an embroidery machine how to move and sew, and the design can include thread changes and other machine actions. Plain DST files hold no thread palette. The pyembroidery library describes a variant with an extended header that stores colors. A program has to interpret the stitches before anything can be drawn. The format came from Tajima and is widely supported by embroidery software, and it is used on industrial embroidery machines.\n\n### Programs that open DST files\n\n- **Windows, Mac and Linux:** Ink/Stitch for Inkscape reads and writes DST.\n- **Windows and Mac:** Embrilliance Essentials displays and recolors DST designs.\n- **Windows:** EmbroideryStudio from Wilcom opens stitch files.\n- **Linux:** pyembroidery is a Python library that reads stitch files.\n- **Web:** Library from Wilcom accepts DST files and previews designs in a browser. It needs an account or service access.\n\n### DST and JPEG compared\n\n- **What it holds:** a DST holds stitch positions and machine commands. A JPEG holds a lossy raster picture, designed for photographs, with adjustable quality and no alpha transparency.\n- **Use:** a DST sews. A JPEG shows a design on a page, in an email or on a product listing.\n\nThis page cannot convert a DST. Use one of the programs above to draw the stitches, export that picture as a PNG, and turn the PNG into a JPEG. Keep the DST, because a JPEG has no stitch order or sewable coordinates.\n\n### Other ways to convert DST to JPEG\n\n- **Ink/Stitch then GIMP:** in Inkscape with Ink/Stitch installed, choose File > Open and select the DST. It opens in Manual Stitch Mode. Choose File > Export PNG Image and click Export. Next bring the PNG into GIMP, pick File > Export As, name it with a .jpg extension and accept the JPEG export dialog.\n- **Wilcom Library and ImageMagick:** in My Designs select the design, open the three-dot more actions menu below it and choose Capture Design Bitmap. The PNG downloads to your computer. Run `magick sample.png approval.jpeg`. A Wilcom Library account is needed.\n- **pyembroidery:** in Python run `import pyembroidery; p = pyembroidery.read_dst('sample.dst'); pyembroidery.write_png(p, 'sample.png')`. Finish by exporting the PNG from GIMP as a .jpg through File > Export As.\n\n### Problems with DST files\n\n- **Wrong preview colors:** a plain DST has no palette, so a viewer chooses colors. Apply the thread list from the design's maker.\n- **A resized design sews badly:** shrinking the coordinates also tightens stitch spacing and stitch length, so resize in embroidery software, not in a picture.\n- **Editing lost:** stitches alone cannot bring back every editing property of the original objects.\n"
+    }
+  },
+  "exr-to-jpeg": {
+    "seo": {
+      "title": "Convert EXR to JPEG: HDR to a Viewing Copy",
+      "h1": "EXR to JPEG Converter",
+      "description": "Turn an OpenEXR image into a JPEG in your browser. Values brighter than white clamp to white, and the linear data is encoded to sRGB. Free.",
+      "howToHeading": "How to convert EXR to JPEG"
+    },
+    "tool": {
+      "subtitle": "Make a viewing JPEG from an OpenEXR image, with linear values encoded to sRGB."
+    },
+    "faqs": [
+      {
+        "question": "Why does my EXR look dark in other viewers?",
+        "answer": "An EXR stores scene-linear values, and showing them without a display transform makes the picture dark. This page encodes them to sRGB so the JPEG does not look dark."
+      },
+      {
+        "question": "What happens to values brighter than white?",
+        "answer": "They are clamped to white. The JPEG keeps the exposure stored in the file, and highlights brighter than white become white."
+      },
+      {
+        "question": "Can I choose a tone-mapping curve?",
+        "answer": "No. The page applies no tone mapping, only the sRGB encoding of the linear values."
+      },
+      {
+        "question": "Can I choose the JPEG quality?",
+        "answer": "No. The page sets none and has no control for it. GIMP and ImageMagick, listed in the guide, let you pick one."
+      },
+      {
+        "question": "Why do dark gradients show banding?",
+        "answer": "Rounding to 256 levels happens on the linear values before the sRGB conversion, so a smooth dark area can show bands."
+      },
+      {
+        "question": "Do I get every part of the EXR?",
+        "answer": "No. The page reads one image and writes one JPEG, and a JPEG has no alpha transparency."
+      },
+      {
+        "question": "Is my EXR uploaded?",
+        "answer": "No. Everything runs locally: ImageMagick as WebAssembly handles the EXR, and the file never leaves your device."
+      },
+      {
+        "question": "Should I delete the EXR afterward?",
+        "answer": "No. A JPEG is lossy and holds 8 bits per channel, so it cannot give back the floating-point values you need for compositing."
+      }
+    ],
+    "aboutSection": {
+      "title": "EXR and JPEG",
+      "fromFormat": {
+        "name": "EXR",
+        "fullName": "OpenEXR image",
+        "description": "A scene-linear, high-dynamic-range image format with floating-point samples and named channels, used in rendering and compositing.",
+        "details": [
+          "high dynamic range",
+          "named channels",
+          "half and full float samples"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format for viewing, at 8 bits per color channel.",
+        "details": [
+          "lossy compression",
+          "8 bits per channel",
+          "no extra channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting EXR to JPEG",
+      "points": [
+        "Values brighter than white are clamped to white.",
+        "Linear values are encoded to sRGB so the JPEG is not dark.",
+        "The page applies no tone mapping and sets no JPEG quality.",
+        "Only one image is read, and a JPEG has no alpha transparency."
+      ]
+    },
+    "guide": {
+      "title": "About EXR files",
+      "markdown": "### What is an EXR file?\n\nOpenEXR is an image format for scene-linear, high-dynamic-range imagery, hosted by the Academy Software Foundation. An EXR can carry named channels besides red, green, blue and alpha, with samples stored as half floats, full floats or unsigned integers. The display window and the region that holds the stored pixels can differ, and the pixels can be laid out in scanlines or tiles. It is used in rendering, compositing and texture work.\n\n### Programs that open EXR files\n\n- **Windows, Mac and Linux:** GIMP has read and written high-bit-depth EXR since version 2.10. Krita opens and saves EXR too, for painting and interchange.\n\n### EXR and JPEG compared\n\n- **Samples:** an EXR keeps floating-point values with no upper limit. A JPEG stores 8 bits per color channel.\n- **Compression:** EXR offers lossless and lossy compression. JPEG is lossy and meant for viewing.\n- **Channels:** extra named channels have nowhere to go in a JPEG.\n\nThe page reads the EXR with ImageMagick compiled to WebAssembly, in your browser, and reads one image. Every value brighter than white is clamped to white, so the picture stays at the exposure stored in the file. The linear values are then encoded to sRGB, because otherwise the picture would look dark. They are rounded to 8 bits before that step. No JPEG quality is chosen by the page. The page refuses anything above roughly 537 megapixels because it is too large to convert.\n\n### Other ways to convert EXR to JPEG\n\n- **GIMP:** open the EXR, use File > Export As, finish the name with .jpeg, and click Export. The JPEG dialog sets the quality from 0 to 100.\n- **OpenImageIO:** run `oiiotool lighting.exr -o review.jpg`. Its --colorconvert option converts between color spaces before the output.\n- **ImageMagick:** run `magick lighting.exr -quality 91 review.jpeg` to choose the JPEG quality yourself.\n\n### Problems with EXR files\n\n- **It looks dark in a viewer:** scene-linear values need display processing, and treating them like a display-ready JPEG changes the appearance.\n- **The crop looks wrong:** a reader may show the display window differently from the stored data window.\n- **The colors shift in an editor:** color interpretation can change when an editor assigns a different working space. Krita documents OCIO and profile workflows.\n"
+    }
+  },
+  "flac-to-wma": {
+    "seo": {
+      "title": "Convert FLAC to WMA: A Lossy WMA Copy",
+      "h1": "FLAC to WMA Converter",
+      "description": "Encode a lossless FLAC as a lossy WMA in your browser, using the standard wmav2 codec. Keep the FLAC as your master. Free, no sign-up.",
+      "howToHeading": "How to convert FLAC to WMA"
+    },
+    "tool": {
+      "subtitle": "Make a lossy WMA copy of a FLAC for players that need it."
+    },
+    "faqs": [
+      {
+        "question": "Is the WMA lossless like my FLAC?",
+        "answer": "No. The page writes wmav2, the standard lossy WMA codec. WMA Lossless is a separate variant that this page does not write."
+      },
+      {
+        "question": "Which bitrate is used for the WMA?",
+        "answer": "192 kbps, with nothing to adjust on the page."
+      },
+      {
+        "question": "Is WMA only one codec?",
+        "answer": "No. WMA covers several codecs, including a lossy standard version and a lossless variant. This page writes the standard one."
+      },
+      {
+        "question": "Can I convert several FLAC files at once?",
+        "answer": "Yes. Select several FLAC files and the page takes them in turn. Each WMA downloads on its own."
+      },
+      {
+        "question": "Why would I convert FLAC to WMA?",
+        "answer": "Windows media libraries and older portable players use WMA, and some of those players do not play FLAC. Check what your device plays before you convert."
+      },
+      {
+        "question": "Are the FLAC tags copied?",
+        "answer": "Yes. Title, artist, album and other global tags travel with the audio, since a WMA can store them and FFmpeg copies them over."
+      },
+      {
+        "question": "Is my FLAC uploaded?",
+        "answer": "No. Encoding runs through FFmpeg compiled to WebAssembly, right in your browser, so the FLAC stays on your device."
+      },
+      {
+        "question": "Why keep the FLAC?",
+        "answer": "The WMA is lossy and cannot return the original samples. Keep the FLAC for later exports."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLAC and WMA",
+      "fromFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open lossless audio format that compresses PCM audio without discarding sample information, standardized as RFC 9639.",
+        "details": [
+          "lossless compression",
+          "1 to 8 channels",
+          "4 to 32 bit samples"
+        ]
+      },
+      "toFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "Microsoft's audio format in an ASF container, with standard, Professional, Lossless and Voice codec variants.",
+        "details": [
+          "ASF container",
+          "several codec variants",
+          "wmav2 here, lossy"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLAC to WMA",
+      "points": [
+        "The WMA is lossy: the page writes the standard wmav2 codec.",
+        "Global tags such as title, artist and album are copied.",
+        "Keep the FLAC as your master.",
+        "Several FLAC files can be chosen at once; each downloads as its own WMA."
+      ]
+    },
+    "guide": {
+      "title": "About FLAC files",
+      "markdown": "### What is a FLAC file?\n\nFLAC stores integer PCM audio and compresses it without losing any sample information. The specification is open, the reference encoder is open source, and RFC 9639 standardized the format description in December 2024. Channels run from one to eight and sample depths from four to 32 bits, and metadata blocks can store seek points, cover pictures and Vorbis comments. The media type is audio/flac. It is used for music archiving and lossless backups of CDs.\n\n### Programs that open FLAC files\n\n- **Windows, Mac and Linux:** Audacity opens FLAC natively, with no FFmpeg add-on required. VLC media player lists FLAC among its inputs, and FFplay decodes it through FFmpeg.\n- **Web:** Firefox decodes FLAC, and Mozilla's browser support comparison also lists Chrome.\n- **Mobile:** VLC for Android and VLC for iOS.\n\n### FLAC and WMA compared\n\n- **Compression:** FLAC is lossless. The WMA made here is lossy.\n- **Container:** WMA is stored in Microsoft's ASF container.\n- **Variants:** a .wma name alone does not say which kind of Windows Media Audio a file holds.\n- **Use:** WMA serves Windows media libraries and older portable music players.\n\nAn FFmpeg WebAssembly build handles the conversion on your device. It encodes with wmav2, the standard WMA codec, at 192 kbps and discards any video stream, so the result is lossy and not WMA Lossless. No stream or tag mapping is passed, so FFmpeg's defaults pick the streams and copy the global tags.\n\n### Other ways to convert FLAC to WMA\n\n- **FFmpeg:** run `ffmpeg -i album.flac -b:a 160k -c:a wmav2 album.wma` for the same codec at a different bitrate.\n- **WavePad for Windows:** open the FLAC with File > Open, choose File > Save As and pick WMA as the format. WavePad saves WMA only on Windows.\n\n### Problems with FLAC files\n\n- **A player rejects it:** Android's documented native FLAC playback covers less than the format does: it expects mono or stereo audio, and 16-bit samples are recommended.\n- **A damaged frame:** it can fail its checksum. Lossless coding does not prevent storage corruption.\n- **A FLAC made from a lossy source:** turning a lossy file into FLAC does not bring back the audio data the lossy encoder threw away.\n"
+    }
+  },
+  "flv-to-mpeg": {
+    "seo": {
+      "title": "Convert FLV to MPEG: MPEG-2 and MP2 Audio",
+      "h1": "FLV to MPEG Converter",
+      "description": "Re-encode a saved Flash video as MPEG-2 video with MP2 audio, in your browser. Larger frames are scaled down. Free, no sign-up.",
+      "howToHeading": "How to convert FLV to MPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a saved Flash FLV into an MPEG file that plays outside a browser."
+    },
+    "faqs": [
+      {
+        "question": "Which video codec does the MPEG use?",
+        "answer": "MPEG-2, re-encoded at a quality scale of 6. The video is not copied from the FLV."
+      },
+      {
+        "question": "What audio comes with it?",
+        "answer": "MP2 audio at 96 kbps, re-encoded from the FLV's sound."
+      },
+      {
+        "question": "Can I burn the file to a DVD?",
+        "answer": "The output is a playable MPEG file, not an authored DVD. A DVD needs menus and a disc structure from authoring software."
+      },
+      {
+        "question": "Is the frame size kept exactly?",
+        "answer": "Not always. A frame above the size limit in the guide is scaled down, a smaller one is never scaled up, and an odd width or height loses a pixel to stay even."
+      },
+      {
+        "question": "Does a faster frame rate slow the video down?",
+        "answer": "No. Extra frames are dropped from a fast clip so its running time stays the same, and a slow clip is not sped up."
+      },
+      {
+        "question": "Are .mpg and .mpeg different?",
+        "answer": "No, they are two names for the same format. The download from this page ends in .mpeg."
+      },
+      {
+        "question": "Will converting an old FLV sharpen small text?",
+        "answer": "No. Re-encoding cannot add detail that the FLV lost."
+      },
+      {
+        "question": "Do I need Flash Player?",
+        "answer": "No. FFmpeg decodes the FLV inside your browser, so Flash Player is not involved and nothing is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and MPEG",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A binary format associated with Macromedia Flash video, holding at most one video and one audio stream.",
+        "details": [
+          "Sorenson or On2 VP6 video",
+          "MP3, PCM or ADPCM audio",
+          "one video and one audio stream"
+        ]
+      },
+      "toFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "MPEG-2 video organized into streams, developed for television and later used for DVDs.",
+        "details": [
+          "video/mpeg",
+          "MPEG-2 here",
+          "MP2 audio"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLV to MPEG",
+      "points": [
+        "The video is re-encoded as MPEG-2 and the audio as MP2; neither is copied from the FLV.",
+        "Larger frames shrink and faster frame rates drop frames, but the length stays.",
+        "Both sides round down to even numbers.",
+        "The result is an MPEG file, not an authored DVD."
+      ]
+    },
+    "guide": {
+      "title": "About FLV files",
+      "markdown": "### What is an FLV file?\n\nMacromedia's Flash video delivery relied on FLV, a binary format. No more than one video and one audio stream fit in an FLV: Sorenson or On2 VP6 pictures, with MP3, PCM or ADPCM sound. A Flash SWF can reference a separate FLV through ActionScript. Adobe stopped supporting Flash Player on December 31, 2020, which leaves FLV mostly in older web video and Flash archives.\n\n### Programs that open FLV files\n\n- **Windows, Mac and Linux:** VLC media player lists FLV input and decodes Sorenson and the VP6 family. FFplay opens FLV through FFmpeg decoders.\n- **Mobile:** phones run VLC through its Android and iOS ports.\n\n### FLV and MPEG compared\n\n- **Streams:** an FLV has one video stream and one audio stream. In an MPEG file, MPEG-1 or MPEG-2 video and audio share a program stream.\n- **Names:** MPEG is another name for MPG, and .mpeg and .mpg are interchangeable.\n- **Use:** MPEG video was the basis of VCD and DVD discs, and the format is now dated.\n- **Quality:** lossy MPEG encoding drops some detail.\n\nYour browser runs FFmpeg as WebAssembly to re-encode the video as MPEG-2 at quality scale 6, with MP2 audio at 96 kbps. A frame whose longer side tops 1920 pixels shrinks, and a rate above 30 fps is cut by dropping frames. A larger frame shrinks, a faster source has frames dropped, and a smaller or slower source is not scaled up or sped up. Width and height are floored to even values, so an odd size gives up one pixel.\n\n### Other ways to convert FLV to MPEG\n\n- **FFmpeg:** run `ffmpeg -i lesson.flv -c:a mp2 -c:v mpeg2video -q:v 4 lesson.mpeg` to name the encoders and a different quality. FFmpeg reads FLV and writes MPEG-PS, MPEG-2 video and MP2 audio.\n\n### Problems with FLV files\n\n- **The video stops early:** an interrupted download leaves a file that opens but ends short. Compare its length with the original.\n- **Flash Player will not help:** Adobe discontinued Flash Player, so reinstalling it will not make an old FLV play.\n- **A player cannot decode it:** the .flv name does not say which video codec is inside, so the player needs that stream's decoder as well.\n- **Several audio tracks:** a workflow that needs alternative audio tracks cannot keep them inside the one-audio-stream FLV model.\n"
+    }
+  },
+  "flv-to-swf": {
+    "seo": {
+      "title": "Convert FLV to SWF: A Legacy Flash Movie",
+      "h1": "FLV to SWF Converter",
+      "description": "Re-encode an FLV as a legacy SWF movie in your browser. The result holds the video only, and no controls are added. Free, no sign-up.",
+      "howToHeading": "How to convert FLV to SWF"
+    },
+    "tool": {
+      "subtitle": "Wrap saved Flash video in an SWF file; no controls or scripts are added."
+    },
+    "faqs": [
+      {
+        "question": "Does converting FLV to SWF add clickable controls?",
+        "answer": "No. The page runs FFmpeg once on the video. It adds no controls, timeline or scripts, so the SWF holds the movie and nothing authored around it."
+      },
+      {
+        "question": "Will a modern browser play the SWF?",
+        "answer": "No. Adobe has ended Flash Player support, and browsers no longer run SWF. Ruffle, an emulator, can open the file."
+      },
+      {
+        "question": "Are FLV and SWF the same container?",
+        "answer": "No. FLV is a media format with one video and one audio stream. SWF can combine vector animation, ActionScript interactivity and embedded video and audio."
+      },
+      {
+        "question": "Which video codec does the page choose?",
+        "answer": "The command names none, so FFmpeg's SWF defaults apply: Sorenson Spark (FLV1) video and MP3 audio at FFmpeg's default bitrates. If you need a specific codec, use FFmpeg on your computer."
+      },
+      {
+        "question": "Will ActionScript from my old player be kept?",
+        "answer": "No. The conversion carries the video and audio only."
+      },
+      {
+        "question": "Will the SWF have the same frame size?",
+        "answer": "The guide gives the largest size; anything bigger shrinks to it and anything smaller stays. A side with an odd pixel count gives up one pixel so that it comes out even."
+      },
+      {
+        "question": "Is the video re-encoded?",
+        "answer": "Yes. The filters scale it and the encoder writes it again, so the picture is re-encoded rather than copied."
+      },
+      {
+        "question": "Is my FLV uploaded?",
+        "answer": "No, nothing is uploaded. Your browser does the work, and the FLV stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and SWF",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A binary format associated with Macromedia Flash video, holding at most one video and one audio stream.",
+        "details": [
+          "Sorenson or On2 VP6 video",
+          "MP3, PCM or ADPCM audio",
+          "one video and one audio stream"
+        ]
+      },
+      "toFormat": {
+        "name": "SWF",
+        "fullName": "Small Web Format",
+        "description": "A legacy multimedia format from Macromedia and Adobe Flash that can combine vector graphics, animation and bitmap video.",
+        "details": [
+          "ActionScript for interactivity",
+          "may refer to external media",
+          "no longer runs in Flash Player"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLV to SWF",
+      "points": [
+        "The video is re-encoded with FFmpeg's SWF defaults, Sorenson Spark video and MP3 audio.",
+        "Larger frames shrink and faster frame rates drop frames, and the length stays.",
+        "No controls or ActionScript are added.",
+        "Browsers no longer play SWF."
+      ]
+    },
+    "guide": {
+      "title": "About FLV files",
+      "markdown": "### What is an FLV file?\n\nMacromedia built FLV, a binary format, for delivering Flash video. A file carries one video stream and one audio stream at most. Video is Sorenson or On2 VP6, and audio is MP3, PCM or ADPCM. A separate FLV can be referred to by ActionScript inside a Flash SWF. Flash Player lost Adobe's support on December 31, 2020, and FLV survives mainly in earlier web video and Flash archives.\n\n### Programs that open FLV files\n\n- **Windows, Mac and Linux:** VLC media player decodes FLV with Sorenson and VP6-family video, and FFplay plays it through FFmpeg's decoders.\n- **Mobile:** the Android and iOS versions of VLC.\n\n### FLV and SWF compared\n\n- **What it is:** FLV is media. SWF is a legacy multimedia format from Macromedia, built for Flash animations and games, that can combine vector animation with embedded video and audio.\n- **Interactivity:** interactive SWF content uses ActionScript. A video conversion does not write any.\n- **Playback:** Flash Player no longer runs Flash content. Ruffle is an emulator that plays SWF.\n\nConversion happens locally with FFmpeg's WebAssembly build. The command names no video or audio encoder for the SWF, so FFmpeg's defaults decide: Sorenson Spark video at 200 kbit/s and MP3 audio. Frames keep the source size unless the longer side tops 1920 pixels, and the source rate unless it tops 30 fps. A larger frame shrinks and a faster source has frames dropped, while a smaller or slower one is not scaled up or sped up. An odd width or height gives up one pixel.\n\n### Other ways to convert FLV to SWF\n\n- **FFmpeg:** run `ffmpeg -i legacy.flv -ar 44100 -c:a libmp3lame -c:v flv legacy.swf`. The SWF muxer takes FLV1 video and MP3 audio at 11025, 22050 or 44100 Hz, and `-ar 44100` picks the highest.\n\n### Problems with FLV files\n\n- **Flash Player does not help:** it is no longer supported, so putting it back on a computer will not play an old FLV. Use VLC or another program from the list.\n- **A reader cannot decode the video:** the FLV extension does not identify one video codec, so the reader also needs the stream's decoder.\n- **Alternative audio tracks do not fit:** a workflow that needs several audio tracks cannot keep them in the one-audio-stream FLV model.\n"
+    }
+  },
+  "gif-to-jxl": {
+    "seo": {
+      "title": "Convert GIF to JXL: First Frame as JPEG XL",
+      "h1": "GIF to JXL Converter",
+      "description": "Encode a GIF's first frame as a JPEG XL still, in your browser. Animation is dropped and metadata is not carried over. Free.",
+      "howToHeading": "How to convert GIF to JXL"
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as a JPEG XL image."
+    },
+    "faqs": [
+      {
+        "question": "Will an animated GIF stay animated in JXL?",
+        "answer": "No, the JXL is a still made from the first frame. JPEG XL itself supports animation, and cjxl compresses an image or an animation."
+      },
+      {
+        "question": "Is the JXL lossless?",
+        "answer": "The page sets no lossless or quality option, so you cannot choose. For a lossless JXL, use cjxl."
+      },
+      {
+        "question": "Does JXL give me more than 256 colors?",
+        "answer": "JPEG XL handles high bit depth, yet each GIF image holds at most 256 colors, and a bigger color model cannot restore detail the palette lost. The page works in 8-bit RGBA."
+      },
+      {
+        "question": "What will the output file be named?",
+        "answer": "The name stays the same apart from the extension, which becomes .jxl, so loop.gif turns into loop.jxl."
+      },
+      {
+        "question": "Are metadata and profiles kept?",
+        "answer": "No. ICC, EXIF and XMP data are not carried over by the conversion."
+      },
+      {
+        "question": "Which programs open a JXL?",
+        "answer": "JPEG XL files open in Safari, GIMP, XnView MP and IrfanView."
+      },
+      {
+        "question": "Why does the page say Image decode failed?",
+        "answer": "Your browser's own decoder failed on this file. It may be damaged or not really a GIF."
+      },
+      {
+        "question": "Can several GIFs be converted together?",
+        "answer": "Yes. Every GIF you add comes back as its own JXL file, and no ZIP is made."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and JXL",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster format introduced by CompuServe in 1987 with LZW compression, a palette of at most 256 colors per image, and animation.",
+        "details": [
+          "256-color palette",
+          "LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "JXL",
+        "fullName": "JPEG XL",
+        "description": "An image coding system from the JPEG committee with lossy and lossless coding, alpha, animation and HDR.",
+        "details": [
+          "lossy and lossless",
+          "alpha and animation",
+          "image/jxl"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to JXL",
+      "points": [
+        "Only the first frame is used, so the JXL is a still.",
+        "Metadata is not carried over.",
+        "The page sets no lossless or quality option.",
+        "Not every viewer opens JXL."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nGIF came out of CompuServe in 1987. Pixels are compressed losslessly with LZW against a palette that holds at most 256 colors, and one palette entry can be flagged transparent, meaning a pixel is fully clear or fully solid, never partly see-through. A file may hold several images in sequence, which is how a GIF animates. The registered media type is image/gif.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP opens GIF, and ImageMagick reads it.\n- **Web and mobile:** Chrome handles GIF in a browser tab as well as on a phone, Firefox does so on the web, and Safari does so on a phone.\n\n### GIF and JXL compared\n\n- **Compression:** JPEG XL is designed for both lossy and lossless coding, and it can losslessly recompress existing JPEG files.\n- **Features:** it supports alpha transparency and animation, and it is used for high-bit-depth and HDR images. A GIF palette stops at 256 colors.\n- **Loading:** JPEG XL allows progressive decoding, so a viewer can show an image before it has fully downloaded.\n- **Metadata:** a JXL file can contain Exif, XMP and JUMBF metadata.\n- **Names:** the extension is .jxl and the media type is image/jxl.\n- **Support:** Safari, GIMP, XnView MP and IrfanView are listed as programs that open it.\n\nThe page decodes your GIF with the browser's own image decoder and reads only the first frame, so a JXL made here is a still. The pixels pass through 8-bit RGBA. ImageMagick, running in your browser, writes the JXL. No server is involved. The page puts no size limit on a file, and a large one just takes longer.\n\n### Other ways to convert GIF to JXL\n\n- **cjxl:** run `cjxl -d 0 loop.gif loop.jxl`. The command line tool accepts GIF input, and `-d 0` selects mathematically lossless coding. It compresses an image or an animation, so it is the route to an animated JXL.\n- **GIMP:** open the GIF in GIMP, pick File > Export As, give it a name that ends in .jxl and click Export. The JPEG XL export dialog has a Lossless checkbox.\n\n### Problems with GIF files\n\n- **Soft edges turn hard:** a GIF has no partial opacity, so a soft transparent edge loses its fade.\n- **Gradients change:** exporting to GIF in GIMP leaves at most 256 colors, and that can alter gradients.\n- **Frames cover each other oddly:** with frame disposal, later images cover earlier ones in different ways, so pick combine or replace to match the animation.\n- **A comment goes missing:** GIF comment text must be seven-bit ASCII, so GIMP leaves out any comment with other characters.\n"
+    }
+  },
+  "gif-to-mkv": {
+    "seo": {
+      "title": "Convert GIF to MKV: Silent H.264 Video",
+      "h1": "GIF to MKV Converter",
+      "description": "Turn a GIF animation into a silent H.264 video in a Matroska file, in your browser. Free, with no sign-up or software to install.",
+      "howToHeading": "How to convert GIF to MKV"
+    },
+    "tool": {
+      "subtitle": "Re-encode a GIF animation as silent H.264 video in an MKV file."
+    },
+    "faqs": [
+      {
+        "question": "Which video codec does the MKV use?",
+        "answer": "H.264, written by libx264 at a constant quality of 32 with its fastest preset."
+      },
+      {
+        "question": "Will the MKV have sound?",
+        "answer": "No. A GIF has no sound, and the MKV holds a single video stream."
+      },
+      {
+        "question": "Will the animation timing be the same?",
+        "answer": "Each frame keeps the delay it had in the GIF. A GIF that runs faster than the frame-rate ceiling in the guide has frames dropped, and a slower one is not sped up."
+      },
+      {
+        "question": "Is the size kept exactly?",
+        "answer": "Anything bigger than the limit in the guide shrinks to fit, and a width or height of odd length is cut by one pixel."
+      },
+      {
+        "question": "What happens to transparency?",
+        "answer": "A video has no transparent pixels, so transparent areas of a GIF come out filled with solid color. Check the edges."
+      },
+      {
+        "question": "What is the downloaded file called?",
+        "answer": "The original name is kept and the extension becomes .mkv, giving drawing.mkv from drawing.gif."
+      },
+      {
+        "question": "Why choose MKV?",
+        "answer": "Matroska is an open container for collections and for videos with several audio tracks. Here it holds one video track."
+      },
+      {
+        "question": "Why does my player not open the MKV?",
+        "answer": "The player needs Matroska and H.264 support. VLC and mpv open MKV files."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and MKV",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster format from CompuServe, 1987, with LZW compression, a palette of at most 256 colors and timed animation. It has no sound.",
+        "details": [
+          "256-color palette",
+          "LZW compression",
+          "animation",
+          "no sound"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "A container built on EBML that can carry several video, audio and subtitle streams, chapters and tags.",
+        "details": [
+          "EBML container",
+          "multiple streams",
+          "video/matroska"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to MKV",
+      "points": [
+        "The MKV is silent H.264 video.",
+        "Large pictures shrink and fast GIFs lose frames.",
+        "Transparency is lost: a video has none.",
+        "Odd widths and heights lose a pixel."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nA GIF stores one or more indexed-color images. Each image picks its colors from a palette capped at 256 entries and is compressed losslessly with LZW. Delays between images, counted in hundredths of a second, turn the sequence into an animation, and one palette color can be flagged transparent. The format started at CompuServe in 1987, has no audio track and uses the media type image/gif.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP opens GIF, and ImageMagick reads it.\n- **Web and mobile:** A GIF shows up in Chrome, both in a desktop browser and on a phone. Firefox does the same on the web, and Safari on mobile.\n\n### GIF and MKV compared\n\n- **Container:** Matroska is an open standard that holds any number of video, audio and picture tracks in one file, with chapters and metadata.\n- **Codecs:** Matroska supports almost any codec and fixes none.\n- **Sound:** a GIF has none, so the MKV from this page is silent.\n- **Compression:** the GIF's LZW is lossless but caps color at 256. The MKV holds lossy H.264.\n\nFFmpeg's WebAssembly build re-encodes the GIF locally with libx264 at CRF 32 in the ultrafast preset. Each side stays within 1920 pixels and is rounded down to an even number, and the video plays at no more than 30 frames per second. A smaller picture is never scaled up, a slower rate is never raised, and a faster GIF has frames dropped. Nothing is uploaded.\n\n### Other ways to convert GIF to MKV\n\n- **FFmpeg:** run `ffmpeg -i drawing.gif -an -c:v libx264 -crf 20 drawing.mkv`. The `-an` option leaves out audio, and `-c:v libx264` picks the H.264 encoder.\n- **Shotcut:** open the GIF, click Export, then Advanced. In Format / Codec set the container to mkv, and export.\n- **ImageMagick and FFmpeg:** run `magick sequence.gif -coalesce 'frame-%04d.png'`, then `ffmpeg -framerate 10 -i 'frame-%04d.png' -c:v libx264 frames.mkv`. The `-coalesce` option fully defines each frame as its own picture, and the second command sets one fixed frame rate in place of the GIF's own delays.\n\n### Problems with GIF files\n\n- **Fading edges do not survive:** GIF has no partial opacity, which means a soft transparent edge cannot hold its fade.\n- **Colors drop to 256:** In GIMP the cap on a GIF export is 256 colors, so gradients may look different.\n- **Overlapping frames:** a frame's disposal setting decides how later images sit over earlier ones; combine or replace should match the animation.\n- **Comment text:** GIF comments only take seven-bit ASCII, so GIMP exports the picture without a comment using other characters.\n"
+    }
+  },
+  "gif-to-tif": {
+    "seo": {
+      "title": "Convert GIF to TIF: First Frame as a Still",
+      "h1": "GIF to TIF Converter",
+      "description": "Save the first frame of a GIF as a TIFF still for print or archive, in your browser. Animation is not kept. Free.",
+      "howToHeading": "How to convert GIF to TIF"
+    },
+    "tool": {
+      "subtitle": "Write the first frame of a GIF as a TIFF image; the animation is dropped."
+    },
+    "faqs": [
+      {
+        "question": "Are TIF and TIFF the same format?",
+        "answer": "Yes. .tif is the short extension for the same Tagged Image File Format."
+      },
+      {
+        "question": "Will the TIF be animated?",
+        "answer": "No. Only the first frame is decoded and saved, as a single still."
+      },
+      {
+        "question": "Can every frame become a page in the TIF?",
+        "answer": "Not on this page, which writes one image. GIMP's TIFF export can store layers as separate pages."
+      },
+      {
+        "question": "Does the TIF look better than the GIF?",
+        "answer": "No. The palette's colors stay as they were, and saving as TIFF adds no detail."
+      },
+      {
+        "question": "Is metadata or the color profile kept?",
+        "answer": "No. The pixels are copied without them, so EXIF, ICC and XMP data are lost."
+      },
+      {
+        "question": "What is the downloaded file called?",
+        "answer": "You get the original name with .tif on the end: diagram.gif is saved as diagram.tif."
+      },
+      {
+        "question": "Does the page cap file size?",
+        "answer": "It sets no limit of its own. A big GIF only takes longer."
+      },
+      {
+        "question": "Is batch conversion supported?",
+        "answer": "Yes: add many GIFs and each one is saved as a TIF of its own."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and TIF",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A 1987 CompuServe format with a 256-color palette, LZW compression and timed animation.",
+        "details": [
+          "256-color palette",
+          "LZW compression",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "The short extension for TIFF, a tagged raster format with several compression choices and multiple images per file.",
+        "details": [
+          "same format as .tiff",
+          "several compression choices",
+          "multiple images"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to TIF",
+      "points": [
+        "Only the first frame is written.",
+        "Metadata and profiles are dropped.",
+        "The result is one image, not a multi-page TIFF.",
+        "Several files convert one after another."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nCompuServe published the GIF format in 1987. Pixels index into a palette with no more than 256 colors and are packed with lossless LZW. A single file can hold a run of images, and each carries its own delay in hundredths of a second. One palette entry can be declared transparent. A GIF has no sound and is labeled image/gif.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP opens GIF, and ImageMagick reads it.\n- **Web and mobile:** Chrome plays GIF on the web and on mobile devices. Firefox handles the web side, and Safari handles mobile.\n\n### GIF and TIF compared\n\n- **Origin:** TIFF dates from Aldus in 1986 and is maintained by Adobe today. It stores one or more images with a tag-based structure.\n- **Pages:** a TIFF file can hold several images, but the converter on this page writes one still.\n- **Compression:** GIF always uses LZW. TIFF compression may be lossless or lossy; the choices in GIMP's TIFF dialog are None, LZW, Pack Bits, Deflate, JPEG and CCITT fax.\n- **Color:** a TIFF may use high bit depth, or CMYK for print. A GIF converted here still has its palette's colors, in an 8-bit file.\n- **Use:** TIFF is common in scanning and archiving, in professional photography and print, and in fax and document imaging.\n- **Names:** .tif and .tiff are the same format.\n\nYour browser's own image decoder reads the GIF and takes just its first frame. That frame passes through 8-bit RGBA, then ImageMagick, running in your browser, writes the TIFF with no quality setting. EXIF, ICC and XMP data are dropped. A file the decoder rejects gives the error \"Image decode failed.\" Nothing is uploaded.\n\n### Other ways to convert GIF to TIF\n\n- **GIMP:** open the GIF in GIMP, then choose File > Export As and save as TIFF. The TIFF dialog has a Compression list and a Save layers option, which stores each layer as a separate page starting from the bottom.\n- **IrfanView:** open the GIF and choose File > Save As. Pick TIF as the format, and tick Show format options dialog to see its saving options. IrfanView's format list shows both GIF and TIF as readable and savable.\n\n### Problems with GIF files\n\n- **No partial opacity:** a GIF cannot hold it, so soft transparent edges lose their fade.\n- **256-color ceiling:** A GIF export from GIMP keeps no more than 256 colors, and gradients can change as a result.\n- **Disposal settings:** disposal changes how later frames cover earlier ones, so combine or replace should fit the animation.\n- **Comments with other characters:** only seven-bit ASCII fits a GIF comment, and GIMP exports without a comment containing anything else.\n"
+    }
+  }
+}

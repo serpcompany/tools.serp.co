@@ -1,0 +1,205 @@
+{
+  "tools": {
+    "mp4-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp4 -c copy output.mkv.",
+          "limits": "Default stream selection picks one stream of each kind. Use explicit mapping when the whole track set matters.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open Source, select the MP4, choose a Matroska preset such as H.264 MKV 1080p30, set the Save As destination and select Start.",
+          "limits": "The presets set their own encoders, so the video is encoded again; this suits a file whose codec also needs to change.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportSource": "https://handbrake.fr/docs/en/latest/technical/official-presets.html"
+        }
+      ]
+    },
+    "mxf-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mxf -c:v libx264 -c:a aac output.mp4.",
+          "limits": "Requires the source decoder and the libx264 and AAC encoders in the build; defaults do not copy every MXF stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Select Open Source and choose the MXF, pick a preset such as Fast 1080p30, set the destination under To, and select Start.",
+          "limits": "The preset sets the encoder and frame settings, so the video is encoded again.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportSource": "https://handbrake.fr/docs/en/latest/technical/source-formats.html"
+        }
+      ]
+    },
+    "psd-to-pdf": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.psd output.pdf.",
+          "limits": "The formats page lists both PSD and PDF as readable and writable.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Photopea",
+          "steps": "Open the PSD using File > Open, then choose File > Export As, pick PDF and save the export.",
+          "limits": "An exported document is distinct from the editable PSD.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        }
+      ]
+    },
+    "webp-to-ico": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the WebP and choose File > Export As. Edit the extension in the Name field to .ico, or pick ICO under Select File Type, then export; the ICO dialog sets the color depth and offers a Compressed (PNG) checkbox.",
+          "limits": "Not all programs support reading icons saved with the Compressed (PNG) option.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/file-ico-export.html"
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, open the WebP with Image.open and call save with a .ico filename; pass sizes=[(16,16),(32,32),(48,48)] to put several icon sizes in one file.",
+          "limits": "Needs libwebp to read WebP; any size bigger than the original or 256 is ignored.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.webp output.ico.",
+          "limits": "FFmpeg's documentation lists WebP decoding and ICO reading and writing.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "aif-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.aif -c:a libmp3lame -b:a 192k output.mp3.",
+          "limits": "Requires a build with the LAME encoder; the b option sets the bitrate for CBR or ABR.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Choose File > Import > Audio and select the AIF, then choose File > Export Audio and pick MP3 as the format.",
+          "limits": "The bit rate modes are Preset, Variable, Average and Constant, and Standard is the default preset; MP3 export always uses joint stereo.",
+          "source": "https://manual.audacityteam.org/man/mp3_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "avif-to-gif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the AVIF in GIMP 2.10.22 or later and choose File > Export As. Edit the extension in the Name field to .gif, or pick GIF under Select File Type, then export.",
+          "limits": "AVIF reading needs GIMP 2.10.22 or newer; GIMP only supports exporting a GIF with a maximum of 256 colors.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-gif-export.html",
+          "importSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.avif output.gif.",
+          "limits": "Check that your ImageMagick build has AVIF support; GIF output is limited to 256 palette entries.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, open the AVIF with Image.open and call save with a .gif filename.",
+          "limits": "Pillow decodes AVIF as 8-bit only.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        }
+      ]
+    },
+    "jpg-to-bmp": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg output.bmp.",
+          "limits": "BMP is written as version 4 by default; the BMP3 and BMP2 tags give versions 3 and 2.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG and choose File > Export As. Edit the extension in the Name field to .bmp, or pick BMP under Select File Type, then export and choose options in the BMP dialog.",
+          "limits": "The BMP dialog has a Write color space information checkbox (not all programs can read it) and an RGB format list.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/file-bmp-export.html"
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, open the JPG with Image.open and call save with a filename ending in .bmp.",
+          "limits": "Pillow reads and writes BMP; save takes the format from the extension when none is given.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        }
+      ]
+    },
+    "mkv-to-gif": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mkv -vf palettegen palette.png, then ffmpeg -i input.mkv -i palette.png -lavfi paletteuse output.gif.",
+          "limits": "The palettegen filter generates one palette for a whole video stream.",
+          "source": "https://ffmpeg.org/ffmpeg-filters.html"
+        },
+        {
+          "app": "Kdenlive",
+          "steps": "Put the MKV on the timeline, choose File > Render, select GIF High Quality under Generic, choose Full Project or Selected Zone, then select Render to File.",
+          "limits": "Selected Zone renders only the part of the project that has a zone selected.",
+          "source": "https://docs.kdenlive.org/en/exporting/render.html"
+        }
+      ]
+    },
+    "png-to-cur": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PNG and choose File > Export As. Edit the extension in the Name field to .cur, or pick it under Select File Type, then export; in the Windows Cursor dialog set the save type, the Compressed (PNG) option and Hot spot X and Hot spot Y.",
+          "limits": "Some programs can't read PNG-compressed entries; the dialog notes that not all programs support reading this type of icon.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/file-cur-export.html"
+        },
+        {
+          "app": "Axialis CursorWorkshop",
+          "steps": "Open the PNG, select the desired area, and choose Image > Create New Cursor from Selection. Choose cursor formats, then use Draw > Set Cursor Hot Spot to place the active point.",
+          "limits": "The hot spot change applies to all formats of the same size.",
+          "source": "https://www.axialis.com/tutorials/create-a-static-cursor-from-an-image.html"
+        },
+        {
+          "app": "SixLabors ImageSharp",
+          "steps": "Load the PNG, set HotspotX and HotspotY on image.Frames.RootFrame.Metadata.GetCurMetadata(), and save to a .cur filename with new CurEncoder().",
+          "limits": "Hotspots should be chosen from the cursor design and not copied from another size.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        }
+      ]
+    },
+    "ai-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -density 150 input.ai output.jpg.",
+          "limits": "-density sets the canvas resolution while rendering vector formats such as PostScript and PDF; ImageMagick lists AI (Adobe Illustrator CS2) as readable.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Ghostscript",
+          "steps": "Run gs -dBATCH -dNOPAUSE -sDEVICE=jpeg -r150 -sOutputFile=page-%d.jpg input.ai.",
+          "limits": "Renders the embedded PDF pages rather than Illustrator's native editable objects; %d in the output name is replaced with the page number.",
+          "source": "https://ghostscript.readthedocs.io/en/latest/Use.html",
+          "supportSource": "https://ghostscript.readthedocs.io/en/latest/Devices.html",
+          "inputSource": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        }
+      ]
+    }
+  }
+}

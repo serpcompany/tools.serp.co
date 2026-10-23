@@ -1,0 +1,909 @@
+{
+  "gif-to-webm": {
+    "seo": {
+      "title": "Convert GIF to WebM Online (Free)",
+      "h1": "GIF to WebM Converter",
+      "description": "Turn a GIF into a silent VP8 WebM video in your browser. Frames wider or taller than 1920 px are shrunk and the rate is capped at 30 fps. Free."
+    },
+    "tool": {
+      "subtitle": "Re-encode a GIF animation as a silent VP8 WebM video, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a GIF to WebM?",
+        "answer": "Choose the GIF above and wait for the encode to finish, then save the WebM. The conversion runs in your browser with FFmpeg, so nothing is uploaded. Each GIF you pick gets its own WebM."
+      },
+      {
+        "question": "Will the WebM loop like my GIF did?",
+        "answer": "The conversion sets no looping for the video, so repeating is up to the player or the page. On a web page, add the `loop` attribute to the video tag; in a player, turn on its repeat option."
+      },
+      {
+        "question": "Will the WebM be smaller than the GIF?",
+        "answer": "It can be either. The video is encoded at a fixed quality target (CRF 40) rather than a target file size, and a tiny GIF can come out larger as a WebM. Compare the two files after converting."
+      },
+      {
+        "question": "Does the WebM have sound?",
+        "answer": "No. A GIF holds no audio, and the conversion switches audio off. If you want a soundtrack, add one in a video editor after converting."
+      },
+      {
+        "question": "What happens to a transparent GIF background?",
+        "answer": "No. The WebM is written as yuv420p video, a pixel format with no alpha channel, so the clip is an opaque rectangle. Place it on a page whose background matches, or keep the GIF if you need see-through areas."
+      },
+      {
+        "question": "Why is my WebM one pixel narrower than the GIF?",
+        "answer": "The converter rounds both sides of the frame down to an even number, so a 401 x 301 GIF becomes 400 x 300. A frame larger than 1920 px on its longer side is also shrunk to fit."
+      },
+      {
+        "question": "What frame rate does the WebM have?",
+        "answer": "It follows the GIF's own rate up to a ceiling of 30 fps. Faster GIFs shed frames while keeping their running time, and slower ones are not sped up."
+      },
+      {
+        "question": "Why does the WebM still look dithered or banded?",
+        "answer": "The dithering is in the GIF itself. Each GIF frame is limited to 256 colors, and the converter can only encode the pixels it decodes."
+      },
+      {
+        "question": "Which programs play the WebM?",
+        "answer": "Chrome, Edge, Firefox and VLC media player play it. The guide lists the Safari version that added WebM with VP8 video."
+      },
+      {
+        "question": "Can I combine several GIFs into one WebM?",
+        "answer": "No. Every GIF becomes its own WebM, one after another, and there is no ZIP. Joining clips takes a video editor."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and WebM",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to WebM",
+      "points": [
+        "The GIF's pictures are re-encoded as VP8 video, so the WebM is not a pixel-for-pixel copy.",
+        "The WebM has no audio track, because a GIF has none.",
+        "Frame rate tops out at 30 fps and the longer side at 1920 px, and an odd width or height loses a single pixel.",
+        "Transparency is dropped: the video has no alpha channel.",
+        "Looping is not set in the file. Set it in the player or the video tag."
+      ]
+    },
+    "guide": {
+      "title": "About GIF and WebM",
+      "markdown": "### What is a GIF file?\n\nGIF stands for Graphics Interchange Format. CompuServe introduced it in 1987. Every picture in a GIF is LZW-compressed and drawn from a palette limited to 256 colors. The GIF89a version added extensions for frame delays and for marking one palette color as transparent, which is what made short animations possible. Transparency is all or nothing: one palette color is declared transparent, and nothing can be partly see-through. The delay between pictures is set in hundredths of a second. Unisys' LZW licensing, which started in 1994, faded as patents lapsed, in the US in 2003 and a year later in Europe and Japan.\n\nYou meet GIFs as reaction clips, looping demos, stickers and small icons. The format stores pictures and timing, not sound. A GIF made from a movie clip lost its audio when it was made, and no converter can bring it back.\n\n### Programs that open GIF files\n\n- **Windows:** Photos opens GIFs.\n- **Mac:** Preview opens GIFs.\n- **Windows, Mac and Linux:** GIMP can export layered animations and still pictures, and an exported animated GIF can be set to loop forever. ImageMagick reads GIF.\n- **Web and mobile:** every major browser displays GIFs; the ones named here are Chrome and Firefox on desktops and Safari and Chrome on phones.\n\n### GIF and WebM compared\n\n- **Extensions and types**: .gif is image/gif; .webm is video/webm.\n- **What it is**: GIF is an image format that can animate. WebM is a video container based on Matroska, and it can hold VP8, VP9 or AV1 video.\n- **Compression**: GIF compresses without loss, but only inside its 256-color palette. The WebM this page writes uses VP8 video.\n- **Color**: the GIF palette limit is gone in the video, but colors that were already reduced in the GIF stay reduced.\n- **Transparency**: GIF allows one fully transparent color. The WebM here is yuv420p, which has no alpha.\n- **Sound**: GIF has none. The WebM from this page has none either, because the conversion switches audio off.\n- **Looping**: the WebM from this page carries no loop setting, so a video repeats only if the page or player is told to.\n\nFFmpeg decodes the GIF and passes its frames to the VP8 encoder (libvpx) at a fixed quality of CRF 40. The WebM follows the GIF's size and rate, but never exceeds 1920 px on its long side or 30 fps. Dimensions are rounded down to even values, which matters when a GIF is, say, 481 px wide. Interlaced frames, if a file has any, are deinterlaced first.\n\nThe file you get is a video, not an image. It opens in a player or sits in a video tag, and it has a play bar. To check it, play it in Chrome, Edge, Firefox or VLC media player; on a phone, try VLC for Android or VLC for iOS. Keep the GIF when the destination only accepts images.\n\n### Other ways to convert GIF to WebM\n\n- **FFmpeg (command line):** type `ffmpeg -i reaction.gif -c:v libvpx -pix_fmt yuv420p -an reaction.webm`. The command writes opaque VP8 video.\n- **GStreamer (command line):** run `gst-launch-1.0 filesrc location=reaction.gif ! gifdec loop=force-no ! videoconvert ! vp8enc ! webmmux ! filesink location=reaction.webm`. It needs the gif, vpx and Matroska plug-ins.\n\n### Problems with GIF files\n\n- **The clip plays once and stops**: the converted file has no loop setting, so switch on repeat in your player or on the page's video tag.\n- **Colors look speckled**: the GIF's 256-color palette causes dithering that no conversion removes. Go back to the original video if you still have it.\n- **A site only accepts image uploads**: a form that wants .gif or an image type can reject video/webm. Keep the GIF there.\n- **The picture has no transparent background**: a GIF marks one palette color as transparent, and the video here can't hold that. Place the clip on a matching background.\n- **The GIF has no sound**: the format has no audio, so the WebM stays silent.\n- **A very large GIF gets smaller**: a GIF wider or taller than 1920 px is shrunk to fit, and a smaller one is never scaled up.\n- **A long GIF takes a while**: nothing on the page limits file size or running time, so a long GIF takes as long as your device needs.\n"
+    }
+  },
+  "jpeg-to-ico": {
+    "seo": {
+      "title": "Convert JPEG to ICO Online (Free)",
+      "h1": "JPEG to ICO Converter",
+      "description": "Turn a JPEG into a Windows ICO icon or favicon in your browser. Images over 256 px are fitted inside 256 x 256, and the ICO holds one size."
+    },
+    "tool": {
+      "subtitle": "Turn a JPEG into an ICO icon or favicon in your browser, at up to 256 x 256."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn a JPEG into a favicon?",
+        "answer": "Choose the JPEG above and save the ICO it produces. It downloads under the JPEG's name with the .ico ending. The ICO holds one image, so check how it looks at the small sizes browsers show."
+      },
+      {
+        "question": "What size will the ICO be?",
+        "answer": "A JPEG whose sides are both 256 pixels or less keeps its size. A larger one is reduced, with its proportions unchanged, until it fits inside a 256 x 256 box. An image of exactly 256 px goes into the ICO as a PNG entry."
+      },
+      {
+        "question": "Does the ICO contain several sizes, like 16, 32 and 48?",
+        "answer": "No. The converter writes one image into the ICO. For an ICO with several sizes in one file, use a program such as ImageMagick; the guide below has a command."
+      },
+      {
+        "question": "Why isn't my ICO square?",
+        "answer": "The picture is placed within the 256 x 256 limit and keeps its own shape. Nothing is cropped and no padding is added, so crop your JPEG to a square first if you want a square icon."
+      },
+      {
+        "question": "Can a JPEG give me a transparent icon?",
+        "answer": "No. The converter adds no transparency, and a JPEG has no alpha channel, so the photo's whole rectangle, background included, becomes the icon."
+      },
+      {
+        "question": "Does converting change the picture?",
+        "answer": "The page passes no quality setting. A side beyond 256 px means the picture is reduced; otherwise its size stays. The JPEG's own compression remains in the picture, because the ICO is built from decoded pixels."
+      },
+      {
+        "question": "Will the ICO keep my JPEG's EXIF data?",
+        "answer": "No. Only pixels are passed on, so EXIF, ICC profiles and XMP stay behind."
+      },
+      {
+        "question": "Will a small JPEG be enlarged to make a bigger icon?",
+        "answer": "No. A smaller picture is never scaled up. A sharper screen enlarges a small icon, so start from a JPEG that is at least 256 pixels on a side if you want the largest size."
+      },
+      {
+        "question": "Can I rename a .jpg to .ico instead?",
+        "answer": "Renaming changes the label only; the data inside is still JPEG. Converting writes a real ICO file."
+      },
+      {
+        "question": "Can I convert JPG and JPEG files with the same page?",
+        "answer": "Yes. Both endings mean one format, and both open here. Select a batch and every picture comes back as a separate ICO."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and ICO",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "Multiple sizes allowed in one file",
+          "Alpha transparency",
+          "PNG or bitmap entries",
+          "Registered as image/vnd.microsoft.icon"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "A picture with a side over 256 px is fitted inside 256 x 256, keeping its shape; a smaller one keeps its size.",
+        "The converter does not crop or pad to a square.",
+        "A JPEG has no transparency, so the icon is a solid rectangle.",
+        "EXIF data, ICC profiles and XMP are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and ICO",
+      "markdown": "### What is a JPEG file?\n\nThree dates frame the history. Work in the Joint Photographic Experts Group began in 1986, ITU-T published its standard as T.81 in 1992, and the same text became ISO/IEC 10918-1 in 1994. Baseline JPEG discards detail on purpose: blocks of 8x8 pixels get a discrete cosine transform, and Huffman coding packs what remains. Color is stored at 8 bits per channel with no alpha channel, so see-through pixels cannot exist in a JPEG. An optional progressive layout draws a blurry whole first and sharpens it. A 0 to 100 quality scale is common, but the numbers are not comparable across programs, and an ordinary setting turns a photo into roughly 1/10 to 1/20 of its raw size, which is the trade that made JPEG the photo format.\n\nEither ending, .jpg or .jpeg, means the same format. A JPEG cannot store layers. The final US patents on the format ran out on 27 October 2006. Digital cameras and scanners commonly save in JPEG, and it turns up wherever photos live: phones, stock sites, product pages and email attachments.\n\n### Programs that open JPEG files\n\n- **Windows:** Photos shows JPEG pictures.\n- **Mac:** Preview shows JPEG pictures.\n- **Windows, Mac and Linux:** GIMP can import a JPEG for editing, while ImageMagick opens one from the command line.\n- **Web and mobile:** every browser displays JPEG, Chrome and Firefox on the web and Safari and Chrome on phones.\n\n### JPEG and ICO compared\n\n- **Extensions and types**: JPEG uses .jpg or .jpeg and image/jpeg; ICO uses .ico and image/vnd.microsoft.icon.\n- **Purpose**: JPEG is for photographs. ICO holds icons for Microsoft Windows, and browsers also use it for favicons.\n- **Several images**: one ICO may contain many pictures at different sizes and color depths. Microsoft describes typical icon sizes as 16, 32, 48 and 256 pixels. A JPEG contains one picture.\n- **Size**: 256 pixels is the largest side this converter writes, which matches the largest of those typical sizes.\n- **Transparency**: ICO supports alpha. A JPEG gives it nothing to carry.\n- **Compression**: JPEG is lossy. Here, an image of 256 px is written as a PNG entry.\n\nThe page decodes the JPEG with your browser, then hands the pixels to ImageMagick, which writes the ICO. One image goes in. A picture wider or taller than 256 pixels is shrunk to sit within 256 x 256 at the same proportions, and a smaller picture keeps its size. No metadata is copied.\n\nIf you need an ICO with 16, 32 and 48 pixel images inside, that is a job for a program that writes several sizes into one file, such as the ImageMagick command below. The converter on this page does not crop to a square or add padding.\n\n### Other ways to convert JPEG to ICO\n\n- **GIMP (Windows, Mac, Linux):** after loading the JPEG, File > Export As lets you name the file with an .ico ending; press Export. The export type is called Microsoft Windows icon.\n- **ImageMagick (command line):** run `magick portrait.jpeg -alpha off -define icon:auto-resize=\"16,32,48,64,96,128,256\" favicon.ico`. This writes seven sizes into one ICO; ImageMagick's page says the input should be square.\n- **IrfanView:** choose File > Open for the JPEG, then File > Save as, pick ICO as the output format, set the file name and save. IrfanView lists ICO among the formats it can save.\n\n### Problems with JPEG files\n\n- **The icon has a white or colored box**: a JPEG can't be transparent, so its whole rectangle becomes the icon. Cut the subject out in an editor first.\n- **\"Image decode failed.\" appears**: your browser could not decode the file as a JPEG. It may be another format that was renamed to .jpg.\n- **Detail disappears at icon size**: a JPEG bigger than 256 px is reduced to fit the 256 x 256 limit, so a detailed photo loses much of its detail. A simple, cropped picture with one clear subject holds up better.\n- **The ICO isn't square**: the converter keeps the JPEG's shape, so crop the JPEG to a square before converting.\n- **You lose your layers**: a JPEG keeps none, and neither does this conversion. Keep the project file you made it from.\n- **EXIF data is gone**: only pixels are passed on, so camera details, ICC profiles and XMP stay behind.\n"
+    }
+  },
+  "tga-to-png": {
+    "seo": {
+      "title": "Convert TGA to PNG Online (Free)",
+      "h1": "TGA to PNG Converter",
+      "description": "Turn a Targa (TGA) texture or render into a lossless PNG in your browser. Your original TGA stays untouched. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a Targa texture or render into a lossless PNG in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I open a TGA file as a PNG?",
+        "answer": "Add the TGA above and save the PNG it returns. The page decodes the TGA with ImageMagick inside your tab and writes a PNG named after your file. The original TGA is not modified."
+      },
+      {
+        "question": "Does PNG lose quality compared with my TGA?",
+        "answer": "The conversion sets no quality, and PNG compression is always lossless, so the PNG step discards nothing."
+      },
+      {
+        "question": "Is my TGA uploaded anywhere?",
+        "answer": "No. The decoding runs as WebAssembly inside your browser tab, using ImageMagick, so the file never leaves your device."
+      },
+      {
+        "question": "What if my TGA is huge?",
+        "answer": "More than about 537 megapixels is too much: the page refuses it with a too-large message. Below that, the file is read as one image."
+      },
+      {
+        "question": "Can I swap the PNG back into my game as the texture?",
+        "answer": "Only after you change the asset reference. The download carries your file's name plus a .png ending, so an engine that asks for the .tga name will not find it."
+      },
+      {
+        "question": "How is PNG different from TGA for textures?",
+        "answer": "Both can carry an alpha channel. Targa has optional run-length compression, while PNG always compresses without loss, allows 8-bit and 16-bit channels and opens in every browser."
+      },
+      {
+        "question": "Does it convert several TGA files at once?",
+        "answer": "Yes. Select many TGA files and each one is converted in turn into its own PNG download, with no ZIP."
+      },
+      {
+        "question": "What does the converter do with a TGA that holds several images?",
+        "answer": "It reads one image from the file and writes that one as the PNG."
+      },
+      {
+        "question": "What is a TGA file?",
+        "answer": "TGA comes from Truevision. It can use run-length encoding, it has an alpha channel, and it turns up in game textures and in rendering output from video and 3D work."
+      },
+      {
+        "question": "Which programs open a TGA without converting it?",
+        "answer": "GIMP, Adobe Photoshop, IrfanView and Paint.NET can all open a TGA file. If you need a picture that every browser displays, convert it to PNG instead."
+      }
+    ],
+    "aboutSection": {
+      "title": "TGA and PNG",
+      "fromFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A raster image format introduced by Truevision in 1984. It stores 8 to 32 bits per pixel with optional run-length encoding and an alpha channel.",
+        "details": [
+          "Optional run-length compression",
+          "Alpha channel",
+          "8 to 32 bits per pixel",
+          "Simple header"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TGA to PNG",
+      "points": [
+        "The conversion sets no quality, and PNG compression is lossless.",
+        "The converter reads one image from the file.",
+        "A picture over about 537 megapixels fails with a too-large message.",
+        "The PNG ends in .png, so game or 3D projects must point to the new name.",
+        "ImageMagick runs in your tab; nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About TGA and PNG",
+      "markdown": "### What is a TGA file?\n\nTarga, or TGA, is a raster format that Truevision introduced in 1984. Each pixel takes 8 to 32 bits, run-length encoding is optional, and an alpha channel may be included. It has a simple header, and ImageMagick's format list marks it as readable and writable.\n\nTarga survives in game development and in video and 3D rendering, where artists and tools still pass textures and renders around as TGA. ImageMagick groups the ICB, VDA and VST endings with Truevision Targa, so those files are the same family.\n\n### Programs that open TGA files\n\n- **Linux, Mac and Windows:** the Targa plug-in that ships with GIMP loads and exports TGA images.\n- **Linux, Mac and Windows:** ImageMagick can read and write Truevision Targa, which covers the TGA, ICB, VDA and VST family.\n- **Windows and Mac:** Adobe Photoshop opens Targa images and provides Targa save options.\n\n### TGA and PNG compared\n\n- **Extensions and media types**: .tga (also .icb, .vda, .vst) for Targa; .png and image/png for PNG.\n- **Compression**: Targa's run-length encoding is optional. PNG always compresses, using DEFLATE (LZ77 plus Huffman coding), and it is lossless.\n- **Color depth**: Targa runs from 8 to 32 bits per pixel. PNG supports indexed, grayscale and truecolor images with 1 to 16 bits per sample.\n- **Transparency**: both have an alpha channel.\n- **Used for**: Targa serves game textures and video and 3D rendering output. PNG is the choice for sharp web graphics, interface art, logos and screenshots, and for pictures that need transparency.\n- **Origin**: Targa dates from 1984, and PNG from the mid-1990s, when it was devised as a patent-free successor to GIF. October 1996 saw it become the W3C's first published Recommendation for an image format. Its standards-body editions are RFC 2083 and ISO/IEC 15948:2004.\n- **Reach**: browsers of every major kind show PNG, and no known patent on it demands royalties. GIMP, Windows Photos and Preview on macOS open it too, and macOS saves screenshots in PNG by default.\n- **Media types**: image/png is registered for PNG, and image/apng for animated files.\n- **Structure**: inside a PNG you find a fixed signature and then a run of chunks; the header lives in IHDR, image data sits in IDAT and IEND ends the file.\n- **Newer features**: software without animation support shows PNG's default still image, though the specification itself now covers animated PNG. The third edition adds HDR support via a cICP chunk and Exif metadata in an eXIf chunk.\n\nMostly the wrapper changes here. ImageMagick compiled to WebAssembly reads the TGA and writes a PNG, and the page passes no quality setting. The file is read as a single image, and nothing is uploaded. A picture over about 537 megapixels is turned away. Your original TGA is not changed, since you download a new copy. When you pick several files, they are handled one at a time and no ZIP is made.\n\n### Other ways to convert TGA to PNG\n\n- **ImageMagick (command line):** run `magick texture.tga texture.png`. ImageMagick's format list shows TGA and PNG as both readable and writable, and its quickstart shows the same pattern: `magick rose.jpg rose.png`.\n- **GIMP (Windows, Mac, Linux):** open the TGA with File > Open, then pick File > Export As and give it the name texture.png. The PNG dialog that follows lists pixel format and metadata options. The compression level only trades speed for size, since PNG compression is not lossy.\n- **IrfanView:** choose File > Open for the Targa, then File > Save as and select PNG. IrfanView's format list marks TGA and PNG as readable and savable, and its FAQ says to set the new file name or folder and save.\n\n### Problems with TGA files\n\n- **An indexed TGA with transparency looks wrong in one program**: programs differ here. GIMP 2.10.32 improved its support for indexed Targa images with an alpha channel, on both import and export.\n- **A tool rejects the file by its ending**: the ICB, VDA and VST endings name Truevision Targa too, but this page's file picker lists .tga files.\n- **The page calls the picture too large**: reduce the render's pixel count in an editor, then convert again.\n- **The PNG has a different file size**: Targa's run-length encoding is optional and PNG always compresses. PNG compression is lossless, so a different size is not a quality loss.\n- **A file with several images gives one picture**: only a single image is taken from the file.\n"
+    }
+  },
+  "3gp-to-mp4": {
+    "seo": {
+      "title": "Convert 3GP to MP4 Online (Free)",
+      "h1": "3GP to MP4 Converter",
+      "description": "Turn an old 3GP phone video into an H.264 MP4 with AAC sound, right in your browser. Frames over 1920 px are shrunk to fit. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode a 3GP phone video as an H.264 MP4 with AAC sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a 3GP video to MP4?",
+        "answer": "Add the 3GP above, give FFmpeg time to re-encode it in your browser tab, then save the MP4. The file never leaves your device, and a longer clip simply keeps the converter busy for longer."
+      },
+      {
+        "question": "Why won't my 3GP play on my phone or TV?",
+        "answer": "The .3gp ending doesn't say which of the permitted video and audio codecs are inside, and the standard registers several of each. A device that lacks the right decoder refuses the file. The MP4 from this page uses H.264 video and AAC audio."
+      },
+      {
+        "question": "Does the conversion make my old 3GP video sharper?",
+        "answer": "No. The video is decoded and re-encoded, and a small phone-sized frame stays small. A frame under 1920 pixels is not enlarged, so a 176 x 144 clip stays 176 x 144, apart from rounding an odd side down."
+      },
+      {
+        "question": "Is the sound kept?",
+        "answer": "Yes, if the file has any. The audio is re-encoded as AAC at 96 kbps, whatever the 3GP used."
+      },
+      {
+        "question": "Can I just rename the .3gp file to .mp4?",
+        "answer": "Renaming changes the label, not the data. Both formats belong to the ISO base media family, but the codecs inside a 3GP can differ from what an MP4 player expects, and the .3gp ending doesn't say which are there. Converting writes H.264 and AAC."
+      },
+      {
+        "question": "Will the MP4 be bigger than the 3GP?",
+        "answer": "It can be. 3GP keeps files small, and this page encodes the MP4 to a quality target (CRF 32) rather than a size target. A short test clip came out slightly larger as an MP4."
+      },
+      {
+        "question": "Why does the video look blocky after converting?",
+        "answer": "The footage goes through H.264 a second time, and this page picks the ultrafast preset at CRF 32, which favors speed. Each further lossy encode can cost some fine detail."
+      },
+      {
+        "question": "What frame rate does the MP4 have?",
+        "answer": "It matches the 3GP, with a ceiling of 30 fps. The conversion never adds frames to raise the rate."
+      },
+      {
+        "question": "Are the video's tags copied?",
+        "answer": "FFmpeg copies the 3GP's global tags, a title for example, into the MP4 where it has fields for them. The page neither adds nor removes any."
+      },
+      {
+        "question": "Can I convert many 3GP files at once?",
+        "answer": "Yes, but separately: each selected 3GP becomes its own MP4, in turn. Nothing is merged."
+      }
+    ],
+    "aboutSection": {
+      "title": "3GP and MP4",
+      "fromFormat": {
+        "name": "3GP",
+        "fullName": "3GPP multimedia",
+        "description": "A container format defined by the 3rd Generation Partnership Project for video on mobile phones. It is a simplified version of the MP4 container and keeps files small.",
+        "details": [
+          "MPEG-4-based container",
+          "H.263, H.264 and AAC or AMR audio",
+          "Small files",
+          "3GPP standard"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting 3GP to MP4",
+      "points": [
+        "Video becomes H.264 and audio becomes AAC at 96 kbps, so the MP4 is re-encoded, not copied.",
+        "Size and rate carry over below 1920 px and 30 fps; an odd width or height loses one pixel.",
+        "The MP4 is written with its index at the front (faststart).",
+        "Several 3GP files are handled in turn, each into its own MP4."
+      ]
+    },
+    "guide": {
+      "title": "About 3GP and MP4",
+      "markdown": "### What is a 3GP file?\n\n3GP is a container format defined by the 3rd Generation Partnership Project for video on mobile phones. It specializes the ISO base media file format, the same family MP4 belongs to, and it is a simplified version of the MP4 container that keeps files small. It serves mobile messaging, downloads and packet-switched streaming, and a single presentation may mix video, speech, other audio and timed text.\n\nThe standard registers several video codecs, including H.263, MPEG-4 Visual, AVC and HEVC. For sound it registers AMR variants and AAC. A file extension does not identify which of the permitted codecs a 3GP recording contains, which is why two .3gp files can behave very differently. You meet 3GP files from older mobile phones and in MMS video. A conforming file includes a file-type box whose brands identify its profile.\n\n### Programs that open 3GP files\n\n- **Linux, Mac and Windows:** FFmpeg reads 3GP containers, and VLC media player accepts 3GP input.\n- **Windows:** Windows Media Player opens 3GP.\n- **Mac:** QuickTime Player opens 3GP.\n\nThe codecs inside the file decide what a player can do with it.\n\n### 3GP and MP4 compared\n\n- **Extensions and media types**: .3gp with video/3gpp for visual content and audio/3gpp for purely audio content; .mp4 with video/mp4 and audio/mp4.\n- **Container family**: both descend from the ISO base media file format, itself an outgrowth of Apple's QuickTime format. MP4 is ISO/IEC 14496-14, first published in 2003.\n- **Video codecs**: 3GP registers the four listed above. MP4 commonly holds H.264 (AVC), and can also carry H.265, AV1, VP9, MP3 and Opus.\n- **Audio**: 3GP registers AMR variants and AAC. MP4 commonly carries AAC.\n- **Extras**: MP4 can hold subtitles and chapters. Its boxes nest inside one another, a structure QuickTime knows as atoms.\n- **Used for**: 3GP serves video on older mobile phones and MMS video. MP4 is used for online video and streaming, for phone and camera recordings, and for passing video around.\n- **Files**: video MP4 files use .mp4 or .m4v, and audio-only MPEG-4 files often use .m4a.\n- **Reach**: every major browser plays MP4, and it plays on nearly every device. Android 5.0 added HEVC playback inside MP4 files.\n\nYour browser runs FFmpeg as WebAssembly to decode the 3GP and encode the result. Video becomes H.264 with libx264 at CRF 32, using the ultrafast preset, and audio becomes AAC at 96 kbps. This page always re-encodes and never copies the streams, and no stream mapping is passed, which leaves FFmpeg's defaults to choose the streams. Frame size carries over unless the long side exceeds 1920 pixels, and frame rate carries over unless it exceeds 30 fps. Interlaced frames, if any, are deinterlaced first. The MP4 is written with the index at the front (faststart).\n\nSeveral 3GP files can be chosen at once. They are processed in sequence, and every result downloads separately, with no ZIP, under your file's name and the .mp4 ending. Your original 3GP is not changed.\n\n### Other ways to convert 3GP to MP4\n\n- **FFmpeg (command line):** enter `ffmpeg -i phone.3gp -c:v libx264 -c:a aac phone.mp4`. FFmpeg's mov demuxer lists the 3gp extension, and both streams are re-encoded.\n- **VLC (Windows, Mac, Linux):** choose Media > Convert/Save, click Add and pick the 3GP, type the destination file name, choose a conversion profile from the Profile drop-down and click Start. VLC lists 3GP among its input formats.\n\n### Problems with 3GP files\n\n- **The file won't open on a modern device**: the .3gp ending doesn't show which codecs are inside, so the device may lack one of them. Converting writes H.264 video and AAC sound.\n- **A player shows less than another tool**: a conforming parser is allowed to skip boxes or codecs the specification does not cover, so two programs may disagree about one file.\n- **The video is tiny**: 3GP keeps files small, and a recording can have a small frame. Conversion cannot add detail, because a small frame is never scaled up.\n- **There is sound but no picture**: an audio-only 3GP has no video track to recover, and the format explicitly permits pure sound.\n- **The MP4 is larger than the 3GP**: the page encodes the MP4 to a fixed quality (CRF 32) instead of a target size, so the size can go either way.\n"
+    }
+  },
+  "bmp-to-jpg": {
+    "seo": {
+      "title": "Convert BMP to JPG Online (Free)",
+      "h1": "BMP to JPG Converter",
+      "description": "Turn a bulky BMP bitmap into a JPG photo file in your browser. It is written at quality 0.85, and transparency is not kept. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a BMP bitmap into a JPG photo file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a BMP into a JPG?",
+        "answer": "Add the BMP above and save the JPG you get back. Your browser decodes the bitmap and the page encodes a JPG from the pixels. With several BMP files selected, each downloads separately."
+      },
+      {
+        "question": "Why is my BMP so much bigger than a JPG?",
+        "answer": "BMP usually stores pixels uncompressed, so the file grows with every pixel, and an uncompressed BMP can be bulky. JPG compresses with loss, and its settings decide how much detail is traded for size."
+      },
+      {
+        "question": "What quality is the JPG saved at?",
+        "answer": "Quality 0.85 on the browser's 0 to 1 scale. There is no slider, so every JPG from this page uses that setting. Quality numbers differ between programs, so 85 in an editor will not give the same file."
+      },
+      {
+        "question": "Will the JPG look worse than the BMP?",
+        "answer": "A little, and it cannot be undone. JPG is lossy, so the pixels are approximated when the JPG is written, and the BMP's own pixels are not kept in it."
+      },
+      {
+        "question": "What happens to transparency in my BMP?",
+        "answer": "JPG has no alpha channel, so the JPG is fully opaque. Version 5 bitmaps can carry an alpha channel, and that channel does not carry over. The BMP to PNG page writes a PNG, a format that can hold transparency."
+      },
+      {
+        "question": "Does the JPG keep the BMP's color profile?",
+        "answer": "No. Only decoded pixels are re-encoded, so ICC profiles and other metadata are dropped. For color-critical work, compare the result in an editor."
+      },
+      {
+        "question": "Why won't this page open my BMP?",
+        "answer": "A file the browser can't decode shows \"Image decode failed.\", and a browser that lacks BMP support shows a message that it can't open the file. Re-saving the picture from an image editor as a standard BMP and trying again is the quickest check."
+      },
+      {
+        "question": "Should I choose PNG instead of JPG?",
+        "answer": "Choose PNG for screenshots, text, line art and anything with transparency, because it keeps every pixel. Choose JPG for photographs, where the smaller file matters more than exact edges. This page writes JPG; the BMP to PNG page writes PNG."
+      },
+      {
+        "question": "Does the JPG keep my BMP's bit depth?",
+        "answer": "No. Both the page's pixel path and the JPG work at 8 bits per channel, so any other depth in the BMP does not carry over."
+      },
+      {
+        "question": "Is the original BMP changed?",
+        "answer": "No. You download a new JPG, and the BMP stays where it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and JPG",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster image format introduced with Microsoft Windows that stores pixel data, usually uncompressed. It is simple to read and write but produces large files.",
+        "details": [
+          "Usually uncompressed",
+          "1 to 32 bits per pixel",
+          "Optional run-length compression",
+          "Large files"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "JPG cannot hold transparency, so an alpha channel in the BMP is not kept.",
+        "ICC profiles and other metadata are not copied.",
+        "Pixels pass through 8 bits per channel.",
+        "Several BMP files can be chosen at once; each downloads as its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "About BMP and JPG",
+      "markdown": "### What is a BMP file?\n\nWindows Bitmap (BMP) is a raster image format introduced with Microsoft Windows. Microsoft owns the BMP family, which first served Windows and OS/2. Pixel data is normally stored uncompressed, so programs can read and write a BMP with little effort, at the cost of large files. Lossless compression is available as an option, in the form of run-length encoding. Version 5 arrived with Windows 98 in 1998 and gained room for an ICC profile plus an alpha channel.\n\nBMP turns up as Windows screen captures and system graphics, and as simple Windows graphics and uncompressed image interchange. The registered media type is image/bmp.\n\n### Programs that open BMP files\n\n- **Windows:** Paint and Photos open BMP.\n- **Mac:** Preview opens BMP.\n- **Windows, Mac and Linux:** GIMP opens BMP. ImageMagick reads BMP images. XnView MP names BMP among its formats, though company use of XnView MP needs a license.\n- **Web:** Firefox displays BMP pictures, and Mozilla's compatibility table lists Chrome as supporting them.\n\n### BMP and JPG compared\n\n- **Extensions**: BMP is .bmp (image/bmp); JPG is .jpg or .jpeg (image/jpeg).\n- **Compression**: BMP is usually uncompressed. JPG is lossy. In baseline JPEG, each 8x8 block of pixels is transformed with a discrete cosine transform, after which Huffman coding packs the result. ITU-T T.81 dates from 1992 and ISO/IEC 10918-1 from 1994.\n- **File size**: an uncompressed BMP can be bulky.\n- **Bit depth**: a BMP may use anywhere from 1 to 32 bits per pixel; the JPG made here is written from 8-bit RGBA pixels.\n- **Transparency**: BMP version 5 can have an alpha channel. JPG has none.\n- **Metadata**: BMP version 5 can carry an ICC profile. The page's JPG carries none.\n- **Progressive mode**: a progressive JPEG paints a blurry whole first and sharpens it as the rest loads; depth is 8 bits per channel either way.\n- **Reach**: every major browser displays JPEG, and digital cameras and scanners commonly output it.\n- **Editable content**: neither file keeps editable vector shapes or live text: a BMP stores plain pixels and a JPG cannot store layers, so neither reopens as an editable project.\n\nThe page decodes the BMP with your browser's own image decoder and writes the pixels as a JPG at quality 0.85 through the browser's canvas. No metadata is copied, and the original BMP is not changed: you download a new JPG.\n\nQuality is usually set on a 0 to 100 scale, and the same number can mean different quality in different programs. This page has no slider, so every JPG from it uses the same setting.\n\n### Other ways to convert BMP to JPG\n\n- **IrfanView:** choose File > Open for the BMP, then File > Save as, pick JPG as the output format and set the new file name. IrfanView's format list marks both BMP and JPG as readable and savable.\n- **GIMP (Windows, Mac, Linux):** after opening the BMP, go to File > Export As, call the file capture.jpg and press Export. The JPEG dialog has a Quality setting from 0 to 100, and GIMP's page says JPEG supports neither transparency nor multiple layers.\n- **ImageMagick (command line):** run `magick capture.bmp -quality 85 capture.jpg`. ImageMagick's format list shows BMP and JPEG as readable and writable.\n\n### Problems with BMP files\n\n- **The file is enormous**: a BMP commonly stores uncompressed pixels, so it can be bulky. For sharing, PNG or JPEG is easier to pass around.\n- **Old software wants a different bitmap header**: software that expects an older header might want BMP3 or BMP2 output, not the default BMP version. That concerns writing a BMP, not producing a JPG.\n- **The transparent area is gone**: JPG has no transparency. A BMP with an alpha channel is a version 5 bitmap, and that channel has nowhere to go in a JPG. For transparency, the [BMP to PNG converter](/bmp-to-png/) is the place to go.\n- **The page can't open the bitmap**: the browser's decoder rejected the file. Open it in an image editor and save it again.\n- **Quality numbers don't match between programs**: 85 in GIMP or ImageMagick may not produce the same JPG as this page's 0.85. Pick one tool for the whole batch.\n- **You need to edit shapes or text later**: a BMP holds pixels only, so keep the original project file.\n"
+    }
+  },
+  "flv-to-mp3": {
+    "seo": {
+      "title": "Convert FLV to MP3 Online (Free)",
+      "h1": "FLV to MP3 Converter",
+      "description": "Pull the soundtrack out of an old Flash FLV video as an MP3, in your browser, at up to 192 kbps. The picture is dropped. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Pull the soundtrack out of an old Flash FLV video as an MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I extract the audio from an FLV file?",
+        "answer": "Add the FLV above and save the MP3 that comes out. FFmpeg works inside your browser tab, discards the picture and encodes the sound as MP3, and the file stays on your device."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps is what the page asks the LAME encoder for. LAME writes at most 160 kbps for FLV sound at 16 to 24 kHz and at most 64 kbps for 8 to 12 kHz, so a low-quality source gets a lower rate. There is no setting to change it on this page."
+      },
+      {
+        "question": "Do I need Flash Player to convert an FLV?",
+        "answer": "No. Nothing here uses Flash Player, which is discontinued. The page reads the FLV container with FFmpeg, so no Flash software is needed."
+      },
+      {
+        "question": "Why does my FLV to MP3 conversion fail?",
+        "answer": "An FLV with no audio track fails, and the page shows an FFmpeg failure message with an exit code. Open the FLV in VLC to confirm it has sound before trying again."
+      },
+      {
+        "question": "Will the MP3 sound worse than the FLV?",
+        "answer": "It can. The sound is decoded and compressed again as lossy MP3, even when the FLV's audio was already MP3. Keep the FLV if you want an archive copy."
+      },
+      {
+        "question": "Does the MP3 keep the video's title and other tags?",
+        "answer": "The FLV's global tags, a title for example, are copied by FFmpeg into the MP3's ID3 fields where the MP3 can hold them. If the FLV carried none, the MP3 has none, and a tag editor can fill them in."
+      },
+      {
+        "question": "Can an FLV hold more than one audio track?",
+        "answer": "An FLV holds at most one audio stream, so the format itself leaves nothing to choose between."
+      },
+      {
+        "question": "Is the video lost?",
+        "answer": "Yes. An MP3 is audio only, so the video is not in the result. Convert FLV to MP4 instead if you want to keep the picture."
+      },
+      {
+        "question": "My FLV is large. Will it convert?",
+        "answer": "Nothing on this page caps file size or sets a timeout, so a big FLV just keeps converting until your device finishes. Keep the tab open until the MP3 appears."
+      },
+      {
+        "question": "Can I convert several FLV files into MP3 together?",
+        "answer": "Yes, queue as many as you like. Every FLV yields its own MP3 download; nothing is zipped or merged."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and MP3",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A container format created by Macromedia and later Adobe for delivering video through Flash Player. Flash reached end of life in 2020, so FLV is now a legacy format.",
+        "details": [
+          "Usually H.263 or H.264 video",
+          "MP3 or AAC audio",
+          "Designed for streaming",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLV to MP3",
+      "points": [
+        "The picture is dropped; only the soundtrack is kept.",
+        "The audio is re-encoded to MP3 at up to 192 kbps, so it goes through a second lossy step. The rate is lower for a source below 32 kHz.",
+        "An FLV with no audio track fails with an FFmpeg error.",
+        "An FLV holds one audio stream at most, so there is no track to choose.",
+        "No Flash Player is involved."
+      ]
+    },
+    "guide": {
+      "title": "About FLV and MP3",
+      "markdown": "### What is an FLV file?\n\nFlash Video, or FLV, is a container format created by Macromedia and later Adobe for delivering video through Flash Player. A single FLV carries no more than one video stream plus one audio stream. Its video is Sorenson or On2 VP6, and its sound may be MP3, PCM or ADPCM. A Flash SWF can point at a standalone FLV via ActionScript.\n\nSupport for Flash Player ended on December 31, 2020, which leaves FLV a legacy format. Older web video and archived Flash content is where you still meet it. The .flv ending does not identify a unique video codec, so two FLV files can need different decoders.\n\n### Programs that open FLV files\n\n- **Windows, Mac and Linux:** playback is covered by VLC media player, which lists FLV input plus Sorenson and VP6-family decoding, and by FFplay, which uses FFmpeg decoders for FLV.\n- **Phones and tablets:** VLC exists for Android and for iOS, and both open files stored on the device.\n\nReinstalling Flash Player is not a way to play an old FLV, since it is discontinued.\n\n### FLV and MP3 compared\n\n- **Extensions and media types**: .flv for Flash Video; .mp3 for MP3.\n- **What it holds**: an FLV is a video container with at most one video and one audio stream. An MP3 is audio only.\n- **Compression**: sound inside an FLV may be MP3, PCM or ADPCM; the MP3 you get is lossy either way, with constant or variable bitrate possible.\n- **Tags**: an MP3 stores metadata as ID3 tags.\n- **Typical uses**: an MP3 suits music libraries and downloads, podcasts, and audio for portable players, which is why pulling the sound out of an old Flash clip often ends in this format.\n- **Playback**: an MP3 plays on nearly every device and in any web browser, whereas an FLV needs a player with the right decoders.\n- **Standards**: MP3 is MPEG-1/2 Audio Layer III, standardized by MPEG as ISO/IEC 11172-3, with major contributions from the Fraunhofer Society. It can use constant or variable bitrate.\n\nHere is what happens when you convert, step by step. A worker in your browser runs FFmpeg as WebAssembly. It reads the FLV, ignores the video and has the LAME encoder write an MP3 with a requested rate of 192 kbps, which LAME lowers for sources with a low sample rate. Even when the FLV's sound was already MP3, it is decoded and encoded again, not copied. The file picker accepts .flv files only. The MP3 is named after your file, with the .mp3 extension, and your FLV is not changed.\n\nBecause of that second encode, the MP3 is not a bit-for-bit copy of the original sound. Several files can be queued together. They run one by one, and each finished MP3 downloads on its own, with no ZIP. If you only need the picture, use the [FLV to MP4 converter](/flv-to-mp4/) instead.\n\n### Other ways to convert FLV to MP3\n\n- **FFmpeg (command line):** the command is `ffmpeg -i archive.flv -vn -c:a libmp3lame -b:a 192k archive.mp3`. FFmpeg's documentation lists FLV among the formats it demuxes, and the FLV needs an audio stream.\n- **GStreamer (command line):** use `gst-launch-1.0 filesrc location=archive.flv ! decodebin ! audioconvert ! audioresample ! lamemp3enc ! filesink location=archive.mp3`. Its flvdemux element demuxes FLV files, decodebin builds the decoding pipeline, and lamemp3enc writes the MP3.\n\n### Problems with FLV files\n\n- **The FLV does not play**: the extension does not identify the codec, and Sorenson or VP6 video needs a decoder. Try VLC, not a Flash Player reinstall.\n- **No MP3 appears**: the FLV may have no audio track, in which case the converter shows an FFmpeg failure message.\n- **The MP3 has no title or artist**: the FLV probably carried none, since FFmpeg copies the FLV's tags where MP3 has fields for them. Add them in a tag editor.\n- **You need several audio tracks**: an FLV holds one audio stream, so a workflow with alternative audio tracks cannot keep that structure inside it.\n- **The picture is gone and you want it**: an MP3 holds sound only. Go back to the FLV, or convert it to MP4.\n- **A Flash page can't find its video**: a SWF can point to a separate FLV file, so move the FLV and the SWF together.\n"
+    }
+  },
+  "gif-to-webp": {
+    "seo": {
+      "title": "Convert GIF to WebP Online (Free)",
+      "h1": "GIF to WebP Converter",
+      "description": "Save the first frame of a GIF as a still WebP in your browser, with transparency kept. The animation is not converted. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as a still WebP in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does GIF to WebP keep my animation?",
+        "answer": "No. This page decodes only the first frame of the GIF and saves it as a still WebP, so the motion is not converted. The command-line methods below are other routes to try."
+      },
+      {
+        "question": "Why is my WebP a different picture than the animation I see?",
+        "answer": "Only the first frame is converted, and the page cannot choose another moment. GIF animations commonly store later frames as overlays on earlier ones, so the first frame may not match what you see mid-playback. Export the frame you want from an image editor, then convert it."
+      },
+      {
+        "question": "Is the transparent background kept?",
+        "answer": "Yes. Transparency survives into the WebP, so see-through GIF pixels stay see-through in the still image. A GIF's transparency is on or off, so soft edges don't appear."
+      },
+      {
+        "question": "What quality is the WebP saved at?",
+        "answer": "The page passes no quality setting and shows no slider. The first frame is decoded by your browser and encoded by a canvas or by ImageMagick, so the WebP is a new encoding of those pixels, not a copy."
+      },
+      {
+        "question": "Will the WebP be smaller than the GIF?",
+        "answer": "This page makes no promise either way, because the result depends on the picture. Compare the two file sizes after converting and keep whichever suits you."
+      },
+      {
+        "question": "Does converting remove the dithering in my GIF?",
+        "answer": "No. The page decodes the dithered, 256-color picture and encodes those pixels. Nothing recovers the colors that were lost when the GIF was made."
+      },
+      {
+        "question": "Are GIF comments and other data copied?",
+        "answer": "No. Only decoded pixels reach the encoder, so EXIF, ICC profiles, XMP and the like are not carried over. Keep the GIF if its comments matter."
+      },
+      {
+        "question": "Can I use the WebP where a GIF is expected?",
+        "answer": "Only where WebP is accepted. The file is a still image with a .webp extension, so a form that wants .gif rejects it. For a GIF-shaped result, keep the GIF."
+      },
+      {
+        "question": "Is a batch of GIFs possible?",
+        "answer": "Yes. Select as many as you like; the page works through them one at a time and saves each WebP separately, with no ZIP. Each WebP is the first frame of its GIF."
+      },
+      {
+        "question": "Which browsers show the WebP?",
+        "answer": "Current major browsers display WebP, and the still image this page makes needs no animation support."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and WebP",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to WebP",
+      "points": [
+        "Only the first frame is converted, so the WebP is a still image.",
+        "The page passes no quality setting; a browser canvas or ImageMagick encodes the WebP.",
+        "Transparent pixels in the GIF stay transparent.",
+        "GIF comments and other metadata are not copied.",
+        "Several GIFs are converted in turn, each into its own download."
+      ]
+    },
+    "guide": {
+      "title": "About GIF and WebP",
+      "markdown": "### What is a GIF file?\n\nGIF is the Graphics Interchange Format, introduced by CompuServe in 1987. A GIF compresses each picture with LZW and holds at most 256 colors per frame, drawn from a palette. It can hold several pictures with delays between them, which is how a GIF animates, and it can mark one palette color as fully transparent. GIF89a added the control blocks for delays and transparency.\n\nGIFs are everywhere short, looping clips are shared: reaction images, stickers, instructions and small animated graphics. Because the palette is limited, a photograph in a GIF often shows dithering, and a smooth gradient shows bands. Converting the file does not undo that. The picture you start from is the palette picture, and WebP simply stores it in a different way.\n\n### Programs that open GIF files\n\n- **Windows:** Windows Photos opens GIF files. GIMP exports GIF as either a still picture or a multilayer animation.\n- **Mac:** Preview opens GIF files, and GIMP exports GIF the same way.\n- **Linux:** GIMP and ImageMagick, which reads GIF and can be scripted from the command line.\n- **Web and mobile:** Chrome and Firefox show GIF on desktop websites; on phones, Chrome and Safari show it too.\n\nTo check the WebP you get from this page, open it in a current browser, since Chrome, Firefox and Safari all display WebP. GIMP has opened and saved WebP natively since 2.10, and Preview on macOS and Windows Photos open it as well.\n\n### GIF and WebP compared\n\n- **Extensions and media types**: .gif and image/gif; .webp and image/webp.\n- **Compression**: GIF is lossless inside a 256-color limit. WebP offers a lossless mode and a lossy one, and the lossy one borrows its compression from the VP8 video codec.\n- **Color**: WebP is not limited to a palette.\n- **Transparency**: GIF has 1-bit transparency, a pixel either shows or does not. WebP has an alpha channel.\n- **Animation**: both can animate. This page does not write an animated WebP.\n- **Size limits**: WebP stops at 16,383 pixels per side, so anything larger cannot be stored as WebP.\n\nThe page decodes the first frame of the GIF with your browser's own image decoder and encodes it as a WebP with a browser canvas or ImageMagick, passing no quality setting. Metadata is not copied, and your original GIF is untouched. The picture passes through 8-bit RGBA, so a GIF's palette colors arrive as ordinary 8-bit pixels.\n\nGoogle developed WebP and released it in 2010. Its lossy mode comes from the VP8 video codec; it also has a lossless mode, transparency and animation. It is used for web images with smaller files, for images that need transparency and for short animations.\n\nA still WebP is useful when you want a web-friendly picture from the opening frame of an animation, for a thumbnail or a poster, for example. It keeps see-through pixels and sits comfortably on a page next to ordinary photos. If the motion matters, this page is the wrong tool; try one of the methods below.\n\n### Other ways to convert GIF to WebP\n\n- **gif2webp (Google):** run `gif2webp animation.gif -o animation.webp` from the WebP tools. It converts a GIF to WebP and offers -lossy and -mixed options, where mixed picks lossy or lossless for each frame.\n- **ImageMagick (command line):** run `magick animation.gif -coalesce animation.webp`. The -coalesce option fully defines the look of each frame of a GIF animation, and your ImageMagick needs WebP support, so check its format list.\n\n### Problems with GIF files\n\n- **The WebP is a single picture**: that is how this page works. Use one of the command-line methods above to try for the motion.\n- **The first frame is not what you expected**: this page converts only the first frame, so pick the frame in an editor and save it as its own picture first.\n- **Soft edges look jagged**: GIF transparency is on or off, so a soft shadow can't be partly see-through. The WebP can't add that back.\n- **Colors look blotchy**: the 256-color palette is the cause. GIMP also limits a GIF export to 256 colors, which alters gradients.\n- **Frames overlap or leave trails after an edit**: frame disposal sets how later images cover earlier ones. Pick combine or replace in GIMP to match the animation.\n- **An old browser balks at the WebP**: a browser from some years back can show still WebP yet lack animation support. Convert the first frame to PNG or JPG if a viewer will not open it.\n- **A comment you wrote in the GIF is gone**: GIMP drops a GIF comment with characters outside seven-bit ASCII, and this page drops metadata altogether.\n"
+    }
+  },
+  "m4p-to-mp3": {
+    "seo": {
+      "title": "Convert M4P to MP3 Online (Free)",
+      "h1": "M4P to MP3 Converter",
+      "description": "Convert an M4P audio file that is not copy-protected to MP3 in your browser. FairPlay-protected songs are refused with a clear message."
+    },
+    "tool": {
+      "subtitle": "Convert an M4P song that is not copy-protected to MP3 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert an iTunes M4P song to MP3 here?",
+        "answer": "Only if it is not copy-protected. The page refuses a FairPlay-protected file with its own message, and a file without that protection goes on to the FFmpeg conversion."
+      },
+      {
+        "question": "Why can I play my M4P in Apple Music but not convert it?",
+        "answer": "Apple lets a computer you have authorized play your Apple Account purchases. This page does not decrypt anything, so it stops at a protected file instead of converting it."
+      },
+      {
+        "question": "How do I know whether my M4P is protected?",
+        "answer": "Try it. Everything runs in your browser, and a FairPlay-protected file is refused with a message of its own. Any other file goes straight on to conversion."
+      },
+      {
+        "question": "What does an M4P that converts become?",
+        "answer": "An MP3. The page requests 192 kbps from the LAME encoder, and LAME caps the result at 160 kbps for 16 to 24 kHz sources and at 64 kbps for 8 to 12 kHz ones. Because the audio is decoded and then encoded a second time, the MP3 is a new encoding, not a copy of the AAC."
+      },
+      {
+        "question": "Does Apple Music have its own way to make an MP3?",
+        "answer": "Yes, in the Music app on a Mac: set the Import Using menu to MP3 Encoder in Settings > Files > Import Settings, select the song, then choose File > Convert > Create MP3 Version. Apple says older purchased songs encoded as Protected AAC can't be converted."
+      },
+      {
+        "question": "Why does M4P exist at all?",
+        "answer": "Songs from the early iTunes Store carried Apple's FairPlay copy protection, and the .m4p ending marks that audio. A protected file plays only in authorized Apple software or devices."
+      },
+      {
+        "question": "How many computers can play my M4P purchases?",
+        "answer": "Apple lets you authorize up to five computers at a time for Apple Account purchases. To add another, deauthorize one first. That limit decides where the file plays, not whether this page can convert it."
+      },
+      {
+        "question": "Does the MP3 keep the song's title and artist?",
+        "answer": "FFmpeg copies the M4P's global tags, a title and artist for instance, into the MP3's ID3 fields where the M4P has them. Anything still blank can be typed in with a tag editor."
+      },
+      {
+        "question": "Why can a converted M4P sound different?",
+        "answer": "MP3 is lossy and the song is compressed again. If you want the best copy, keep the original file as well."
+      },
+      {
+        "question": "Can I convert several M4P files together?",
+        "answer": "Yes. Pick more than one M4P and the page processes them in sequence, giving each its own MP3 download with no ZIP. Nothing is merged."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4P and MP3",
+      "fromFormat": {
+        "name": "M4P",
+        "fullName": "Protected MPEG-4 audio",
+        "description": "An MPEG-4 audio file with Apple's FairPlay copy protection, used for songs bought from the early iTunes Store. Files can only be played by authorized Apple software or devices.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "DRM copy protection",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4P to MP3",
+      "points": [
+        "A copy-protected (FairPlay) M4P is refused; the page does not decrypt anything.",
+        "The MP3 is encoded again from the AAC audio, requesting 192 kbps.",
+        "FFmpeg copies global tags into the MP3 where it can.",
+        "Several files run in turn, each into its own MP3."
+      ]
+    },
+    "guide": {
+      "title": "About M4P and MP3",
+      "markdown": "### What is an M4P file?\n\nM4P is the ending Apple used for MPEG-4 audio that carries its FairPlay copy protection. Apple's archived media-format documentation identifies .m4p with protected AAC audio and gives its media type as audio/x-m4p. Songs from the early iTunes Store were sold this way. The container is MPEG-4 and the audio is AAC, but the copy protection restricts playback to authorized Apple software or devices.\n\nToday the format mostly turns up in older iTunes Store purchases and in music libraries on Apple devices. That is why an M4P plays in Apple Music, iTunes, an iPhone, iPad or Mac that is authorized for the purchase, and in little else. Apple allows up to five authorized computers at a time for an Apple Account. Apple also says older purchased songs can remain in a Protected AAC format that prevents them from being converted in the Music app.\n\n### Programs that open M4P files\n\n- **Windows and Mac:** Apple Music, where Apple documents authorizing a computer for your Apple Account purchases, and iTunes, which the format reference also names for playback.\n- **Mobile:** iPhone and iPad are named for playing authorized purchases.\n\nYou can only authorize a computer you have access to. Apple says you can't authorize one using another computer or an iPhone or iPad, and a sixth computer can't be added until you deauthorize one.\n\n### M4P and MP3 compared\n\n- **Extensions and media types**: .m4p and audio/x-m4p; .mp3 for MP3.\n- **Container and codec**: an M4P is an MPEG-4 container with AAC audio. MP3 is its own format, standardized as ISO/IEC 11172-3.\n- **Copy protection**: M4P carries FairPlay DRM. MP3 has none.\n- **Compression**: both are lossy.\n- **Tags**: MP3 keeps song details in ID3 tags.\n- **Playback**: MP3 plays on nearly every device, while a protected M4P plays only where it is authorized.\n- **Status**: M4P is a legacy format, used for older iTunes Store purchases and for music libraries on Apple devices.\n\nThe page does not decrypt anything. If the file is FairPlay-protected, the page stops and shows a refusal message. Otherwise the FFmpeg build in your browser reads the audio and writes an MP3 with the LAME encoder, requesting 192 kbps. The picture stream, if any, is dropped. The page sets neither a size limit nor a timeout, so how long a long song takes depends on your device. The file stays on your machine, and the original M4P is left as it was.\n\nThe page does not decrypt Apple's protection, so a purchased song that is still protected can't be converted here, even though you own it. Pick this page for M4P files that are not protected. If you are not sure which kind you have, drop it in and the page tells you. Several files can be queued together; each gets its own MP3, named after the original.\n\n### Other ways to convert M4P to MP3\n\n- **Apple Music on a Mac:** open Music > Settings > Files > Import Settings, choose MP3 Encoder from the Import Using menu and click OK. Then select the song and choose File > Convert > Create MP3 Version, and the MP3 appears next to the original in your library. Apple says older purchased songs in Protected AAC can't be converted this way.\n\n### Problems with M4P files\n\n- **A message says the file is copy-protected**: the song is FairPlay audio, and this page cannot convert it. That is the refusal, not a fault.\n- **Apple Music cannot convert the song**: Apple says older purchases that remain in Protected AAC can't be converted.\n- **The M4P won't play on a new computer**: the computer needs authorizing for your Apple Account first, and only five can be authorized at once.\n- **Authorization isn't working**: it must be done on the computer being authorized, not from another device.\n- **A new computer can't be authorized**: while all five authorization slots are occupied, no further computer can be authorized.\n- **You own the song but cannot convert it**: ownership and decryption are separate. The remaining option is to play the song in authorized Apple software.\n- **The song plays on an Apple device but nowhere else**: that is the protection at work. Playback is limited to authorized Apple software or devices, and this page can't lift it.\n- **The MP3 sounds different**: it has been compressed again as lossy MP3. Keep the original when possible.\n"
+    }
+  },
+  "mts-to-mp4": {
+    "seo": {
+      "title": "Convert MTS to MP4 Online (Free)",
+      "h1": "MTS to MP4 Converter",
+      "description": "Turn AVCHD camcorder MTS clips into H.264 MP4 files in your browser. Frames flagged interlaced are deinterlaced. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode AVCHD camcorder MTS clips as H.264 MP4 files, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MTS camcorder file to MP4?",
+        "answer": "Drop the MTS onto the page above, wait for FFmpeg to finish inside your browser and save the MP4 it produces. No upload happens. Every MTS you add yields a separate MP4."
+      },
+      {
+        "question": "Is the video simply rewrapped or re-encoded?",
+        "answer": "Re-encoded. The picture becomes H.264 (libx264, CRF 32, ultrafast preset) and the sound becomes AAC at 96 kbps. Because it is a second lossy encode, the MP4 is not a copy of the camera's original quality."
+      },
+      {
+        "question": "How is interlaced footage handled?",
+        "answer": "Frames flagged as interlaced are deinterlaced with FFmpeg's yadif filter, which sends one output frame for each input frame. Frames not flagged interlaced pass through that filter untouched. Whether a camera's clip carries the flag depends on how it was recorded."
+      },
+      {
+        "question": "What frame size does the MP4 have?",
+        "answer": "The MP4 keeps the clip's frame size up to 1920 pixels on a side. A 1920 x 1080 recording keeps that size, and anything larger is scaled down to fit. Widths and heights come out even, so an odd side gives up a pixel."
+      },
+      {
+        "question": "What frame rate does the MP4 have?",
+        "answer": "Whatever the camera recorded, up to 30 fps. A 50p or 60p recording is thinned to 30 fps by dropping frames, and a slower recording is not sped up."
+      },
+      {
+        "question": "My camcorder records Dolby Digital sound. Is it kept?",
+        "answer": "The sound is decoded and re-encoded as AAC at 96 kbps, the usual MP4 pairing with H.264. It is no longer the original Dolby Digital or PCM stream."
+      },
+      {
+        "question": "Why is the MP4 softer than the camera original?",
+        "answer": "The page encodes to a modest quality target, CRF 32 with the ultrafast preset, and that is a second lossy encode after the camera's own. Speed was chosen over fine detail."
+      },
+      {
+        "question": "Must the whole AVCHD folder be present?",
+        "answer": "No. The page takes a single MTS file and converts that one clip. It does not read the rest of the folder, and your original file is not changed."
+      },
+      {
+        "question": "Should I keep the original AVCHD folder?",
+        "answer": "Yes. The MP4 is a new copy and does not carry the card's folder structure, which is what an editor looks for when importing archived camera material."
+      },
+      {
+        "question": "Can I convert several MTS clips at once?",
+        "answer": "Yes, though each clip stays separate: you get one MP4 per MTS, in sequence, each downloaded on its own. None are joined and there is no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "MTS and MP4",
+      "fromFormat": {
+        "name": "MTS",
+        "fullName": "AVCHD transport stream",
+        "description": "The file extension for video recorded by AVCHD camcorders. It is an MPEG transport stream containing H.264 video.",
+        "details": [
+          "MPEG transport stream",
+          "H.264 video",
+          "Dolby Digital or PCM audio",
+          "192-byte packets"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MTS to MP4",
+      "points": [
+        "Picture and sound are both encoded again (H.264, AAC at 96 kbps), so the MP4 is a second lossy generation.",
+        "Frames flagged interlaced are deinterlaced, one frame for each input frame.",
+        "Frame size and rate carry over up to 1920 px and 30 fps; odd sides lose a pixel.",
+        "One MTS gives one MP4. Clips are not joined.",
+        "Keep the original AVCHD folder if you may edit in a video editor."
+      ]
+    },
+    "guide": {
+      "title": "About MTS and MP4",
+      "markdown": "### What is an MTS file?\n\nMTS is the file extension for video recorded by AVCHD camcorders. It is an MPEG transport stream, a container made of 192-byte packets, and AVCHD recordings use MPEG-4 AVC (H.264) for the picture. The sound can be Dolby Digital or linear PCM. The container and the compressed video are separate layers, which is why a player needs the codec as well as the extension.\n\nThe AVCHD format was made for digital high-definition camcorders, and MTS camera clips usually sit inside an AVCHD folder structure. The format is used for recordings from Sony and Panasonic cameras. You meet MTS files when you copy footage off a camera or when an editor lists camera media.\n\n### Programs that open MTS files\n\n- **Windows, Mac and Linux:** FFmpeg, the command-line tool, can demux MPEG-TS input; VLC media player can open MPEG transport streams, with AVC video and AC-3 audio among what it decodes. The format reference also names Adobe Premiere Pro and DaVinci Resolve.\n\nA player needs support for the contained video and audio codecs, not just the filename ending.\n\n### MTS and MP4 compared\n\n- **Extensions**: .mts for AVCHD transport stream; .mp4 for MPEG-4 Part 14.\n- **Container**: MTS is an MPEG transport stream with 192-byte packets. MP4 is defined in ISO/IEC 14496-14 and holds video, audio, subtitles and metadata.\n- **Video**: MTS carries H.264 here. MP4 usually does too, and also takes H.265 and AV1.\n- **Audio**: MTS uses Dolby Digital or PCM. MP4 usually carries AAC.\n- **Reach**: MP4 with H.264 and AAC plays on nearly every device. For MTS, a player needs the right codecs.\n\nHere, WebAssembly FFmpeg decodes the clip and writes fresh H.264 video (libx264, preset ultrafast, CRF 32) plus 96 kbps AAC sound into an MP4 whose index sits at the front. Footage bigger than 1920 pixels is scaled to fit, dimensions are forced even, and anything above 30 fps is thinned down to 30 by dropping frames. Frames flagged interlaced are deinterlaced. The file picker accepts .mts files, and the MP4 is named after your clip.\n\nThe settings favor speed in a browser over archival quality. For a master copy, keep the MTS or edit it directly in a video editor.\n\nInterlaced source material may need deinterlacing for progressive displays, which is why that filter is part of the conversion. Before you convert, copy the clips off the card and keep the full folder. Archived camera material is best stored with the card's folders as they were. After converting, play the MP4 once from start to end to confirm the picture and the sound, and only then delete anything from the card or your drive.\n\n### Other ways to convert MTS to MP4\n\n- **FFmpeg (Windows, Mac, Linux):** type `ffmpeg -i recording.mts -c:v libx264 -c:a aac recording.mp4`. This re-encodes picture and sound.\n- **HandBrake (Windows, Mac, Linux):** click Open Source and select the clip, then choose the Fast 1080p30 preset, which writes MP4. Enter a name under Save As and press Start. HandBrake lists MTS among the files it can open, though AVCHD playlists are not fully supported.\n- **GStreamer (command line):** use `gst-launch-1.0 -e mp4mux name=container ! filesink location=recording.mp4 filesrc location=recording.mts ! decodebin ! queue ! videoconvert ! x264enc ! h264parse ! container.video_0`, which writes video only.\n\n### Problems with MTS files\n\n- **The clip plays with no picture or no sound**: the player lacks the H.264 or Dolby Digital decoder. Try VLC, or convert the clip here.\n- **Moving edges show combing**: the footage is interlaced and the player isn't deinterlacing. The page deinterlaces frames flagged interlaced.\n- **The converted file is softer than the camera original**: it is a second lossy encode at a modest setting. Edit the MTS directly if quality matters.\n- **An editor won't import copied clips**: an editor that imports camera media wants the card's layout, so copy the whole AVCHD folder instead of single files.\n- **The frame size changed by a pixel**: an odd dimension gives up one pixel, since the encoder needs even sides. A standard 1920 x 1080 clip is unaffected.\n- **Only one clip converted**: each MTS becomes its own MP4, and clips are never joined.\n- **The MP4 won't play**: an interrupted write can leave an MP4 unfinished and unplayable. Convert the clip again and let it finish.\n"
+    }
+  },
+  "heif-to-png": {
+    "seo": {
+      "title": "Convert HEIF to PNG Online (Free)",
+      "h1": "HEIF to PNG Converter",
+      "description": "Turn a HEIF or HEIC photo into a PNG in your browser. You get the primary image at 8 bits per channel, without EXIF. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a HEIF or HEIC photo into an 8-bit PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a HEIF photo to PNG?",
+        "answer": "Choose the HEIF file above and save the PNG it produces. The decoding, done by libheif, runs in your browser, so no upload happens and the source file stays untouched."
+      },
+      {
+        "question": "What is the difference between HEIF and HEIC?",
+        "answer": "HEIF is the container, standardized as ISO/IEC 23008-12, and HEIC is one of its variants. The page decodes both."
+      },
+      {
+        "question": "Does PNG lose quality compared with the HEIF?",
+        "answer": "PNG compression is lossless, so writing the PNG adds no loss of its own. The page does reduce the picture to 8 bits per channel, and any loss that happened when the HEIF was made does not come back."
+      },
+      {
+        "question": "My file holds several images. Which one do I get?",
+        "answer": "The primary image. A HEIF that holds several images still gives a single PNG, not one per image."
+      },
+      {
+        "question": "Is the 10-bit color in my photo kept?",
+        "answer": "No. The pixels pass through 8 bits per channel, so extra color depth in the source, such as 10 bits, is lost in the PNG."
+      },
+      {
+        "question": "Does the PNG keep the EXIF location and date?",
+        "answer": "No. EXIF data and ICC color profiles are not carried over, so the PNG has no camera details or GPS position."
+      },
+      {
+        "question": "Why does it say \"No images in HEIF\"?",
+        "answer": "The decoder found no image in the file, so there was nothing to convert. Try opening the file in another app to see whether it holds a picture."
+      },
+      {
+        "question": "Why can't Windows open my HEIF?",
+        "answer": "Opening a HEIF takes support for the container and also for the codec inside it, and Windows Photos manages that only once the HEIF extension is installed. A PNG avoids both requirements."
+      },
+      {
+        "question": "What is the PNG file called?",
+        "answer": "It is named after your photo with a .png ending. The HEIF file you chose stays exactly as it was."
+      },
+      {
+        "question": "Can a batch of HEIF photos be converted?",
+        "answer": "Yes. Select a group of photos and the page converts them in sequence, downloading one PNG per photo with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIF and PNG",
+      "fromFormat": {
+        "name": "HEIF",
+        "fullName": "High Efficiency Image File Format",
+        "description": "A container format standardized by MPEG as ISO/IEC 23008-12 for single images and image sequences, most often compressed with HEVC. HEIC and AVIF files are HEIF variants.",
+        "details": [
+          "Multiple images per file",
+          "Supports alpha and depth maps",
+          "HEVC or other codecs",
+          "Smaller files than JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIF to PNG",
+      "points": [
+        "Only the primary image is converted; a file with several images gives one PNG.",
+        "The PNG holds 8 bits per channel, so deeper color in the source is reduced.",
+        "EXIF data and ICC color profiles are not copied.",
+        "PNG compression is lossless, but the decode to 8-bit pixels is not reversible.",
+        "A file with no image fails with No images in HEIF."
+      ]
+    },
+    "guide": {
+      "title": "About HEIF and PNG",
+      "markdown": "### What is a HEIF file?\n\nMPEG standardized HEIF, the High Efficiency Image File Format, as ISO/IEC 23008-12. It covers single pictures, picture collections and timed image sequences. It organizes images inside the ISO Base Media File Format, and it can associate metadata and derived images with the stored pictures. HEVC is one of the coding formats it supports, but the container is not the H.265 codec.\n\nHEIC and AVIF are HEIF variants. Phones are where most people meet HEIF: Apple devices gained support for HEIF photos with iOS 11 and macOS High Sierra. HEIF files can be smaller than a JPEG of the same picture. The media type for stills is image/heif; sequences are image/heif-sequence.\n\n### Programs that open HEIF files\n\n- **Linux, Mac and Windows:** GIMP gained HEIF load and export support in release 2.10.2.\n- **Windows and Linux:** XnView MP counts HEIF among the formats it supports; private and educational users pay nothing for it.\n- **Windows:** the Photos app opens HEIF after the HEIF extension has been added.\n- **Mac:** Preview, where Apple documents exporting HEIF as JPEG. HEIF support began with High Sierra.\n- **Mobile:** Apple Photos, since iOS 11 introduced HEIF photos from supported devices, and Adobe Lightroom for mobile, which documents HEIF and .heic support.\n\n### HEIF and PNG compared\n\n- **Extensions and media types**: .heif and .heic with image/heif; .png and image/png.\n- **Compression**: HEIF is usually lossy, most often through HEVC. PNG is lossless.\n- **Several images**: HEIF can hold many, plus depth maps. PNG holds one.\n- **Transparency**: HEIF supports alpha. PNG has an alpha channel.\n- **Color depth**: PNG allows 8-bit and 16-bit channels. This page writes 8-bit.\n- **Metadata**: HEIF can carry metadata with its images. The PNG here carries none.\n- **Reach**: PNG is supported by every browser. HEIF needs support for the container and the codec.\n\nThe page decodes the primary image with libheif in your browser and writes it as a PNG at 8 bits per channel. The decode drops EXIF and ICC profile data. This page imposes no size cap, so a large photo simply takes whatever time your device needs.\n\nPNG, Portable Network Graphics, was developed in the mid-1990s as a patent-free replacement for GIF. It is standardized as ISO/IEC 15948 and as a W3C Recommendation, and typical uses are screenshots, interface graphics, logos, pictures with transparency and web graphics that have to stay crisp. HEIF, by contrast, is used for photographs from modern phones and for image sequences and bursts.\n\nChoose PNG when you need a lossless file for editing or for a program that does not read HEIF. Open the PNG in GIMP, ImageMagick, Preview on macOS, Windows Photos or any web browser. GIMP's PNG export has a compression-level setting, and lowering it never costs pixel fidelity, since PNG compression is lossless.\n\n### Other ways to convert HEIF to PNG\n\n- **libheif's heif-dec (command line):** run `heif-dec photo.heif photo.png`. The output format comes from the file ending, and a file with several images is written as numbered files.\n- **GIMP (Windows, Mac, Linux):** choose File > Open and pick the HEIF, then File > Export As, type photo.png as the name and click Export. GIMP 2.10.2 or later is required for HEIF.\n- **ImageMagick (command line):** run `magick photo.heic photo.png`. ImageMagick lists HEIC as readable when its libheif delegate library is present.\n\n### Problems with HEIF files\n\n- **A program can't open the photo**: Windows Photos needs the HEIF extension installed first, and a PNG from this page sidesteps that.\n- **Only one picture came out**: a HEIF may hold a group of related pictures or a sequence, while this page converts only the primary image.\n- **Deeper color is gone**: the PNG holds 8 bits per channel, so 10-bit color in the HEIF is reduced.\n- **The camera details are missing**: the PNG carries no EXIF record and no ICC profile.\n- **You need the camera data in the PNG**: this page drops it. GIMP's PNG export treats camera tags and profiles as optional, and you switch on its metadata controls when you need them. Its layer-offset option is best avoided, since offsets may differ between GIMP and other applications.\n- **\"No images in HEIF\" appears**: the file held no picture the decoder could use. Look at it in another app.\n- **An older Apple system can't show it**: Apple notes that converting to JPEG improves compatibility there.\n"
+    }
+  }
+}

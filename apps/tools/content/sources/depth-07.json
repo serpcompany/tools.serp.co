@@ -1,0 +1,269 @@
+{
+  "tools": {
+    "mpeg-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg (desktop)",
+          "steps": "Run ffmpeg -i input.mpeg -vn -c:a libmp3lame output.mp3.",
+          "limits": "The build needs libmp3lame (--enable-libmp3lame); its b option sets the bitrate.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Install the optional FFmpeg library, open the source, choose File > Export Audio and pick MP3 in the Format menu.",
+          "limits": "The FFmpeg library imports audio from most video files that are not DRM-protected.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "webm-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg (desktop)",
+          "steps": "Run ffmpeg -i input.webm -vn -c:a libmp3lame output.mp3.",
+          "limits": "The build needs libmp3lame (--enable-libmp3lame).",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Install the optional FFmpeg library, open the source, choose File > Export Audio and pick MP3 in the Format menu.",
+          "limits": "The FFmpeg library imports audio from most video files that are not DRM-protected.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "wma-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg (desktop)",
+          "steps": "Run ffmpeg -i input.wma -c:a libmp3lame output.mp3.",
+          "limits": "The build needs libmp3lame (--enable-libmp3lame).",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Install the optional FFmpeg library, open the WMA, choose File > Export Audio and pick MP3 in the Format menu.",
+          "limits": "Protected WMA files cannot be imported through the FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "gif-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the GIF, choose File > Export As, choose JPEG in the file-type list and click Export; the JPEG settings dialog follows.",
+          "limits": "The JPEG export has a default quality of 85 and stores no transparency or layers.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick 'input.gif[0]' output.jpg.",
+          "limits": "The [0] modifier picks the first frame; quotes keep the brackets from the shell.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        }
+      ]
+    },
+    "jpg-to-jpeg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG, choose File > Export As, choose JPEG in the file-type list and click Export; the JPEG settings dialog follows.",
+          "limits": "GIMP accepts .jpg, .JPG and .jpeg as the extension; the export is a new JPEG encode.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg output.jpeg.",
+          "limits": "This re-encodes the JPEG; it is not just a filename change.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        }
+      ]
+    },
+    "tiff-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the TIFF, choose File > Export As, choose JPEG in the file-type list and click Export; the JPEG settings dialog follows.",
+          "limits": "The JPEG export has a default quality of 85 and stores no transparency or layers.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the image, choose File > Export, select JPEG in Format, and save the new copy.",
+          "limits": "The Format menu in the export sheet lists JPEG.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick 'input.tiff[0]' output.jpg.",
+          "limits": "The [0] modifier picks the first image; quotes keep the brackets from the shell.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        }
+      ]
+    },
+    "tiff-to-pdf": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the TIFF; choose File > Export, set the format to PDF, and save.",
+          "limits": "The Format menu in the export sheet lists PDF.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.tiff output.pdf.",
+          "limits": "The formats page lists TIFF as readable and writable and PDF as readable and writable, requiring Ghostscript.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php",
+          "supportSource": "https://imagemagick.org/script/formats.php"
+        }
+      ]
+    },
+    "txt-to-pdf": {
+      "methods": [
+        {
+          "app": "TextEdit (Mac)",
+          "steps": "Open the TXT, then choose File > Export as PDF.",
+          "limits": "TextEdit's page layout differs from this page's fixed grid.",
+          "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+        },
+        {
+          "app": "Adobe Acrobat",
+          "steps": "Choose File > Create > PDF from File, change the file-type filter in the Open dialog to show TXT files, select the file, click Open, and save the PDF.",
+          "limits": "Layout follows Acrobat's settings.",
+          "source": "https://www.adobe.com/acrobat/hub/how-to-convert-notepad-to-pdf.html"
+        }
+      ]
+    },
+    "pdf-to-txt": {
+      "methods": [
+        {
+          "app": "pdftotext (Poppler)",
+          "steps": "Run pdftotext input.pdf output.txt; without the second name it writes the PDF's name with .txt.",
+          "limits": "Converts a PDF to plain text.",
+          "source": "https://man.archlinux.org/man/pdftotext.1"
+        },
+        {
+          "app": "PyMuPDF",
+          "steps": "Follow the 'Extract all Document Text' recipe: open the PDF, join page.get_text() for each page with a form feed, then write the encoded text bytes to a file.",
+          "limits": "The recipe warns that the extracted text may not be in reading order.",
+          "source": "https://pymupdf.readthedocs.io/en/latest/recipes-text.html"
+        },
+        {
+          "app": "Preview and TextEdit (Mac)",
+          "steps": "Choose Tools > Text Selection in Preview, select text, use Edit > Copy, then paste into TextEdit and choose Format > Make Plain Text before saving.",
+          "limits": "Manual excerpt extraction, not an export of all pages.",
+          "source": "https://support.apple.com/guide/preview/select-and-copy-text-in-a-pdf-prvw1020/mac"
+        }
+      ]
+    },
+    "png-to-dds": {
+      "methods": [
+        {
+          "app": "DirectXTex texconv (Windows)",
+          "steps": "Run texconv -ft dds -f BC3_UNORM input.png; add -m 1 if only one mip level is required.",
+          "limits": "The format must match the target renderer. Mip generation defaults to all levels.",
+          "source": "https://github.com/microsoft/DirectXTex/wiki/Texconv"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the PNG, choose File > Export As, choose DDS in the file-type list and click Export; the DDS settings dialog follows.",
+          "limits": "The DDS plug-in has been part of GIMP since 2.10.10.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://www.gimp.org/release-notes/gimp-2.10.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.png output.dds.",
+          "limits": "The formats page lists DDS as readable and writable, with compression defines such as dxt1 and dxt5, and mipmaps.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php",
+          "supportSource": "https://imagemagick.org/script/formats.php"
+        }
+      ]
+    }
+  },
+  "fallbackFormatFacts": {
+    "mpeg": [
+      {
+        "fact": "MPEG-1 describes compressed moving images that may have accompanying audio and originated for digital storage media.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000035.shtml"
+      }
+    ],
+    "webm": [
+      {
+        "fact": "WebM is based on Matroska and documents VP8/VP9 video with Vorbis/Opus audio.",
+        "source": "https://www.webmproject.org/about/faq/"
+      }
+    ],
+    "wma": [
+      {
+        "fact": "Microsoft’s WMA family includes standard, Professional, Lossless and Voice variants.",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs"
+      }
+    ],
+    "dds": [
+      {
+        "fact": "DDS supports compressed and uncompressed textures, mipmaps, cube maps, volume maps and arrays.",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+      }
+    ],
+    "png": [
+      {
+        "fact": "PNG is a lossless raster format with indexed, grayscale and truecolor modes, optional alpha, and animation support in its current specification.",
+        "source": "https://www.w3.org/TR/png-3/"
+      }
+    ],
+    "gif": [
+      {
+        "fact": "GIF uses color tables and timed image sequences; its transparency flag refers to a palette entry.",
+        "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+      }
+    ],
+    "jpg": [
+      {
+        "fact": "JPEG standards came from a committee process begun in 1986; the familiar coding mode is lossy DCT.",
+        "source": "https://jpeg.org/jpeg/"
+      },
+      {
+        "fact": ".jpg and .jpeg name JPEG; JPEG does not store layers or alpha.",
+        "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+      }
+    ],
+    "jpeg": [
+      {
+        "sameAs": "jpg"
+      }
+    ],
+    "tiff": [
+      {
+        "fact": "TIFF is a tagged raster format developed by Aldus and Microsoft; its specification is associated with Adobe.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+      },
+      {
+        "fact": "GIMP supports high-precision TIFF import and export.",
+        "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+      }
+    ],
+    "pdf": [
+      {
+        "fact": "The format holds fixed pages with text, graphics and images; scan imagery is distinct from extractable text.",
+        "source": "https://www.adobe.com/acrobat/resources/document-files/pdf-to-txt.html"
+      }
+    ],
+    "txt": [
+      {
+        "fact": "Plain text has no rich text formatting, and TextEdit supports opening and converting it.",
+        "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+      }
+    ]
+  }
+}

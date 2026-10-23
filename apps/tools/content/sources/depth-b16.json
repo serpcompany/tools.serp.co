@@ -1,0 +1,211 @@
+{
+  "tools": {
+    "mp4-to-mts": {
+      "methods": [
+        {
+          "app": "FFmpeg, copying streams",
+          "steps": "ffmpeg -i event-delivery.mp4 -c copy event-transport.mts",
+          "limits": "Stream copy does not re-encode; read the log for streams that were dropped.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg, encoding the video again",
+          "steps": "ffmpeg -i editor-source.mp4 -c:v libx264 -c:a copy editor-transport.mts",
+          "limits": "Encodes the video with libx264 and copies the audio; needs that encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add File(s); set Save to Folder; choose MTS in Output Format; optionally Encoder Options; Convert.",
+          "limits": "Windows application.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSource": "https://www.nchsoftware.com/prism/index.html"
+        }
+      ]
+    },
+    "pcd-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick family-scan.pcd family-view.jpg",
+          "limits": "Command-line tool.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "IrfanView",
+          "steps": "Open the PCD; File > Save as; choose JPG as the output format, set the name and folder, and save. Install the Photo-CD plug-in for high-resolution decoding.",
+          "limits": "Windows.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportSource": "https://www.irfanview.com/plugins.htm"
+        },
+        {
+          "app": "hpcdtoppm and Netpbm",
+          "steps": "hpcdtoppm archive-image.pcd -ppm -5 archive-image.ppm; pnmtojpeg -quality=90 archive-image.ppm > archive-image.jpg",
+          "limits": "-5 extracts the 16Base size; hpcdtoppm is distributed separately and may not be sold or used in profit-making activity.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html",
+          "supportSource": "https://netpbm.sourceforge.net/doc/pnmtojpeg.html"
+        }
+      ]
+    },
+    "psd-to-webp": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick campaign.psd campaign.webp",
+          "limits": "Command-line tool.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the PSD; File > Export As; export as WebP and review the WebP dialog (Lossless, Image quality, Alpha quality, Save animation, metadata).",
+          "limits": "Leave Save animation off for a single picture.",
+          "source": "https://docs.gimp.org/3.0/en/file-webp-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        }
+      ]
+    },
+    "raf-to-jpeg": {
+      "methods": [
+        {
+          "app": "RawTherapee",
+          "steps": "Click the hard disk icon at the bottom left of the Editor preview; set the name, location and format in the dialog; Save immediately or put the file in the processing queue.",
+          "limits": "Camera support depends on the program.",
+          "source": "https://rawpedia.pixls.us/saving_images/"
+        },
+        {
+          "app": "darktable",
+          "steps": "Export module: target file on disk, choose the file format, set the quality and size; press Export.",
+          "limits": "Camera support comes from darktable's RawSpeed library.",
+          "source": "https://docs.darktable.org/usermanual/4.6/en/module-reference/utility-modules/shared/export/",
+          "supportSource": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick mountain-capture.raf mountain-delivery.jpeg",
+          "limits": "Command-line tool.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "tif-to-tiff": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick contract-scan.tif contract-page.tiff",
+          "limits": "Command-line tool.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the TIF; File > Export As; in the TIFF dialog review Compression, Save layers and the metadata options.",
+          "limits": "Save layers stores each layer as a separate TIFF page.",
+          "source": "https://docs.gimp.org/3.0/en/file-tiff-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "Preview",
+          "steps": "Open the file; File > Export; choose TIFF in the Format pop-up menu; Save.",
+          "limits": "Mac only.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        }
+      ]
+    },
+    "tif-to-webp": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the TIF; File > Export As; export as WebP and review the dialog (Lossless, Image quality, Alpha quality, Save animation, metadata).",
+          "limits": "Leave Save animation off for a single picture.",
+          "source": "https://docs.gimp.org/3.0/en/file-webp-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick brochure-master.tif brochure-cover.webp",
+          "limits": "Command-line tool.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "ts-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i broadcast-segment.ts -c copy broadcast-segment.mkv",
+          "limits": "Copies the streams; no re-encode.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "HandBrakeCLI",
+          "steps": "HandBrakeCLI -i recorder-input.ts -o recorder-output.mkv -f av_mkv -e x264",
+          "limits": "Encodes the video with x264 into Matroska.",
+          "source": "https://handbrake.fr/docs/en/latest/cli/command-line-reference.html",
+          "supportSource": "https://handbrake.fr/docs/en/1.2.0/technical/source-formats.html"
+        },
+        {
+          "app": "MKVToolNix mkvmerge",
+          "steps": "mkvmerge -o channel-archive.mkv channel-capture.ts",
+          "limits": "Reads MPEG transport streams.",
+          "source": "https://mkvtoolnix.download/doc/mkvmerge.html"
+        }
+      ]
+    },
+    "vob-to-mpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i feature-part.vob -c:v mpeg2video -b:a 128k -q:v 4 -c:a mp2 feature-review.mpeg",
+          "limits": "Encodes MPEG-2 video and MP2 audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add File(s); set Save to Folder; choose MPG in Output Format; optionally Encoder Options; Convert.",
+          "limits": "Windows application; writes MPG.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSource": "https://www.nchsoftware.com/prism/index.html"
+        }
+      ]
+    },
+    "vob-to-mpg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i dvd-extract.vob -q:v 5 -c:a mp2 -c:v mpeg2video dvd-extract.mpg",
+          "limits": "Encodes MPEG-2 video and MP2 audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add File(s); set Save to Folder; choose MPG in Output Format; optionally Encoder Options; Convert.",
+          "limits": "Windows application.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSource": "https://www.nchsoftware.com/prism/index.html"
+        }
+      ]
+    },
+    "webp-to-psd": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick site-banner.webp site-banner.psd",
+          "limits": "Command-line tool.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Photopea",
+          "steps": "File > Open to load the WebP; File > Save as PSD.",
+          "limits": "Runs in the browser.",
+          "source": "https://www.photopea.com/learn/opening-saving",
+          "supportSource": "https://www.photopea.com/"
+        }
+      ]
+    }
+  }
+}

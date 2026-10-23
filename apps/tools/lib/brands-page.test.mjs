@@ -22,7 +22,9 @@ test("brands route exists and is backed by network brands data", () => {
   assert.notEqual(brandsPageSource, "");
   assert.match(brandsPageSource, /getNetworkBrands/);
   assert.equal(Object.keys(networkBrands.brands).length, 46);
-  assert.equal(networkBrands.brandGroups.mainGroup.length, 38);
+  // serp.video is parked (no HTTPS), so it is out of the main group (#323).
+  assert.equal(networkBrands.brandGroups.mainGroup.length, 37);
+  assert.ok(!networkBrands.brandGroups.mainGroup.includes("serp-video"));
   assert.equal(networkBrands.brandGroups.serpxxxGroup.length, 14);
   assert.equal(
     networkBrands.brands["thisvidvideodownloader-com"].url,

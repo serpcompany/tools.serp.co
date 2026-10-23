@@ -1,0 +1,256 @@
+{
+  "tools": {
+    "txt-to-svg": {
+      "methods": [
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Click the page, choose Insert > File, select the TXT and click Insert, then click OK in the Insert Text dialog. Choose File > Export, select SVG as the file type and save.",
+          "limits": "SVG shows no options dialog on export.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/sdraw/guide/text_enter.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/00/00000200.html"
+          ]
+        },
+        {
+          "app": "ImageMagick and Inkscape",
+          "steps": "magick -size 800x -pointsize 16 caption:@note.txt note.png; in Inkscape use File > Import, choose embed, then save SVG.",
+          "limits": "Bitmap lettering, not text.",
+          "source": "https://usage.imagemagick.org/text/",
+          "supportSources": [
+            "https://inkscape-manuals.readthedocs.io/en/latest/import-pictures.html",
+            "https://inkscape-manuals.readthedocs.io/en/latest/saving.html"
+          ]
+        }
+      ]
+    },
+    "vob-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg H.264 delivery",
+          "steps": "ffmpeg -i scene.vob -c:a aac -b:a 192k -c:v libx264 -crf 21 scene.mov",
+          "limits": "Re-encodes the video and audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "FFmpeg compatible remux",
+          "steps": "ffmpeg -i scene.vob -c copy scene-copy.mov",
+          "limits": "Stream copy passes packets through without decoding or encoding.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "FFmpeg ProRes intermediate",
+          "steps": "ffmpeg -i scene.vob -c:v prores_ks scene-edit.mov",
+          "limits": "Encodes the video as ProRes.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "wav-to-opus": {
+      "methods": [
+        {
+          "app": "opus-tools opusenc",
+          "steps": "opusenc --bitrate 128 take.wav take.opus",
+          "limits": "Reads Wave input and writes an Ogg Opus stream; the bitrate is in kbit/s.",
+          "source": "https://www.opus-codec.org/docs/opus-tools/opusenc.html"
+        },
+        {
+          "app": "FFmpeg libopus",
+          "steps": "ffmpeg -i take.wav -c:a libopus -b:a 128k take.opus",
+          "limits": "The libopus encoder is a wrapper that requires --enable-libopus.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "Choose File > Import > Audio and select the WAV. Then choose File > Export Audio, pick Opus as the format, name the file and export.",
+          "limits": "Opus is one of the export formats Audacity lists.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html"
+          ]
+        }
+      ]
+    },
+    "wma-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg AAC encode",
+          "steps": "ffmpeg -i library.wma -vn -c:a aac -b:a 192k listening.m4a",
+          "limits": "A new lossy encode.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "Audacity M4A export",
+          "steps": "Install the optional FFmpeg library, open the WMA, then choose File > Export Audio and pick M4A(AAC) Files FFmpeg as the format.",
+          "limits": "The manual warns that the AAC bitrate setting is not always honored.",
+          "source": "https://manual.audacityteam.org/man/aac_export_options.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html",
+            "https://manual.audacityteam.org/man/aac_export_options.html"
+          ]
+        }
+      ]
+    },
+    "wpg-to-jpg": {
+      "methods": [
+        {
+          "app": "CorelDRAW",
+          "steps": "Choose File > Import, select the WPG file type, click Import and click the page to place it. Then choose File > Export, pick JPG in the Save as type list and click Export.",
+          "limits": "Corel lists limitations for WPG import.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html",
+          "supportSources": [
+            "https://product.corel.com/help/CorelDRAW/540111130/Main/EN/Documentation/CorelDRAW-Exporting-files.html"
+          ]
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Open the WPG, then choose File > Export and pick JPEG.",
+          "limits": "Draw lists WPG among the graphics formats it opens and JPEG among the formats it exports.",
+          "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/00/00000200.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick illustration.wpg illustration.jpg",
+          "limits": "ImageMagick lists WPG as a format it reads.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "xcf-to-svg": {
+      "methods": [
+        {
+          "app": "GIMP path export",
+          "steps": "Open the XCF in GIMP, choose Windows > Dockable Dialogs > Paths, right-click the path and pick Export Paths, then save the file.",
+          "limits": "GIMP saves the path in SVG format.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-path-dialog.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "GIMP and Inkscape bitmap wrapper",
+          "steps": "In GIMP choose File > Export As and export a PNG. In Inkscape choose File > Import, pick the PNG, choose embed, and save as SVG.",
+          "limits": "Keeps pixels instead of vector shapes.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-png-export.html",
+            "https://inkscape-manuals.readthedocs.io/en/latest/import-pictures.html",
+            "https://inkscape-manuals.readthedocs.io/en/latest/saving.html"
+          ]
+        },
+        {
+          "app": "GIMP and Inkscape tracing",
+          "steps": "Export the picture as PNG in GIMP and import it into Inkscape. Select it with the Selector tool, choose Path > Trace Bitmap, set the options, click Update and then Ok.",
+          "limits": "The trace is not an exact copy of the picture.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSources": [
+            "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html",
+            "https://inkscape-manuals.readthedocs.io/en/latest/saving.html"
+          ]
+        }
+      ]
+    },
+    "aac-to-flac": {
+      "methods": [
+        {
+          "app": "FFmpeg FLAC",
+          "steps": "ffmpeg -i speech.aac -vn -c:a flac speech-decoded.flac",
+          "limits": "Leaves out video streams; the encoder is FLAC.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Choose Media > Convert/Save, add the AAC, click Convert, pick the Audio - FLAC profile, set a .flac destination and click Start.",
+          "limits": "The profile list includes Audio - FLAC.",
+          "source": "https://vlc-user-documentation.readthedocs.io/en/latest/tipsandtricks/",
+          "supportSources": [
+            "https://raw.githubusercontent.com/videolan/vlc/3.0.x/modules/gui/qt/components/sout/profiles.hpp",
+            "https://www.videolan.org/vlc/features.html"
+          ]
+        }
+      ]
+    },
+    "ai-to-tiff": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick -density 300 artwork.ai artwork.tiff",
+          "limits": "-density sets the resolution used when a vector format is rendered.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-options/"
+          ]
+        }
+      ]
+    },
+    "aiff-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg AAC",
+          "steps": "ffmpeg -i master.aiff -c:a aac -b:a 192k listening-from-aiff.m4a",
+          "limits": "Requests AAC rather than ALAC; AAC is lossy.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "Audacity M4A AAC",
+          "steps": "Open the AIFF, choose File > Export Audio, select M4A (AAC) Files (FFmpeg) and export.",
+          "limits": "The optional FFmpeg library is needed.",
+          "source": "https://manual.audacityteam.org/man/aac_export_options.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        }
+      ]
+    },
+    "avi-to-m4v": {
+      "methods": [
+        {
+          "app": "FFmpeg explicit MP4 encoding",
+          "steps": "ffmpeg -i archive.avi -c:v libx264 -crf 19 -c:a aac -f mp4 delivery.m4v",
+          "limits": "A new encode; the player must decode H.264 and AAC.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "ffmpeg -i archive.avi -c copy -f mp4 copied.m4v",
+          "limits": "Streams are left unchanged rather than re-encoded.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    }
+  }
+}

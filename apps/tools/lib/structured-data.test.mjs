@@ -15,9 +15,12 @@ import {
 import { dynamicRouteHandler, scanPageHandlers } from "../scripts/lib/tool-sweep.mjs";
 import { activeTools, allTools } from "./catalog/catalog.ts";
 import {
+  breadcrumbListStructuredData,
   serializeJsonLd,
   structuredDataOrigin,
   toolStructuredData,
+  videoListStructuredData,
+  videoObjectStructuredData,
 } from "./structured-data.ts";
 
 // lib/metadata.ts imports by the "@/" alias (tsconfig paths), which Node
@@ -34,7 +37,9 @@ registerHooks({
   },
 });
 const { buildToolMetadata } = await import("./metadata.ts");
-const { buildTableConvertMetadata } = await import("./table-convert.ts");
+const { VIDEOS_TITLE, buildWatchMetadata, findWatchVideo, watchBreadcrumbs, watchVideos } = await import(
+  "./videos.ts"
+);
 
 const ORIGIN = "https://tools.serp.co";
 
@@ -87,7 +92,7 @@ const typesIn = (value, types = new Set()) => {
 // here, so the module graph stands in for it.
 
 const realPath = (...segments) => realpathSync(path.join(appDir, ...segments));
-const structuredDataFile = realPath("components", "StructuredData.tsx");
+const jsonLdFile = realPath("components", "JsonLd.tsx");
 const toolRoutePage = realPath("app", "(convert)", "[tool]", "page.tsx");
 
 // Every page under app/ by the path it serves: route groups such as
@@ -137,13 +142,13 @@ function readRenderedComponents(file) {
   return components;
 }
 
-// How many JSON-LD scripts a module renders: each <StructuredData> element in
-// it and in the components it renders, all branches added up. A client module
-// renders none: StructuredData reads the registry, which must stay out of the
-// browser (catalog/client-boundary.test.mjs).
+// How many JSON-LD scripts a module renders: each <JsonLd> element in it and
+// in the components it renders (StructuredData renders one), all branches
+// added up. A client module renders none: StructuredData reads the registry,
+// which must stay out of the browser (catalog/client-boundary.test.mjs).
 const mountCounts = new Map();
 function mounts(file) {
-  if (file === structuredDataFile) return 1;
+  if (file === jsonLdFile) return 1;
   if (!mountCounts.has(file)) {
     mountCounts.set(file, 0); // a cycle adds nothing
     const count = isClientModule(parse(file))
@@ -199,20 +204,16 @@ function stringConstants(file) {
   return constants;
 }
 
-// A table converter's page: what it passes TableConvertLanding and
-// buildTableConvertMetadata. TableConvertLanding gives StructuredData the
-// Tool id `${from}-to-${to}`; null for a page that isn't one.
+// A table converter's page: the formats it passes TableConvertLanding, which
+// gives StructuredData the Tool id `${from}-to-${to}`, and the toolId its
+// generateMetadata reads (none on an uncatalogued page); null for a page that
+// isn't one.
 function tablePage(file) {
   if (!renderedComponents(file).some(({ name }) => name === "TableConvertLanding")) return null;
   const constants = stringConstants(file);
-  const page = {
-    from: constants.get("fromFormat"),
-    to: constants.get("toFormat"),
-    title: constants.get("title"),
-    slug: constants.get("slug"),
-  };
-  assert.ok(page.from && page.to && page.title && page.slug, `${file} declares its formats, title and slug`);
-  return { ...page, toolId: `${page.from}-to-${page.to}` };
+  const page = { from: constants.get("fromFormat"), to: constants.get("toFormat") };
+  assert.ok(page.from && page.to, `${file} declares its formats`);
+  return { ...page, toolId: `${page.from}-to-${page.to}`, metadataToolId: constants.get("toolId") };
 }
 
 test("a converter page is a free WebApplication at its canonical URL", () => {
@@ -244,9 +245,9 @@ test("a Lander and a compressor are at their routes", () => {
   assert.equal(parsed(byId("jpg-to-png")).applicationCategory, "UtilitiesApplication");
 });
 
-test("every live Tool page outside the table converters: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
-  const tools = liveTools().filter((tool) => !tablePage(pageModuleOf(tool)));
-  assert.ok(tools.length > 2400, `${tools.length} Tool pages`);
+test("every live Tool page: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
+  const tools = liveTools();
+  assert.ok(tools.length > 2500, `${tools.length} Tool pages`);
 
   for (const tool of tools) {
     const data = parsed(tool);
@@ -307,18 +308,19 @@ test("page text can't end the script tag or change how HTML parses it", () => {
   assert.equal(html.toLowerCase().indexOf("</script"), html.length - "</script>".length);
 });
 
-test("a table converter's url is the canonical its page's metadata writes", () => {
+test("a table converter's markup is for the Tool its page's metadata is for", () => {
   let pages = 0;
   for (const tool of liveTools()) {
     const page = tablePage(pageModuleOf(tool));
     if (!page) continue;
     pages += 1;
 
+    // TableConvertLanding's id, the id buildToolMetadata gets, and the route
+    // are one Tool, so the url (checked above) is this page's canonical.
     assert.equal(page.toolId, tool.id, `${routeOf(tool)} is the page of ${page.toolId}`);
-    const data = toolStructuredData({ toolId: page.toolId, name: page.title, description: "line" }, ORIGIN);
-    const canonical = buildTableConvertMetadata(page).alternates?.canonical;
-    assert.equal(typeof canonical, "string", `${tool.id} has a canonical`);
-    assert.equal(data?.url, new URL(canonical, ORIGIN).href, tool.id);
+    assert.equal(page.metadataToolId, tool.id, `${routeOf(tool)}'s generateMetadata`);
+    const data = toolStructuredData({ toolId: page.toolId, name: "H1", description: "line" }, ORIGIN);
+    assert.equal(data?.url, canonicalOf(tool), tool.id);
     assert.equal(data.applicationCategory, "UtilitiesApplication", tool.id);
   }
   // 86 TableConvertLanding pages; json-to-csv and html-to-markdown have their own.
@@ -399,7 +401,10 @@ test("the tool sweep files each page under its own component, never StructuredDa
   assert.deepEqual(misfiled, []);
 });
 
-test("pages that aren't a live Tool's render no JSON-LD", () => {
+// The pages with JSON-LD of their own, about videos, not a Tool (#376).
+const VIDEO_PAGES = ["/videos", "/watch/[tool]/[video]"];
+
+test("pages that aren't a live Tool's render no Tool JSON-LD; the video pages their one script", () => {
   const toolPages = new Set(liveTools().map((tool) => pageFiles.get(routeOf(tool))));
   let pages = 0;
   for (const [route, file] of pageFiles) {
@@ -408,17 +413,109 @@ test("pages that aren't a live Tool's render no JSON-LD", () => {
     // The uncatalogued table pages (#221) mount it, but no Tool has their id.
     const table = tablePage(file);
     if (table) {
+      assert.equal(table.metadataToolId, undefined, route);
       assert.equal(toolStructuredData({ toolId: table.toolId, name: "x", description: "y" }, ORIGIN), null, route);
     } else {
-      assert.equal(mounts(file), 0, route);
+      assert.equal(mounts(file), VIDEO_PAGES.includes(route) ? 1 : 0, route);
+      if (VIDEO_PAGES.includes(route)) {
+        assert.ok(!renderedComponents(file).some(({ name }) => name === "StructuredData"), route);
+      }
     }
   }
+  for (const route of VIDEO_PAGES) assert.ok(pageFiles.has(route), route);
   // The homepage, /categories/, the category pages, /brands/ and the others.
   assert.ok(pageFiles.has("/") && pages > 5, `${pages} other pages`);
 });
 
 test("the component renders one script tag, escaped", () => {
   const component = source("../components/StructuredData.tsx");
-  assert.equal(component.match(/application\/ld\+json/g)?.length, 1);
-  assert.match(component, /serializeJsonLd\(/);
+  assert.equal(component.match(/<JsonLd\b/g)?.length, 1);
+  const script = source("../components/JsonLd.tsx");
+  assert.equal(script.match(/application\/ld\+json/g)?.length, 1);
+  assert.match(script, /serializeJsonLd\(data\)/);
+});
+
+test("a watch page's VideoObject is its video at its canonical URL, played by its embed, with no contentUrl", () => {
+  const video = findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN);
+  const data = videoObjectStructuredData(video, ORIGIN);
+  assert.deepEqual(data, {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: "How to Convert WebP to PNG (Free Method)",
+    description:
+      "A WebP photo is dragged onto the WebP to PNG Converter and converted to PNG in the browser. The PNG downloads automatically and opens as the same picture.",
+    thumbnailUrl: ["https://i.ytimg.com/vi/FJkyr2TEUs0/maxresdefault.jpg"],
+    uploadDate: "2026-10-22T00:15:20-07:00",
+    duration: "PT27S",
+    embedUrl: "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0",
+    url: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/",
+    mainEntityOfPage: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/",
+    isFamilyFriendly: true,
+    requiresSubscription: false,
+    publisher: { "@type": "Organization", name: "SERP Tools", url: ORIGIN },
+    potentialAction: {
+      "@type": "WatchAction",
+      target: { "@type": "EntryPoint", urlTemplate: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/" },
+    },
+  });
+
+  for (const each of watchVideos(ORIGIN)) {
+    const object = videoObjectStructuredData(each, ORIGIN);
+    const metadata = buildWatchMetadata(each);
+    assert.equal(object.contentUrl, undefined);
+    assert.equal(object.name, metadata.title, "the name is the page's title and H1");
+    assert.equal(object.url, `${ORIGIN}${metadata.alternates.canonical}`, "the url is the canonical");
+    assert.notEqual(object.embedUrl, object.url, "the player is not the page");
+    assert.doesNotMatch(object.embedUrl, /youtube\.com\/watch/);
+    assert.match(object.uploadDate, /T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$/, "a timestamp with its time zone");
+  }
+});
+
+test("a watch page's BreadcrumbList is the trail it shows, at canonical URLs", () => {
+  const video = findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN);
+  const data = breadcrumbListStructuredData(watchBreadcrumbs(video), ORIGIN);
+  assert.deepEqual(data.itemListElement, [
+    { "@type": "ListItem", position: 1, name: "Home", item: ORIGIN },
+    { "@type": "ListItem", position: 2, name: "Videos", item: `${ORIGIN}/videos/` },
+    { "@type": "ListItem", position: 3, name: "WebP to PNG Converter", item: `${ORIGIN}/webp-to-png/` },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "How to Convert WebP to PNG (Free Method)",
+      item: `${ORIGIN}/watch/webp-to-png/FJkyr2TEUs0/`,
+    },
+  ]);
+});
+
+test("the /videos/ ItemList lists each video at its watch page, in the page's order", () => {
+  const videos = watchVideos(ORIGIN);
+  const data = videoListStructuredData(VIDEOS_TITLE, videos);
+  assert.equal(data["@type"], "ItemList");
+  assert.equal(data.name, "How-to Videos");
+  assert.deepEqual(
+    data.itemListElement.map((item) => [item.position, item.url, item.item.name, item.item.embedUrl]),
+    videos.map((video, index) => [index + 1, video.watchUrl, video.title, video.embedUrl]),
+  );
+  for (const item of data.itemListElement) {
+    assert.equal(item.item.url, item.url);
+    assert.equal(item.item.contentUrl, undefined);
+  }
+});
+
+test("the watch page and the library mount their JSON-LD through JsonLd, and a converter page has no VideoObject", () => {
+  const watch = source("../app/watch/[tool]/[video]/page.tsx");
+  assert.equal(watch.match(/<JsonLd\b/g)?.length, 1);
+  assert.match(watch, /videoObjectStructuredData\(/);
+  // The trail the page shows is the one its BreadcrumbList describes.
+  assert.match(watch, /const crumbs = watchBreadcrumbs\(video\);/);
+  assert.match(watch, /<Breadcrumbs crumbs=\{crumbs\} \/>/);
+  assert.match(watch, /breadcrumbListStructuredData\(crumbs, siteOrigin\)/);
+  // The player is in the server HTML, playing the VideoObject's embedUrl.
+  assert.match(watch, /<iframe[^>]*\n\s*src=\{video\.embedUrl\}/);
+  const library = source("../app/videos/page.tsx");
+  assert.equal(library.match(/<JsonLd\b/g)?.length, 1);
+  assert.match(library, /videoListStructuredData\(/);
+  for (const template of ["../components/ToolPageTemplate.tsx", "../components/sections/ToolVideoSection.tsx"]) {
+    assert.doesNotMatch(source(template), /VideoObject|videoObjectStructuredData|JsonLd/, template);
+  }
 });

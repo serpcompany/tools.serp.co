@@ -6,15 +6,13 @@ import { Button } from "@serp-tools/ui/components/button";
 import { Badge } from "@serp-tools/ui/components/badge";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
-import { ToolVideoPanel } from "@/components/ToolVideoPanel";
 import { beginToolRun } from "@/lib/telemetry";
 
 type Props = {
   toolId?: string;
-  // The H1 and the line under it, which the page's structured data repeats.
-  title: string;
+  // The page's H1 and the line under it, which its structured data repeats.
+  heading: string;
   subtitle: string;
-  videoEmbedId?: string;
 };
 
 type FileEntry = {
@@ -127,7 +125,7 @@ function mergeCsvFiles(parsedFiles: ParsedCsv[]) {
   };
 }
 
-export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: Props) {
+export default function CsvCombiner({ toolId, heading, subtitle }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -136,7 +134,6 @@ export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: P
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [adsVisible, setAdsVisible] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(false);
 
   function onPick() {
     inputRef.current?.click();
@@ -146,7 +143,6 @@ export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: P
     if (!list || list.length === 0) return;
     const next = Array.from(list);
     if (!adsVisible) setAdsVisible(true);
-    if (!videoPlaying) setVideoPlaying(true);
     setSelectedFiles(next);
     setFiles(next.map((file) => ({ name: file.name, size: file.size })));
     setOutput("");
@@ -160,7 +156,6 @@ export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: P
       return;
     }
 
-    if (!videoPlaying) setVideoPlaying(true);
     if (selectedFiles.length < 2) {
       setError("Please add at least two CSV files.");
       return;
@@ -221,7 +216,7 @@ export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: P
       hero={
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold tracking-tight mb-4">{title}</h1>
+            <h1 className="text-4xl font-bold tracking-tight mb-4">{heading}</h1>
             <p className="mx-auto max-w-2xl text-lg text-gray-600">{subtitle}</p>
           </div>
 
@@ -371,20 +366,6 @@ export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: P
               )}
             </div>
           </Card>
-
-          {videoEmbedId && (
-            <div className="mt-10">
-              <div className="mb-4 text-center">
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-gray-500">
-                  Walkthrough
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-gray-900">
-                  Watch the CSV combiner in action
-                </h2>
-              </div>
-              <ToolVideoPanel embedId={videoEmbedId} autoplay={videoPlaying} />
-            </div>
-          )}
         </div>
       }
     />

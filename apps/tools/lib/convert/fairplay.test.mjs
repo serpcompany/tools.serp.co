@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
 import { convertWithWorker } from "./workerClient.ts";
+import { threadCpuMs } from "./test-cpu-time.mjs";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 const bytes = (name) => new Uint8Array(readFileSync(path.join(fixtures, name)));
@@ -96,9 +97,9 @@ test("a file cut short anywhere is read as far as it goes, without an error", ()
 
 test("a huge crafted sample entry is scanned quickly", () => {
   const { ftyp, moov } = mp4(box("mp4a", AUDIO_FIELDS, zeros(32 * 1024 * 1024)));
-  const started = performance.now();
+  const started = threadCpuMs();
   assert.equal(isCopyProtected(concat(ftyp, moov)), false);
-  const ms = performance.now() - started;
+  const ms = threadCpuMs() - started;
   assert.ok(ms < 2000, `took ${Math.round(ms)} ms`);
 });
 

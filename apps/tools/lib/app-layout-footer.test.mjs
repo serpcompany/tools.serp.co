@@ -39,6 +39,9 @@ test("site footer includes core SERP Tools navigation", () => {
   assert.match(siteFooterSource, /\/brands\//);
   assert.match(siteFooterSource, /https:\/\/apps\.serp\.co/);
   assert.match(siteFooterSource, /https:\/\/extensions\.serp\.co/);
+  // filetypes.serp.co has no DNS record; the file types live on wiki.serp.co (#323).
+  assert.match(siteFooterSource, /href: "https:\/\/wiki\.serp\.co\/file-types\/", label: "Filetypes"/);
+  assert.doesNotMatch(siteFooterSource, /filetypes\.serp\.co/);
   assert.match(siteFooterSource, /https:\/\/dr\.serp\.co\/sites\/tools\.serp\.co/);
   assert.match(siteFooterSource, /https:\/\/dr\.serp\.co\/badge\/tools\.serp\.co\?style=serp-dr-v3/);
   assert.match(siteFooterSource, /Verified DR 78 for tools\.serp\.co/);

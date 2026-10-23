@@ -1,0 +1,906 @@
+{
+  "ai-to-pdf": {
+    "seo": {
+      "title": "Convert AI to PDF Online (Free)",
+      "h1": "AI to PDF Converter",
+      "description": "Convert an Illustrator AI file to PDF. The PDF stored inside the AI is returned as it is, with nothing redrawn. Free, with no sign-up.",
+      "howToHeading": "How to convert AI to PDF"
+    },
+    "tool": {
+      "subtitle": "Get the PDF stored inside your Illustrator file, unchanged, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does converting AI to PDF turn my artwork into pixels?",
+        "answer": "No. The page renders nothing. It checks that your AI starts as a PDF and hands that same data back under a .pdf name."
+      },
+      {
+        "question": "What does the \"no PDF inside\" message mean?",
+        "answer": "The page found no PDF in your file. It refuses any AI that lacks the embedded PDF, and that includes older PostScript-based ones. Re-save it from Illustrator with the compatibility option enabled, then convert the new file."
+      },
+      {
+        "question": "Why is the PDF the same size as my AI?",
+        "answer": "Because it is the same data. A PDF-compatible AI already starts as a complete PDF, so the page returns it with a .pdf ending instead of making a new one."
+      },
+      {
+        "question": "Can I send a batch of AI files?",
+        "answer": "Yes. Choose several files and each becomes a separate PDF. Nothing is combined into one document."
+      },
+      {
+        "question": "How do I convert AI to PDF without Illustrator?",
+        "answer": "Use this page if the AI has a PDF inside. Inkscape and Affinity Designer can also open an AI and save a PDF from their File menus."
+      },
+      {
+        "question": "Is the PDF ready to send to a print shop?",
+        "answer": "This page adds nothing to the file and applies no print preset. If a printer asks for a particular kind of PDF, export it from Illustrator."
+      },
+      {
+        "question": "Why do my linked images show as missing?",
+        "answer": "Placed pictures are packed into the AI only when Include Linked Files is chosen at save time, and otherwise they are missing from the PDF as well. Save the AI again with that option on, then convert it."
+      },
+      {
+        "question": "Why can't my PDF program edit the artwork?",
+        "answer": "The PDF is a copy of the page stored beside the Illustrator data, so the native objects may be absent from it. Edit in Illustrator."
+      },
+      {
+        "question": "Does the page change or upload my AI file?",
+        "answer": "No. Your original stays as it is and you download a new copy. The check and the copy happen in your browser."
+      },
+      {
+        "question": "How can I tell whether my AI will convert?",
+        "answer": "Try it. A file without a PDF inside is refused with a message that says how to save it again, and nothing is uploaded. A file saved with that option enabled goes through."
+      }
+    ],
+    "aboutSection": {
+      "title": "AI and PDF",
+      "fromFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "The native file format of Adobe Illustrator. It stores vector artwork such as paths, shapes, text and effects, and modern files embed a PDF-compatible stream.",
+        "details": [
+          "vector artwork",
+          "layers and artboards",
+          "PDF-compatible content",
+          "proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "fixed page layout",
+          "embedded fonts",
+          "vector and raster content",
+          "optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AI to PDF",
+      "points": [
+        "You get the PDF stored inside the AI. Nothing is redrawn.",
+        "An AI saved without Create PDF Compatible File is refused, with a message that says how to save it again.",
+        "Several AI files each become their own PDF; they are not merged.",
+        "Your AI is not changed. You download a new copy.",
+        "This page applies no print preset. For a printer's PDF type, export from Illustrator."
+      ]
+    },
+    "guide": {
+      "title": "About AI files",
+      "markdown": "### What is an AI file?\n\nArtwork made in Adobe Illustrator is saved as AI. Vector objects and pixel images can share a document, and the editable effects, brushes, layers and transparency all remain in the file. Designers use AI source files for logos, illustrations and print layouts, which is where most people meet one: a logo or layout arrives from a designer, and the person receiving it does not own Illustrator.\n\nFiles from before 2000 were PostScript, and Illustrator 9 moved the format on. A file saved since can also include a PDF copy of the page next to Illustrator's own data, provided the PDF-compatible save option was switched on. That PDF copy is what other software reads. An AI saved without it may fail in third-party programs.\n\nThe .ai ending does not say whether the PDF is there. Two files called logo.ai can behave very differently: one opens in a print shop's software, and the other opens only in Illustrator. This page is built around that difference. It checks for the PDF and returns it, so whether a file converts here depends on how it was saved.\n\n### Programs that open AI files\n\n**Windows & Mac**\n\n- Adobe Illustrator: opens native artwork with editable Illustrator objects.\n\n**Windows, Mac & Linux**\n\n- ImageMagick: its format list names AI as Illustrator CS2 and reads it. The artwork is rendered rather than kept editable.\n\n**Linux**\n\n- Inkscape: imports Illustrator artwork from version 9.0 onward, according to its manual, though a few document features may not come across.\n\nSoftware that reads just the PDF part shows the page faithfully but without Illustrator's native objects. For editing, Illustrator remains the reference.\n\n### AI and PDF compared\n\n- **Extensions and media types**: .ai and .pdf. PDF's registered media type is application/pdf.\n- **Origin**: Adobe created PDF, and the goal was a file that shows or prints a document the same way anywhere. AI is Illustrator's working format.\n- **Content**: a PDF combines text, vector shapes and raster pictures, plus links, bookmarks and form fields. An AI combines vector objects with pixel images.\n- **Standards**: ISO adopted PDF 1.7 as 32000-1 in 2008. ISO 32000-2, from 2017, covers PDF 2.0. PDF/A (archiving) and PDF/X (printing) are narrower profiles.\n- **Editing**: only Illustrator keeps every object editable. Software working from the stored PDF may not offer them.\n\nFor this conversion the two overlap completely. When the AI has a PDF inside, the page returns that PDF as it is, under a .pdf name. Nothing is redrawn or resized.\n\nThe page cannot improve what Illustrator stored. If a linked picture was left outside the file, the PDF lacks it too, because a picture linked rather than embedded stays out of the PDF unless the AI file was saved with Include Linked Files. Check the result in a PDF viewer before you send it on.\n\n### Other ways to convert AI to PDF\n\n- **Inkscape:** open the AI, choose File > Save a Copy, and select Portable Document Format from the file type list. The dialog then offers text output options (embed fonts, convert text to paths, or omit text), a rasterize filter effects choice, and the output page size.\n- **Affinity Designer:** open the AI, go to File > Export, and choose PDF from the format row at the top of the dialog. Adjust the file settings, click Export, then enter a name and location. Affinity's file-format table marks AI as importable and notes that text will be rasterized on PDF export.\n\nBoth programs open the artwork and write a new PDF, unlike this page, which returns the stored one. Compare the new file with the original when the artwork uses features the program does not support.\n\n### Problems with AI files\n\n- **The page reports no PDF inside**: the AI has no PDF-compatible content, or it is an older PostScript file. In Illustrator, save it again as AI with Create PDF Compatible File turned on.\n- **Third-party software cannot open it**: an AI saved without its PDF-compatible representation may fail outside Illustrator. Ask the sender to save it again with the option on.\n- **Linked images are missing**: Illustrator only packs placed pictures into the AI when Include Linked Files is chosen, so save once more with it chosen.\n- **A program shows the artwork but will not edit it**: the stored PDF is a view of the page, and the native objects may be missing from it. Edit in Illustrator.\n- **An older Illustrator has trouble with the file**: Adobe advises opening artwork in the same or a newer version of Illustrator than the one that saved it.\n"
+    }
+  },
+  "ai-to-svg": {
+    "seo": {
+      "title": "Convert AI to SVG Online (Free)",
+      "h1": "AI to SVG Converter",
+      "description": "Convert an Illustrator AI file to SVG. Each page is drawn as a picture and placed inside an SVG, not turned into editable paths. Free, no sign-up.",
+      "howToHeading": "How to convert AI to SVG"
+    },
+    "tool": {
+      "subtitle": "Turn each page of an Illustrator file into an SVG that holds a picture of that page."
+    },
+    "faqs": [
+      {
+        "question": "Is the SVG a real vector drawing?",
+        "answer": "No. The page draws each page of the AI as a picture and puts that picture inside an SVG. Its paths and text are not editable shapes."
+      },
+      {
+        "question": "How do I get editable paths from an AI file?",
+        "answer": "Open the AI in Inkscape and save it as SVG, or import it into Affinity Designer and export SVG. Those programs can keep vector objects, which this page does not."
+      },
+      {
+        "question": "Will the SVG stay sharp when I enlarge it?",
+        "answer": "Only up to a point. The picture inside is drawn at up to twice the page size, so a big enlargement shows pixels. Export real vector SVG from a design program when you need unlimited scaling."
+      },
+      {
+        "question": "Why does the page say the AI has no PDF inside?",
+        "answer": "It draws from the PDF that Illustrator can save inside the AI, and yours has none. Older PostScript-based files lack it too. Saving the file again from Illustrator with the compatibility option enabled fixes that."
+      },
+      {
+        "question": "Why did I get more than one SVG?",
+        "answer": "Every page of the file becomes its own SVG, named with _page1, _page2 and so on. There is no page limit and no ZIP, so check the downloads for the page you need."
+      },
+      {
+        "question": "What color is the background?",
+        "answer": "White and opaque. Pages are drawn on white, so a logo with a see-through background gets a white one in the SVG."
+      },
+      {
+        "question": "How large is the SVG?",
+        "answer": "Its width and height match the picture it holds, which is the page at up to twice its size. A very large artboard is shrunk so the picture stays within about 16.8 megapixels."
+      },
+      {
+        "question": "Why is the SVG file big?",
+        "answer": "The picture is stored inside the SVG as text, so the file is larger than a PNG of the same page."
+      },
+      {
+        "question": "Can I select or edit the text in the SVG?",
+        "answer": "No. The words are part of the picture, so they cannot be selected, searched or copied. Keep the AI for that."
+      },
+      {
+        "question": "Can I choose several AI files at once?",
+        "answer": "Yes. Several AI files are taken one by one, each producing its own SVG or SVGs that start with the AI's name. Your originals are not changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "AI and SVG",
+      "fromFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "The native file format of Adobe Illustrator. It stores vector artwork such as paths, shapes, text and effects, and modern files embed a PDF-compatible stream.",
+        "details": [
+          "vector artwork",
+          "layers and artboards",
+          "PDF-compatible content",
+          "proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AI to SVG",
+      "points": [
+        "The SVG holds a picture of the page, not editable paths or text.",
+        "Each page of the file becomes its own SVG, named _page1, _page2 and so on.",
+        "Pages are drawn on an opaque white background at up to twice their size.",
+        "An AI without a PDF inside is refused with a message about saving it again.",
+        "For true vector SVG, open the AI in Inkscape or Affinity Designer instead."
+      ]
+    },
+    "guide": {
+      "title": "About AI files",
+      "markdown": "### What is an AI file?\n\nIllustrator's own format is AI. What an AI document stores is paths, shapes and text, and pixel images can sit alongside them. Illustrator keeps layers, brushes and transparency in it as editable parts, which makes AI the working file behind many logos, illustrations and packaging layouts.\n\nBefore 2000 the format was PostScript-based, and Illustrator 9 changed that. When Create PDF Compatible File was on at save time, a newer AI also holds a PDF of the page beside the Illustrator data, and other software can read that PDF.\n\nPeople search for AI to SVG when they want a design on a website, in a cutting machine or in a program other than Illustrator. SVG is the format those places accept. This page helps when you need an SVG that looks like the artwork. It does not help when you need to edit the shapes afterward, because the SVG it makes contains a picture of the page.\n\n### Programs that open AI files\n\n**Mac & Windows**\n\n- Adobe Illustrator: the program that wrote the format, with every object editable.\n\n**Linux, Mac & Windows**\n\n- ImageMagick: its formats page lists AI as Illustrator CS2. It draws the artwork and does not keep the objects.\n\n**Linux**\n\n- Inkscape: opens AI files made by Illustrator 9.0 or later, per its manual, though not every document feature survives.\n\nBrowsers display SVG but do not open AI files, so the SVG from this page works in them while the original does not. Use the SVG when the destination wants a web-friendly picture, and keep the AI as the source for any later change.\n\n### AI and SVG compared\n\n- **Extensions and media types**: .ai, and .svg with the type image/svg+xml.\n- **Structure**: SVG is XML text that describes shapes, paths and text. AI is Adobe's own format with layers and artboards.\n- **Scaling**: real SVG paths stay sharp at any size. An SVG that wraps a picture does not.\n- **Standard**: SVG is a W3C standard, written as XML text, and it can be styled with CSS and scripted. AI is proprietary to Adobe.\n- **Fonts**: SVG text depends on the viewer's fonts unless it is turned into outlines.\n- **Embedded pictures**: an SVG can embed pixel images, and they keep their own resolution when enlarged.\n\nThat last point describes what this page produces. It draws each page of the AI's PDF and embeds the picture in an SVG, so the result is a picture of each page and nothing stays an editable vector.\n\nThe scale matters too. Pages are drawn at up to twice their size, and a page is shrunk when that would pass about 16.8 megapixels. An Illustrator artboard can be thousands of points across, so a large one comes out smaller than twice its size. The background is opaque white.\n\n### Other ways to convert AI to SVG\n\n- **Inkscape:** open the AI and save the drawing with a .svg ending. Choose Plain SVG for sharing, or Inkscape SVG to keep Inkscape's own editing information.\n- **Affinity Designer:** open the AI, then File > Export with SVG as the type. Set the area and options, press Export, and name the file. Affinity's file-format table lists AI as importable.\n\nUnlike this page, both can keep paths and text as vector objects, so check fonts and effects in the result before you use it.\n\n### Problems with AI files\n\n- **You see the no-PDF message**: save the AI again from Illustrator with Create PDF Compatible File turned on.\n- **The font cannot be swapped**: the lettering is fixed inside the picture, whereas a true vector SVG uses installed fonts unless the text is outlined.\n- **Linked pictures are missing**: if Include Linked Files was off when the AI was saved, the placed pictures never made it into the file, so nothing here can draw them.\n- **The SVG pixelates when enlarged**: it contains a picture. Make a vector SVG in Inkscape or Affinity Designer.\n- **The SVG has a white box behind it**: pages are drawn on white, so transparency in the artwork is not kept.\n- **The SVG is large**: the picture is stored as text inside the file, so it outweighs a PNG of the same page.\n- **You cannot select the words**: they are baked into the picture. Keep the AI or a PDF for that.\n"
+    }
+  },
+  "apng-to-gif": {
+    "seo": {
+      "title": "Convert APNG to GIF Online (Free)",
+      "h1": "APNG to GIF Converter",
+      "description": "Convert an APNG to GIF in your browser. Only the first frame is kept, so you get a still GIF, not an animation. Free, with no sign-up.",
+      "howToHeading": "How to convert APNG to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn an animated PNG into a still GIF of its first frame, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the GIF be animated?",
+        "answer": "No. Only the first frame of the APNG is read, so you get one still GIF picture. To keep the motion, use apng2gif, FFmpeg or ImageMagick on your computer."
+      },
+      {
+        "question": "Why do I get only one frame?",
+        "answer": "The page decodes the file with your browser's own image decoder and takes the first frame it returns. Later frames, their timing and the loop count are not read."
+      },
+      {
+        "question": "How can I make an animated GIF from an APNG?",
+        "answer": "Run apng2gif on the file, or use ffmpeg -i input.apng output.gif. apng2gif carries over the delays and the loop count, and it has options for partial transparency."
+      },
+      {
+        "question": "What happens to the colors?",
+        "answer": "A GIF frame can use only 256 palette colors, so smooth gradients and photos can show banding. ImageMagick writes the GIF from the decoded pixels."
+      },
+      {
+        "question": "What happens to soft, semi-transparent edges?",
+        "answer": "GIF supports one transparent color and no partial opacity. An APNG can have soft alpha edges, and they cannot stay soft in a GIF."
+      },
+      {
+        "question": "How do I tell whether a PNG is animated?",
+        "answer": "Open it in Firefox or Chrome. If it moves, it is an APNG. Either extension is possible, and a viewer that ignores animation shows it as a still."
+      },
+      {
+        "question": "Is the metadata copied over?",
+        "answer": "No. The image goes through raw pixels on the way, which leaves behind EXIF, ICC profiles and XMP data."
+      },
+      {
+        "question": "Can I turn several APNGs into GIFs at once?",
+        "answer": "Yes. Pick several together and each returns as a separate GIF under its own APNG's name. There is no ZIP."
+      },
+      {
+        "question": "What does the Image decode failed message mean?",
+        "answer": "Your browser could not turn the file into pixels. Check that the file plays in a browser, or download it again."
+      },
+      {
+        "question": "Does my APNG leave my computer?",
+        "answer": "No. Decoding and GIF writing both happen in your browser, and the APNG on your disk is untouched."
+      }
+    ],
+    "aboutSection": {
+      "title": "APNG and GIF",
+      "fromFormat": {
+        "name": "APNG",
+        "fullName": "Animated Portable Network Graphics",
+        "description": "An extension of PNG, originally proposed by Mozilla, that stores multiple frames in one file. It keeps PNG's lossless compression and full alpha transparency.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "animation",
+          "backward compatible with PNG viewers"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting APNG to GIF",
+      "points": [
+        "Only the first frame is converted. The GIF is a still picture, not an animation.",
+        "A GIF frame holds at most 256 colors, so gradients can band.",
+        "GIF has no partial transparency, so soft alpha edges cannot stay soft.",
+        "EXIF, ICC profiles and XMP are not copied.",
+        "For an animated GIF, use apng2gif, FFmpeg or ImageMagick."
+      ]
+    },
+    "guide": {
+      "title": "About APNG files",
+      "markdown": "### What is an APNG file?\n\nAPNG stands for Animated Portable Network Graphics. Mozilla introduced it as an animated extension of PNG. Each frame is compressed without loss and can carry full color and an alpha channel. Animation control and frame control chunks tell a player how often to repeat, how long to show each frame and how to compose it. The W3C's third edition of the PNG specification, published in June 2025, includes animation.\n\nAn APNG can end in .apng or in .png, which is why people often do not know they have one. The PNG specification defines image/apng as its media type. People use the format for animated stickers and graphics, and for animations that need smooth transparency.\n\nA decoder that does not process animation can show the default PNG image instead. That keeps an APNG visible in a plain viewer, and it also means a file cannot be told apart from an ordinary PNG by its name alone.\n\n### Programs that open APNG files\n\n**Windows, Mac, Linux and Web**\n\n- Firefox: plays animated PNG. Mozilla lists support from Firefox 3.\n\n**Windows, Mac and Linux desktops**\n\n- XnView MP: lists APNG among the animated formats it opens.\n\n**Web**\n\n- Chrome: displays APNG in web content, with support listed from Chrome 59.\n\n**Mobile**\n\n- Safari: Mozilla lists support from Safari 8.\n- Mozilla's Firefox for Android: plays APNG in web pages.\n\n### APNG and GIF compared\n\n- **Extensions and media types**: .apng or .png with image/apng, against .gif with image/gif.\n- **Color**: APNG carries full color. Each GIF frame draws from a palette capped at 256 entries.\n- **Transparency**: APNG has a full alpha channel. GIF has a single transparent color with no partial opacity.\n- **Compression**: both are lossless, but GIF compresses its palette image with LZW. CompuServe introduced it in 1987.\n- **Animation**: both can animate, and GIF's animation is simple.\n\nOn this page the difference goes one step further. The browser decoder gives the page one frame, so the result is a still GIF of your first frame, with the colors reduced to a palette. The motion stays in the APNG.\n\nThe path is short. Your browser decodes the file into 8-bit RGBA pixels, the page hands those to ImageMagick, and ImageMagick writes the GIF. Nothing is uploaded. If your browser has no decoder for the file, the page says it cannot open it. What you download starts with your APNG's name and ends in .gif. The APNG itself stays as it was. Several APNGs chosen together each become a separate GIF.\n\n### Other ways to convert APNG to GIF\n\n- **apng2gif (command line):** run apng2gif.exe anim.png anim.gif on Windows, or use the installed program name elsewhere. It keeps the source delays and loop count, and the -t threshold and -b background options handle partial transparency.\n- **FFmpeg (command line):** run ffmpeg -i input.apng output.gif. It reads the frame sequence and writes an animated GIF.\n- **ImageMagick (command line):** run magick apng:input.apng output.gif. The apng: prefix names the input format, and ImageMagick's format list says that reading it needs FFmpeg installed.\n\nAll three aim at an animated GIF, unlike this page. Check the result, since a GIF palette may change colors that looked smooth in the APNG.\n\nIf a still is all you need, such as a preview image or a poster frame, this page does that job in one step and costs nothing. If you need the motion, one of the three tools above is the better choice.\n\n### Problems with APNG files\n\n- **It looks like a still image**: a viewer that does not process animation shows the default PNG image. Open the file in Firefox or Chrome to see the motion.\n- **The still does not match the first frame**: the default image is not required to belong to the animation, so a plain PNG viewer may show a different picture.\n- **Leftovers from earlier frames**: wrong blend or disposal handling can leave remnants of earlier frames in an animation. Try another viewer.\n- **The file is invalid**: wrong frame sequence numbers signal an invalid APNG stream, and a tool may refuse it.\n- **A decode error appears**: the page could not read the file. Download it again or export it again from the source.\n- **The page says the browser cannot open the file**: your browser has no decoder for it. Try a current Chrome, Edge, Firefox or Safari.\n"
+    }
+  },
+  "avi-to-mov": {
+    "seo": {
+      "title": "Convert AVI to MOV Online (Free)",
+      "h1": "AVI to MOV Converter",
+      "description": "Convert AVI video to MOV in your browser. The video is re-encoded as H.264 with AAC sound, at most 1920 px and 30 fps. Free, with no sign-up.",
+      "howToHeading": "How to convert AVI to MOV"
+    },
+    "tool": {
+      "subtitle": "Re-encode an AVI as an H.264 and AAC MOV, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Which codecs end up in the MOV?",
+        "answer": "H.264 video with AAC audio at 96 kbps. The AVI is re-encoded, not copied, so the MOV holds a new encoding of the same picture and sound."
+      },
+      {
+        "question": "Will the MOV look identical to the AVI?",
+        "answer": "No. The video is encoded again with H.264, a lossy codec, using the ultrafast preset at a constant-quality setting of 32. That favors speed over fine detail, so start from the cleanest source you have."
+      },
+      {
+        "question": "Will my 4K AVI keep its resolution?",
+        "answer": "No. Anything larger than 1920 px on the long side is reduced to fit, and an odd width or height loses 1 px so both come out even. Smaller frames are never scaled up."
+      },
+      {
+        "question": "What happens to fast clips, such as 60 fps?",
+        "answer": "Frames are dropped to reach 30 per second, and the clip keeps its length. Slower clips are not sped up or padded."
+      },
+      {
+        "question": "Is interlaced AVI footage cleaned up?",
+        "answer": "Frames flagged as interlaced are deinterlaced before encoding, which removes the combing along moving edges. Frames not flagged that way pass through untouched."
+      },
+      {
+        "question": "Why can't my editor open the AVI?",
+        "answer": "AVI only wraps the streams, so an editor may accept the file and still be missing the decoder for them. The MOV from this page holds H.264 and AAC, which MOV can carry."
+      },
+      {
+        "question": "Does my AVI leave my computer?",
+        "answer": "No. The page carries FFmpeg compiled to WebAssembly, so the footage never leaves your device. A long clip simply takes as long as your computer needs."
+      },
+      {
+        "question": "What is the exit code in the FFmpeg failure message?",
+        "answer": "FFmpeg stopped with an error while reading or writing. A damaged or cut-short AVI usually still converts and gives a shorter MOV, so check that the file plays in a desktop player."
+      },
+      {
+        "question": "Is the MOV just the AVI with a new extension?",
+        "answer": "No. Renaming .avi to .mov does not transcode anything. This page writes a QuickTime container with newly encoded video and sound."
+      },
+      {
+        "question": "Can I convert several AVI clips at once?",
+        "answer": "Yes. Drop in several AVIs and the page converts them in sequence. Each result is a separate MOV with the AVI's name, and nothing is merged or zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and MOV",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container format introduced by Microsoft in 1992 based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "many codecs",
+          "limited support for modern features",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVI to MOV",
+      "points": [
+        "The video is re-encoded as H.264 and the sound as AAC at 96 kbps.",
+        "A frame wider or taller than 1920 px shrinks to fit, and footage over 30 fps loses frames.",
+        "Both sides are rounded down to an even number, so an odd width or height loses 1 px.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "FFmpeg runs in your browser, so the AVI is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About AVI files",
+      "markdown": "### What is an AVI file?\n\nAudio Video Interleave, or AVI, is a Microsoft container that arrived with Windows 3.1 and was first specified in 1992. The file is built on RIFF and carries timed pictures and sound. Each stream and codec is labeled by a FOURCC identifier. Dimensions and frame rate sit in the header, while the actual media lives in another chunk.\n\nThe extension does not tell you the quality, because an AVI can wrap uncompressed, lossless or lossy video. The usual ending is .avi, and one media-type label in common use is video/x-msvideo. You still find AVI in archived production footage and in older desktop editing setups.\n\nThose older workflows are why many AVIs now need converting. The size limits of original AVI are not those of the later OpenDML extension, so very large captures need software that supports it. Different AVI implementations also treat aspect-ratio and scan-type metadata in their own ways.\n\n### Programs that open AVI files\n\n**Windows, Linux & Mac**\n\n- mpv: a desktop player that offers a choice among audio and subtitle streams.\n- ffplay: FFmpeg's player. The FFmpeg project includes the AVI demuxer.\n\n**Mac & Windows**\n\n- Adobe Premiere: brings the container in when a decoder for its contents is present.\n\n**Mobile**\n\n- VLC for Android: a free phone player, where what plays is decided by the media inside the file.\n- VideoLAN's VLC for iOS: handles most movie formats and reads both local and network media.\n\nWhether any of these plays a particular AVI depends on the codec inside. Converting gets around an editor that opens the AVI container but has no decoder for the codec inside.\n\n### AVI and MOV compared\n\n- **Names**: .avi, often labeled video/x-msvideo, against .mov or .qt with video/quicktime.\n- **Container**: AVI is a RIFF file from Microsoft. MOV is Apple's QuickTime format, introduced in 1991 and built from objects called atoms.\n- **Codecs**: both hold many codecs, so neither extension guarantees how a file plays. A MOV often holds H.264, ProRes or Motion JPEG video next to AAC or uncompressed PCM sound.\n- **Relatives**: QuickTime gave rise to the MPEG-4 file format. MOV and MP4 remain different formats, and one cannot stand in for the other.\n- **Reach**: browsers handle MOV only patchily, and even Apple tends to choose MP4 these days.\n\nThe MOV the page writes contains H.264 picture and AAC sound, with its index placed ahead of the media.\n\nThe settings are chosen for speed in a browser. The H.264 step runs the ultrafast preset at constant quality 32, which keeps encoding quick but costs fine detail. Audio goes through AAC at 96 kbps. If you need a master for color work or final delivery, convert on a desktop with settings of your own.\n\n### Other ways to convert AVI to MOV\n\n- **FFmpeg (command line):** use ffmpeg -i input.avi -c:v libx264 -c:a aac output.mov. This re-encodes the video, rather than copying the AVI's streams, and it needs the decoder for the AVI's codec.\n- **OpenShot:** import the AVI, open File > Export Video, switch to the Advanced tab, set Video Format to mov and press Export Video. Codecs and bitrates are set on that tab as well.\n\nThe page offers no codec choice. It always writes H.264 and AAC, so if your editor wants another codec, use FFmpeg or OpenShot, where you set it yourself.\n\n### Problems with AVI files\n\n- **An editor recognizes the AVI but cannot show it**: the editor lacks the decoder for the codec inside. Converting to H.264 in a MOV gives it something it can decode.\n- **A large capture will not open**: the original AVI size restrictions are tighter than OpenDML's, so a big recording needs software that handles the extension.\n- **Wrong shape or combing**: aspect-ratio and scan-type information is not handled the same way in every AVI program. This page deinterlaces frames flagged as interlaced.\n- **A renamed file fails**: a new .mov ending on an AVI changes the name only. No transcoding happens and no decoder appears. Convert it instead.\n- **The MOV is softer than the AVI**: the video was encoded again with a setting chosen for speed. If the AVI was already heavily compressed, the loss compounds.\n- **A file plays in one program but not another**: what plays turns on the codec stored in the AVI, and each program ships its own set of decoders.\n- **The picture is smaller than the original**: a frame over 1920 px in either direction is reduced to fit.\n"
+    }
+  },
+  "dng-to-png": {
+    "seo": {
+      "title": "Convert DNG to PNG Online (Free)",
+      "h1": "DNG to PNG Converter",
+      "description": "Convert a DNG raw photo to PNG in your browser. The sensor data is developed with default settings and no editing controls. Free, no sign-up.",
+      "howToHeading": "How to convert DNG to PNG"
+    },
+    "tool": {
+      "subtitle": "Develop a DNG raw photo into a lossless PNG picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the PNG still a raw file?",
+        "answer": "No. The page decodes the DNG with LibRaw and turns the sensor data into an ordinary picture. The PNG holds finished pixels, so you cannot change white balance or exposure from raw data afterward."
+      },
+      {
+        "question": "Can I change exposure or white balance before converting?",
+        "answer": "No. The page offers no sliders or other controls for the look of the photo. Develop the file in a raw editor first if you want a particular look, then convert the result."
+      },
+      {
+        "question": "Why does the PNG weigh so much more than the DNG?",
+        "answer": "Every finished pixel goes into the PNG without loss, while the raw samples in a DNG may be compressed. Expect a big file from a high-resolution camera."
+      },
+      {
+        "question": "What if my DNG uses a compression the page cannot decode?",
+        "answer": "Some variants fail. The page reports that it cannot decode the compression. It names JPEG XL and GoPro DNG compression as likely causes, with a damaged file as the other possibility."
+      },
+      {
+        "question": "What does a message about the RAW file ending before its picture does mean?",
+        "answer": "LibRaw reached the end of the file before it had all the picture data, which points to an incomplete file. Transfer it again from the card or phone and retry."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "Yes. Anything above roughly 537 megapixels is refused, and the page says so in a notice."
+      },
+      {
+        "question": "Does a DNG with several images give me every image?",
+        "answer": "No. The page takes one image from the file and gives back one PNG, however many the DNG holds."
+      },
+      {
+        "question": "Does the DNG leave my device?",
+        "answer": "No. The page runs ImageMagick as WebAssembly in your browser. The raw file stays on your machine, and the DNG is left as it is."
+      },
+      {
+        "question": "Can I convert a whole shoot at once?",
+        "answer": "Yes. Add the DNGs together and each is converted in turn to its own PNG, with no ZIP."
+      },
+      {
+        "question": "What name does the PNG get?",
+        "answer": "The name of your DNG with a .png ending, so IMG_0042.dng downloads as IMG_0042.png."
+      }
+    ],
+    "aboutSection": {
+      "title": "DNG and PNG",
+      "fromFormat": {
+        "name": "DNG",
+        "fullName": "Digital Negative",
+        "description": "Adobe’s documented format for raw photographic data and its interpretation information.",
+        "details": [
+          "Raw-oriented image source",
+          "Camera and processing information",
+          "Retain for later development"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A losslessly compressed raster picture format with full-color and alpha-channel options.",
+        "details": [
+          "Lossless pixel encoding",
+          "Optional graded transparency",
+          "Rendered picture rather than raw negative"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DNG to PNG",
+      "points": [
+        "The raw data is developed into a finished picture with default settings. The page offers no controls.",
+        "You cannot recover raw editing latitude from the PNG. Keep the DNG.",
+        "One image is read from the file, so you get a single PNG.",
+        "A picture over about 537 megapixels fails, as can JPEG XL and GoPro DNG variants.",
+        "Everything runs in your browser. Nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About DNG files",
+      "markdown": "### What is a DNG file?\n\nDigital Negative, or DNG, is Adobe's documented format for camera-raw data. Its first specification dates to September 2004, and it extends the TIFF family with tags needed to interpret raw photographs. A DNG can store the mosaic of sensor values or a demosaiced linear representation. Raw samples may use lossless JPEG compression, and Exif metadata can accompany the image data.\n\nThe idea is a single documented alternative to the many proprietary raw formats. Adobe supplies a free-standing DNG Converter for supported raw files from specific cameras, and some phones and cameras write DNG themselves. People use it to archive raw photos and to exchange them between raw editors.\n\nA raw file is not a picture yet. Before anyone can view it, software has to turn the sensor data into red, green and blue values and write the result in a format such as PNG. That step is called development, and the choices made there decide how the photo looks. This page does that step once, with defaults, and gives you the result as a PNG you can open anywhere.\n\n### Programs that open DNG files\n\n**Linux, Mac and Windows**\n\n- darktable: DNG is among the formats it imports, with decoding limits that still apply.\n- ImageMagick: reads DNG, and when the format has to be named you give the dng: prefix, as in dng:filename.dng.\n\n**Mac & Windows**\n\n- Adobe Camera Raw: Adobe's raw processing workflow supports DNG.\n\nA DNG can fail in a program that otherwise handles the format. A DNG is no guarantee that every reader copes with the sensor pattern inside. darktable, for one, documents limits for non-Bayer sensors, so try a second program if the first fails.\n\n### DNG and PNG compared\n\n- **Purpose**: DNG keeps camera data for later development. PNG holds a finished picture.\n- **Editing room**: a DNG lets you change exposure and white balance from the raw data. A PNG fixes those choices into pixels.\n- **Compression**: both can be lossless, but a PNG stores every finished pixel, so it can be much larger than a DNG with compressed raw samples.\n- **Transparency**: PNG supports an alpha channel, which a camera photo does not use.\n- **Metadata**: a DNG may carry Exif tags next to the raw samples.\n- **Standard**: a W3C Recommendation and also ISO/IEC 15948, PNG began in the mid-1990s as a royalty-free successor to GIF.\n- **Reach**: browsers display PNG. DNG needs a raw-capable program.\n\nOn this page ImageMagick reads the DNG through LibRaw and writes the PNG. LibRaw turns the sensor data into pixels and the page offers no controls, so the result is a default rendering. It is a good way to get a quick, widely readable copy. It is a poor way to do careful photo editing, because nothing in the PNG can be undone.\n\nNothing is uploaded, and the DNG on your device stays untouched.\n\n### Other ways to convert DNG to PNG\n\n- **darktable-cli (command line):** run darktable-cli input.dng output.png. The output extension selects the format, and a related XMP sidecar can supply the processing history.\n- **ImageMagick (command line):** run magick dng:input.dng output.png. The DNG format entry requires an explicit input prefix, and you should inspect the result, since it is a default rendering.\n\nThe first lets a sidecar file carry your development choices, which this page cannot do. Keep the DNG afterward whichever way you convert.\n\n### Problems with DNG files\n\n- **A program will not open the DNG**: it may not support the stored sensor pattern. darktable, for example, documents limits for non-Bayer sensors.\n- **A linear DNG acts differently**: its data is already demosaiced, which makes it a different thing from untouched mosaic samples.\n- **The page names an unsupported compression**: a file using one of the compressions in its message cannot be decoded here. Use a program that supports it.\n- **A message about the RAW file ending before its picture does**: LibRaw ran out of data, so the copy may be cut short. Transfer it again from the source.\n- **The message says the RAW file is damaged**: LibRaw found the structure broken. Try another copy.\n- **The message says it is too large to convert here**: the declared picture size passes roughly 537 megapixels, so shrink it in a desktop program first.\n- **Proprietary raw files differ in support**: verify that DNG Converter lists the source camera before you rely on it.\n"
+    }
+  },
+  "eps-to-pdf": {
+    "seo": {
+      "title": "EPS to PDF: Ways to Convert EPS Files",
+      "h1": "EPS to PDF Converter",
+      "description": "This page makes no promise to convert EPS files. Here is how to convert EPS to PDF with Ghostscript or Affinity Designer instead."
+    },
+    "tool": {
+      "subtitle": "This page makes no promise to convert EPS. Use Ghostscript or Affinity Designer."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert EPS to PDF?",
+        "answer": "This page makes no promise to. It reads images with your browser's own image decoder, or with ImageMagick for a fixed list of formats that does not include EPS, and the one EPS test run stopped with the message Image decode failed. Use Ghostscript or Affinity Designer instead."
+      },
+      {
+        "question": "What is one command-line way to convert EPS to PDF?",
+        "answer": "With Ghostscript installed, run ps2pdf input.eps output.pdf. Ghostscript's usage guide lists EPS among the files its PostScript utility scripts accept."
+      },
+      {
+        "question": "Why does Ghostscript come up for EPS?",
+        "answer": "An EPS describes its graphic through PostScript instructions, and Ghostscript interprets those instructions. ImageMagick also relies on it to read EPS."
+      },
+      {
+        "question": "Why can't my ImageMagick read an EPS?",
+        "answer": "ImageMagick hands EPS to Ghostscript. If Ghostscript is not installed, or the installed policy and delegates exclude it, ImageMagick cannot render the artwork."
+      },
+      {
+        "question": "Does transparency survive the conversion?",
+        "answer": "An EPS cannot retain live transparency, so the PDF cannot bring it back. Ask the sender for the artwork in another form if you need it live."
+      },
+      {
+        "question": "Will Illustrator keep every object from my EPS?",
+        "answer": "Not necessarily. Opening an EPS in Illustrator can discard objects that its importer does not recognize, so compare the result with the original."
+      },
+      {
+        "question": "Why does my Mac not show an EPS preview?",
+        "answer": "Current macOS has no built-in EPS viewer, so Preview cannot show the file. Open it in Illustrator or Affinity Designer to look at it."
+      },
+      {
+        "question": "How does an EPS differ from a PDF?",
+        "answer": "An EPS is one rectangular graphic written as PostScript instructions. A PDF is a page-based document that can mix text, vector graphics and raster images."
+      },
+      {
+        "question": "Should I keep the EPS after converting?",
+        "answer": "Yes. The PDF is a new file that leaves your original untouched, and EPS stays relevant for legacy artwork."
+      },
+      {
+        "question": "What is an EPS file used for?",
+        "answer": "An EPS wraps a PostScript program describing a single page of graphics, which lets artwork be placed inside other documents. Print and prepress work, logos sent to printers, and exchange between design programs are its usual jobs."
+      }
+    ],
+    "aboutSection": {
+      "title": "EPS and PDF",
+      "fromFormat": {
+        "name": "EPS",
+        "fullName": "Encapsulated PostScript",
+        "description": "A PostScript description of a placed graphic that may combine vector drawing instructions with text and raster data.",
+        "details": [
+          "PostScript interpretation required",
+          "One placed graphic",
+          "May depend on fonts"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A page-oriented document that can contain text, raster pictures, and vector drawing objects.",
+        "details": [
+          "Fixed document pages",
+          "Text and graphics together",
+          "Viewing and print workflows"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know about converting EPS to PDF",
+      "points": [
+        "This page makes no promise to convert EPS, and a test run ended with Image decode failed.",
+        "Ghostscript turns EPS into PDF with ps2pdf input.eps output.pdf.",
+        "Affinity Designer opens EPS and exports PDF.",
+        "EPS cannot keep live transparency, so a PDF made from it cannot bring that back."
+      ]
+    },
+    "guide": {
+      "title": "About EPS files",
+      "markdown": "### What is an EPS file?\n\nEPS stands for Encapsulated PostScript. Adobe developed it in the late 1980s for placing illustrations in printed documents. An EPS represents one rectangular graphic through PostScript instructions, and the format can combine vector drawing commands with raster images. EPS version 3 appeared in 1990, and Adobe published its separate specification in 1992. Its MIME type is application/postscript.\n\nBecause an EPS wraps a PostScript program, something has to interpret the instructions before you can see the artwork. This page reads images with your browser's decoder, or with ImageMagick for a set of formats that leaves EPS out. Its test run of an EPS failed during decoding, so the page makes no promise about converting one.\n\nMany publishing workflows moved from EPS to PDF, though EPS remains relevant to legacy artwork. The tools in the next sections are the route to a PDF. PDF is the paged format that now does that job.\n\n### Programs that open EPS files\n\n**Windows, Mac and Linux**\n\n- ImageMagick: reads EPS through Ghostscript, and the installed policy and delegates determine whether it is available.\n- Ghostscript: interprets the PostScript instructions used by EPS.\n\n**Windows & Mac**\n\n- Adobe Illustrator: can open EPS or place it as linked artwork. Unfamiliar objects can be lost during import.\n\nNo browser or phone app is listed for EPS. A program that renders it needs a PostScript interpreter, and Ghostscript is the one named here.\n\n### EPS and PDF compared\n\n- **Extensions and media types**: .eps with application/postscript, and .pdf with application/pdf.\n- **Pages**: an EPS is one rectangular graphic, while a PDF is organized in pages that each mix text, vector drawing and raster images.\n- **Origin**: Adobe created both. The way PDF describes a page is inherited from PostScript, and it is independent of device and resolution.\n- **Transparency**: EPS cannot retain live transparency, and Adobe recommends PDF 1.4 when placing transparent artwork.\n- **Fonts**: embedding the fonts is what lets a PDF look identical on every machine.\n- **Standards**: the 2008 ISO 32000-1 edition standardized PDF 1.7, and a 2017 edition, ISO 32000-2, did the same for 2.0. Profiles such as PDF/A and PDF/X serve archiving and print.\n\nThose differences are why the move from EPS to PDF is common. Which route to take depends on what you have installed.\n\nIf you only need to look at the artwork, Illustrator or Affinity Designer can show it. If you need a PDF to send on, converting once with Ghostscript is a short command. Check the result in a PDF viewer afterward, looking at the page area, the fonts and any images, since those are the places a conversion can change the artwork.\n\n### Other ways to convert EPS to PDF\n\n- **Ghostscript (command line):** run ps2pdf input.eps output.pdf. The usage guide explicitly allows EPS with its PostScript utility scripts. Inspect the page area and resolve missing fonts in the source.\n- **Affinity Designer:** open the EPS, choose File > Export, select PDF, adjust the settings and export area, then export and save. Compare the imported artwork and the final PDF, since font and feature interpretation can affect the result. Affinity's file-format table lists EPS as importable.\n\nBoth write a new PDF and leave the EPS untouched. Ghostscript works from the command line and has no editing view, while Affinity Designer opens the artwork on a canvas first, so you can look at it before exporting. Affinity's table also notes that text is rasterized when a PDF is exported, which is worth checking if you need selectable text in the result.\n\n### Problems with EPS files\n\n- **No preview on a Mac**: Apple's support notes list EPS preview only for older releases such as macOS 12 and earlier, so the Preview app no longer shows it on current macOS.\n- **Objects missing after opening in Illustrator**: an object the importer does not recognize is left out, so check the result against the original.\n- **ImageMagick cannot render it**: the Ghostscript it relies on is missing, so the artwork cannot be drawn. Install Ghostscript and try again.\n- **Transparency looks flattened**: the EPS never held it live, so the effect is flat before conversion starts.\n- **This page reports Image decode failed**: the page could not read the file. Use one of the programs above.\n"
+    }
+  },
+  "gif-to-mov": {
+    "seo": {
+      "title": "Convert GIF to MOV Online (Free)",
+      "h1": "GIF to MOV Converter",
+      "description": "Turn an animated GIF into a MOV video in your browser. The clip becomes H.264 with no audio track, at most 1920 px and 30 fps. Free, no sign-up.",
+      "howToHeading": "How to convert GIF to MOV"
+    },
+    "tool": {
+      "subtitle": "Turn an animated GIF into a silent H.264 MOV video, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the MOV have sound?",
+        "answer": "No. A GIF has no audio, so the MOV has none either. If you need sound, add it afterward in a video editor."
+      },
+      {
+        "question": "Will the GIF's frame rate change?",
+        "answer": "Only when the GIF runs faster than 30 fps. Then frames are skipped to reach 30 and the clip lasts as long as before. A slower rate is left alone and keeps its own timing."
+      },
+      {
+        "question": "Does the MOV loop?",
+        "answer": "The MOV is a video of fixed length, so whether it repeats is up to the player or editor you open it in."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "No. The H.264 video written here has no alpha channel, so a GIF's transparent color does not survive as see-through video. For transparency, look for a format that supports alpha."
+      },
+      {
+        "question": "Will the colors look the same?",
+        "answer": "The MOV cannot invent colors the GIF lacked. With 256 colors at most in a GIF frame, any banding and rough gradients carry through."
+      },
+      {
+        "question": "Why does the MOV have an odd size?",
+        "answer": "H.264 output needs sides of an even length, so a GIF with an odd width or height gives up its final column or row. A frame larger than 1920 px either way is reduced until it fits."
+      },
+      {
+        "question": "Does the GIF get sent anywhere?",
+        "answer": "No. FFmpeg is built to WebAssembly and works inside this page. The GIF stays on your device, and the file you picked is not modified."
+      },
+      {
+        "question": "How is the video encoded?",
+        "answer": "As H.264 with the ultrafast preset at a constant-quality value of 32, which favors a quick result over fine detail. The page offers no setting to change that."
+      },
+      {
+        "question": "Can I convert several GIFs at once?",
+        "answer": "Yes. Select several GIFs and they are processed in sequence, each one saved as a MOV carrying that GIF's name. They are never zipped or merged."
+      },
+      {
+        "question": "What happens to a very long GIF?",
+        "answer": "No size limit or timeout is set here, so a long clip simply runs for as long as your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and MOV",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based raster format that supports still pictures, frame animation, and a transparent palette entry.",
+        "details": [
+          "Up to 256 colors per frame palette",
+          "Frame timing and disposal",
+          "No conventional soundtrack"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "Apple’s track-based media wrapper, used for video and sound with codec-dependent playback requirements.",
+        "details": [
+          "Picture and sound tracks",
+          "Can include production metadata",
+          "Container does not establish quality"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to MOV",
+      "points": [
+        "The MOV is H.264 video with no audio track, because a GIF has none.",
+        "A MOV has a fixed length, so looping is up to the player.",
+        "A frame larger than 1920 px on a side shrinks to fit, and a GIF above 30 fps loses frames but keeps its length.",
+        "Odd widths and heights are rounded down to an even number.",
+        "Transparency is not kept. The H.264 video has no alpha channel."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nThe Graphics Interchange Format, or GIF, is a raster format that CompuServe introduced in 1987. It compresses with LZW and limits each frame to a palette of at most 256 colors. It also supports simple animation, which is why GIFs became the format for short looping clips such as reaction images and stickers.\n\nThat makes a GIF a series of palette images, not a video stream, and a GIF has no soundtrack. A silent reaction clip, a screen recording of an interface or a small looping illustration may all be GIFs.\n\nTransparency in a GIF is all or nothing. One palette color can be marked transparent, but soft, semi-transparent edges cannot keep partial opacity.\n\nDisposal settings decide whether a new image combines with the previous one or replaces it. That is how a GIF builds an animation from partial frames, and it is one reason a GIF can look wrong in a viewer that handles it differently.\n\n### Programs that open GIF files\n\n**Mac, Linux & Windows**\n\n- GIMP: exports still pictures or multilayer animations.\n- ImageMagick: reads GIF. Check which formats your installation supports.\n\n**Web and Mobile**\n\n- Google Chrome: displays GIF.\n\n**Web**\n\n- Mozilla Firefox: displays GIF.\n\n**Mobile**\n\n- Safari: displays GIF.\n\nA browser is the easiest way to check the original before converting, since it shows the animation as the GIF stores it.\n\n### GIF and MOV compared\n\n- **Structure**: a GIF is a series of palette images. A MOV is a QuickTime container, introduced in 1991, built from objects called atoms.\n- **Colors**: GIF frames are limited to 256 colors. A MOV can hold H.264 video, which is not limited that way, but it cannot recover colors the GIF never held.\n- **Sound**: GIF has none. A MOV can carry audio such as AAC, but this one will not, since the source has none.\n- **Transparency**: a GIF has a single transparent color, and the video this page writes has no alpha channel at all.\n- **Support**: browsers handle MOV only patchily, and Apple now mostly favors MP4. MOV and MP4 stay separate formats that cannot replace each other.\n- **Names**: .gif with image/gif, against .mov or .qt with video/quicktime.\n\nH.264 encoding runs on the ultrafast preset at constant quality 32, and the index is relocated to the head of the file. That is tuned for a quick result in a browser, so very fine detail may soften. A frame beyond 1920 px on its long side is shrunk, and a clip faster than 30 fps gives up frames while keeping its running time. The audio settings in the command have nothing to act on, because a GIF has no audio.\n\nThe work happens in your browser. FFmpeg is compiled to WebAssembly and runs single-threaded in its own worker, so nothing is uploaded. A small frame is not enlarged, and the file you download is your GIF's name with .mov at the end. Your original file is not changed, and you can pick several GIFs together to get a separate MOV for each.\n\n### Other ways to convert GIF to MOV\n\n- **FFmpeg (command line):** run ffmpeg -i input.gif -c:v libx264 -pix_fmt yuv420p output.mov. The pixel format may require even dimensions. No audio is created, since the GIF has none.\n\nThis page does the same kind of job without an install, and it also caps the frame at 1920 px and 30 fps. With FFmpeg you set those yourself. Play the result before using it in an edit, since looping and frame timing are handled by the player.\n\n### Problems with GIF files\n\n- **Banding and dithering**: with at most 256 colors per frame, gradients and photos look rough. Converting to MOV does not restore the missing colors.\n- **Soft edges look jagged**: a GIF cannot keep partial transparency, so edges are hard.\n- **Frames overlap wrongly**: disposal settings control how a new image covers the last. A smeared GIF may be read differently in another viewer.\n- **A comment is missing**: GIMP omits a GIF comment that contains characters outside seven-bit ASCII.\n- **The MOV looks different from the GIF**: the clip is encoded again as H.264, which is a new lossy version of the animation rather than the original frames.\n- **The MOV is a few pixels narrower**: the last pixel of an odd side is cut off.\n- **The video does not loop**: it plays once at its fixed length. Set repeat in your player or editor.\n"
+    }
+  },
+  "mov-to-webm": {
+    "seo": {
+      "title": "Convert MOV to WebM Online (Free)",
+      "h1": "MOV to WebM Converter",
+      "description": "Convert a MOV video to WebM in your browser, re-encoded as VP8 video with Vorbis sound, at most 1920 px and 30 fps. Free, with no sign-up.",
+      "howToHeading": "How to convert MOV to WebM"
+    },
+    "tool": {
+      "subtitle": "Re-encode a QuickTime MOV as a WebM with VP8 video and Vorbis sound."
+    },
+    "faqs": [
+      {
+        "question": "What codecs does the WebM use?",
+        "answer": "VP8 for video and Vorbis for audio at 64 kbps. Both are codecs the WebM format combines. The MOV is re-encoded, not copied."
+      },
+      {
+        "question": "Will it play in Safari?",
+        "answer": "Safari on macOS plays WebM with VP8 video and Vorbis sound, which is what this page writes. Test your own devices anyway, since playback depends on the codecs inside, not the file ending."
+      },
+      {
+        "question": "Does the page use VP9 or Opus?",
+        "answer": "No. It writes VP8 and Vorbis and offers no choice. For VP9 and Opus, use FFmpeg on your computer with libvpx-vp9 and libopus."
+      },
+      {
+        "question": "Why does the WebM look softer than the MOV?",
+        "answer": "VP8 is lossy, and the fast real-time mode used here favors speed over fine detail. Start from your best MOV."
+      },
+      {
+        "question": "How big can the WebM frame be?",
+        "answer": "A frame no bigger than 1920 px on a side keeps its size. Larger pictures are shrunk to fit, with the finished width and height forced to even values."
+      },
+      {
+        "question": "What about 60 fps clips?",
+        "answer": "Frames above 30 per second are dropped, so a 60 fps clip loses half its frames but keeps its length. Slower clips are never sped up."
+      },
+      {
+        "question": "Does interlaced footage get fixed?",
+        "answer": "Any frame flagged as interlaced goes through a deinterlacing filter before encoding."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "No. The output uses the yuv420p pixel format, which has no alpha channel."
+      },
+      {
+        "question": "Does the MOV go to a server?",
+        "answer": "No. FFmpeg runs inside the page, so the file stays on your device and your original is not changed. Large files take as long as your computer needs."
+      },
+      {
+        "question": "Can I convert a batch of MOV files?",
+        "answer": "Yes. Choose as many MOV clips as you need; each is encoded on its turn and downloads as a WebM bearing its MOV's name, with no zip."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and WebM",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "Apple’s track-based media wrapper, used for video and sound with codec-dependent playback requirements.",
+        "details": [
+          "Picture and sound tracks",
+          "Can include production metadata",
+          "Container does not establish quality"
+        ]
+      },
+      "toFormat": {
+        "name": "WebM",
+        "fullName": "WebM media",
+        "description": "A Matroska-based delivery format with defined web video and audio codec combinations.",
+        "details": [
+          "VP8, VP9, or AV1 workflows",
+          "Vorbis or Opus audio",
+          "Codec-aware playback required"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to WebM",
+      "points": [
+        "The video is re-encoded as VP8 with Vorbis sound at 64 kbps.",
+        "Frames over 1920 px on the longer side are scaled down, and above 30 fps frames are dropped.",
+        "Interlaced frames are deinterlaced. Both sides are rounded down to an even number.",
+        "Transparency is not kept. The output has no alpha channel.",
+        "For VP9 or Opus, use FFmpeg on your computer."
+      ]
+    },
+    "guide": {
+      "title": "About MOV files",
+      "markdown": "### What is a MOV file?\n\nApple created the QuickTime file format behind MOV in 1991 and brought it to Windows in 1994. A MOV is built from atoms, and a reader may skip each atom it has no use for. It organizes media tracks, including video, sound and timing, and files use the .mov or .qt ending. A screen recording made on a Mac is saved as a MOV.\n\nTypical contents are H.264, ProRes or Motion JPEG video together with AAC or uncompressed PCM audio. The extension alone does not tell you how a file will play. QuickTime containers may use codecs the destination editor does not have, and renaming a file does not convert the video or supply a decoder it lacks.\n\nAfter an interrupted write a standard MOV may not be playable at all, whereas fragmented output recovers differently. If a MOV from a camera or phone refuses to open, it may need repair before any converter can read it.\n\n### Programs that open MOV files\n\n**Mac, Linux and Windows**\n\n- mpv: a desktop player where the audio and subtitle stream can be picked.\n- ffplay: the MOV demuxer ships with FFmpeg.\n\n**Windows & Mac**\n\n- Adobe Premiere: opens the container once a decoder for the contents is installed.\n\n**Mobile**\n\n- VLC for Android: free, and the codecs inside the file settle whether it works.\n- VideoLAN's VLC for iOS: a player for most movie formats, with local and network media access.\n\nA program that opens the container may still fail on the video inside, so test the file in the player you plan to use.\n\n### MOV and WebM compared\n\n- **Origin**: MOV is Apple's QuickTime container. WebM is an open format from the WebM Project, based on Matroska and intended for web delivery.\n- **Codecs**: WebM video is VP8 or VP9, and its audio is Vorbis or Opus. A MOV can hold many codecs, including H.264 and ProRes.\n- **Terms**: royalty-free terms cover the format technology the WebM Project provides.\n- **Media types**: video/webm for video, audio/webm for audio-only files, and video/quicktime for a MOV.\n- **Seeking**: a missing cue index can make seeking in a WebM less efficient, because the player has less direct location information.\n- **Playback**: a browser cares about the real codecs inside, not the file ending.\n- **Safari**: older Safari behavior should not be generalized to current releases. On macOS, Safari plays WebM holding VP8 or VP9 video with Vorbis sound.\n\nOn this page the choices are fixed: VP8 video at a constant-quality value of 40 in real-time mode, yuv420p pixels and Vorbis sound at 64 kbps. That favors a quick result. A source whose longer edge is at most 1920 px and whose rate is at most 30 fps keeps both. A smaller or slower source is not enlarged or accelerated. The download takes the name of your MOV with a .webm ending, and the original file is not changed.\n\n### Other ways to convert MOV to WebM\n\n- **FFmpeg (command line):** run ffmpeg -i quicktime.mov -c:a libopus -c:v libvpx-vp9 web-copy.webm. It needs libvpx-vp9 and libopus support, and uses a different codec combination from this page.\n- **OpenShot (Windows, Mac, Linux):** add the MOV to the project, open File > Export Video, go to Advanced, set Video Format to webm and export. Codecs and bitrates are chosen on that tab too.\n\nThe desktop options let you pick the codecs, which this page does not. Before you publish a WebM, play it in the browsers your visitors use, since the codecs inside decide whether it plays.\n\n### Problems with MOV files\n\n- **The editor lacks the codec**: a MOV may use a codec the destination editor does not have. Convert it to a format the editor reads instead of renaming it.\n- **A renamed file fails**: a changed ending touches neither the video nor the decoders on your system.\n- **The file will not open after a crash**: an ordinary MOV can be left unplayable by an interrupted write, and a fragmented one recovers differently.\n- **The WebM will not play on one device**: browser playback depends on the actual video and audio codecs, so check which codecs that device decodes.\n- **The WebM is not identical to the MOV**: video and sound are encoded again with VP8 and Vorbis rather than copied, so the result is a new lossy version of the same picture and sound.\n- **Seeking is slow in the WebM**: the cause may be the cue index, which the player uses to jump.\n"
+    }
+  },
+  "mp3-to-aac": {
+    "seo": {
+      "title": "Convert MP3 to AAC Online (Free)",
+      "h1": "MP3 to AAC Converter",
+      "description": "Convert MP3 to a raw .aac file in your browser at 192 kbps. It is a second lossy encode, and the file is not an M4A. Free, no sign-up.",
+      "howToHeading": "How to convert MP3 to AAC"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP3 as a raw AAC (ADTS) audio file at 192 kbps, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does converting MP3 to AAC improve the sound?",
+        "answer": "No. The MP3 is decoded, then encoded again as AAC at 192 kbps. That is a second lossy step, and the audio the MP3 already lost does not come back."
+      },
+      {
+        "question": "Is the result an M4A?",
+        "answer": "No. The page writes a raw AAC stream with ADTS framing and a .aac ending, not an MP4-based M4A. Changing .aac to .m4a does not replace the ADTS framing with an MP4 wrapper, so a player that wants M4A may refuse it."
+      },
+      {
+        "question": "How do I get an M4A instead?",
+        "answer": "In Audacity with the optional FFmpeg library installed, go to File > Export Audio and select M4A (AAC) Files. FFmpeg also writes an MP4-based file if you name the output with .m4a."
+      },
+      {
+        "question": "What bitrate does the AAC use?",
+        "answer": "192 kbps, with the video stream (such as cover art in the file) left out. The page offers no setting to change the bitrate."
+      },
+      {
+        "question": "Will the file be smaller than the MP3?",
+        "answer": "Not always. 192 kbps is a fixed target, so a lower-bitrate MP3, such as one at 128 kbps, can come out larger."
+      },
+      {
+        "question": "Are my tags and cover art kept?",
+        "answer": "A raw ADTS .aac stream has no fields for title, artist or album, so those tags do not appear in the result. Cover art is not carried either, because it sits in a video stream and the page writes audio only."
+      },
+      {
+        "question": "Which players open a raw .aac file?",
+        "answer": "FFmpeg's own tools read it as an AAC stream. A player that expects an MP4 wrapper may refuse it."
+      },
+      {
+        "question": "Does the MP3 get sent to a server?",
+        "answer": "No. The encoder runs in your browser, and your original file is not changed."
+      },
+      {
+        "question": "What does it mean when the page reports an FFmpeg exit code?",
+        "answer": "FFmpeg stopped on an error. Damaged or truncated MP3s often still convert, producing a shorter AAC, so confirm in another player that the MP3 itself plays."
+      },
+      {
+        "question": "Can I convert a batch?",
+        "answer": "Yes. Select as many MP3s as you like. Every MP3 produces its own AAC file that keeps the MP3's name, and nothing is zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and AAC",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG Audio Layer III",
+        "description": "A lossy audio representation used for music and spoken recordings, often with descriptive library tags.",
+        "details": [
+          "Lossy encoded sound",
+          "Constant or variable bitrate",
+          "Does not retain original waveform exactly"
+        ]
+      },
+      "toFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A lossy MPEG audio codec delivered as an AAC stream or inside media containers such as MP4.",
+        "details": [
+          "Audio codec",
+          "Raw and container delivery forms",
+          "Another lossy encode from MP3"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to AAC",
+      "points": [
+        "The MP3 is decoded and encoded again as AAC at 192 kbps. This is a second lossy step.",
+        "The output is a raw .aac stream with ADTS framing, not an M4A. Renaming it does not wrap it.",
+        "Only audio is written: a raw .aac stream has no tag fields, and cover art is left out.",
+        "FFmpeg runs in your browser, so nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 files",
+      "markdown": "### What is an MP3 file?\n\nThe letters MP3 come from MPEG-1 Audio Layer III. A 1993 standard, ISO/IEC 11172-3, defined it, and ISO/IEC 13818-3 broadened it in 1995. Fraunhofer IIS and MPEG audio colleagues built it starting in the late 1980s. Browsers all play it, and its media type is audio/mpeg.\n\nCompression in MP3 is lossy: a hearing model picks out sound people are unlikely to miss and throws it away, so the file cannot be turned back into the original samples. Bitrate choices span 32 to 320 kbps at 32, 44.1 or 48 kHz. A 128 kbps file is about an eleventh of the CD size of the same audio. Titles and other tags live in ID3 blocks embedded in the file.\n\nWhen an MP3 feeds another lossy format, the new encoder works from decoded audio that already reflects the first compression step. An edit followed by another MP3 export stacks a second lossy stage in just that way. A converted file cannot be better than the MP3 it came from, so treat the MP3 as the final source for listening and the converted file as a copy made for compatibility.\n\n### Programs that open MP3 files\n\n**Mac, Windows and Linux**\n\n- Audacity: opens an MP3 as an editable project.\n- ffplay: FFmpeg includes the MP3 demuxer.\n\n**Web**\n\n- Firefox: plays supported media by itself, though AAC and H.264 may rely on codecs from the system.\n- Chrome: handles supported web audio and MP4 combinations, with the inner codec still deciding the outcome.\n\n**Mobile**\n\n- VLC for Android: a free player on the phone, with the file's own contents deciding what it can decode.\n- mpv for Android: a port listed by the mpv project.\n\nAudacity can report an import error on a malformed MP3 that another player plays without trouble.\n\n### MP3 and AAC compared\n\n- **Family**: MP3 is MPEG Layer III. AAC is Advanced Audio Coding, a perceptual audio coding family standardized through MPEG. MPEG-2 specifies AAC in Part 7, and MPEG-4 places it in Part 3.\n- **Wrappers**: MP4, QuickTime and other containers can carry AAC. A bare .aac file usually holds ADTS frames. The registered media type is audio/aac.\n- **Profiles**: AAC includes LC, HE-AAC and HE-AAC v2.\n- **Use**: streaming and delivery to listeners are where AAC is found.\n- **Compatibility**: a decoder for MPEG-2 AAC may not understand the MPEG-4 variants.\n\nEncoding here goes through FFmpeg's built-in AAC encoder at 192 kbps, and the .aac output starts with ADTS frames. That is useful when an app asks for AAC. It is not a repair for a noisy recording or a low-quality download. If you still have a lossless master or the original, encode AAC from that instead.\n\nThe raw stream is the part people trip over. An .aac file carries ADTS frames one after another, with no MP4 wrapper. A player such as VLC reads it, while software that expects an M4A may not.\n\n### Other ways to convert MP3 to AAC\n\n- **FFmpeg (command line):** the command ffmpeg -i song.mp3 -vn -b:a 192k -c:a aac converted.aac does it. This is another lossy encode, and the bitrate cannot restore source information. For an MP4-based file, name the output with .m4a.\n- **Audacity:** load the MP3 and export through File > Export Audio as M4A (AAC) Files. The optional FFmpeg library is required, and you get an M4A, not a raw AAC stream.\n\nIf you need the AAC inside an MP4-style wrapper, pick the Audacity route or name the FFmpeg output .m4a.\n\n### Problems with MP3 files\n\n- **Audacity refuses the file**: a malformed MP3 can fail there while another player copes. Try a clean copy from the source.\n- **Tags change after combining files in Audacity**: with several imports in a single project, the newest file's tags can overwrite earlier ones.\n- **Quality drops after converting**: each lossy encode removes more. Start from the original recording when you can.\n- **The AAC will not play in a music app**: the app may want M4A. Renaming the extension to .m4a keeps the ADTS frames and adds no MP4 wrapper, so use one of the routes above for a real M4A.\n- **The new file is not smaller**: 192 kbps is fixed here, so a low-bitrate MP3 can grow.\n- **Cover art is gone**: it sits in a video stream, which the page leaves out. Add it again in your music app.\n- **A decoder complains about the AAC**: the decoder may only know the older MPEG-2 form, so try another player.\n"
+    }
+  },
+  "mp3-to-flac": {
+    "seo": {
+      "title": "Convert MP3 to FLAC Online (Free)",
+      "h1": "MP3 to FLAC Converter",
+      "description": "Convert MP3 to FLAC in your browser. FLAC stores the decoded samples without further loss, but cannot restore what the MP3 dropped. Free, no sign-up.",
+      "howToHeading": "How to convert MP3 to FLAC"
+    },
+    "tool": {
+      "subtitle": "Store a decoded MP3 as lossless FLAC, in your browser. No quality is regained."
+    },
+    "faqs": [
+      {
+        "question": "Will FLAC make my MP3 sound better?",
+        "answer": "No. FLAC keeps the decoded MP3 samples exactly, but no conversion can bring back audio that was discarded when the MP3 was made. The sound stays the same."
+      },
+      {
+        "question": "Why is the FLAC so much larger?",
+        "answer": "The MP3 is a compressed lossy file, and the FLAC stores the decoded audio without discarding sample information. It can be several times the size of the MP3."
+      },
+      {
+        "question": "Is it a lossless copy of the original song?",
+        "answer": "No. It is a lossless copy of the MP3. Samples dropped when the MP3 was made cannot be recreated by any later conversion."
+      },
+      {
+        "question": "Why convert MP3 to FLAC at all?",
+        "answer": "One reason is editing. Exporting another MP3 after an edit adds a second lossy stage, while saving each round as FLAC does not. For a real archive, use the original recording instead."
+      },
+      {
+        "question": "What does the page write?",
+        "answer": "FLAC audio only, using FFmpeg's flac encoder with the video stream left out. The page has no compression level or bit depth setting."
+      },
+      {
+        "question": "Are tags and cover art kept?",
+        "answer": "Tags such as title and artist are moved over by FFmpeg's defaults wherever the output can store them, and FLAC has Vorbis comments for that. Cover art is not carried, since the page writes audio only."
+      },
+      {
+        "question": "Where does the conversion happen?",
+        "answer": "On your device. FFmpeg is loaded into the page, so the MP3 is not uploaded anywhere and your original is not changed."
+      },
+      {
+        "question": "Why did my conversion end with an FFmpeg exit code?",
+        "answer": "FFmpeg ended with an error. A damaged or truncated MP3 often converts anyway, to a shorter FLAC, so try the MP3 in another player."
+      },
+      {
+        "question": "Will the FLAC play on my phone?",
+        "answer": "Android's documentation covers native FLAC for mono or stereo audio and recommends 16-bit samples. VLC for Android and VLC for iOS also list FLAC support."
+      },
+      {
+        "question": "Can I do an album in one go?",
+        "answer": "Yes. Choose the whole set of tracks and each returns as a separate FLAC carrying its MP3's name, without a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and FLAC",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG Audio Layer III",
+        "description": "A lossy audio representation used for music and spoken recordings, often with descriptive library tags.",
+        "details": [
+          "Lossy encoded sound",
+          "Constant or variable bitrate",
+          "Does not retain original waveform exactly"
+        ]
+      },
+      "toFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "A reversible encoding of supplied audio samples; source information already lost before encoding cannot be recovered.",
+        "details": [
+          "Lossless sample storage",
+          "Compression level affects packing",
+          "Metadata support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to FLAC",
+      "points": [
+        "The FLAC holds the decoded MP3 audio without further loss. It will not sound better than the MP3.",
+        "The FLAC can be several times larger than the MP3.",
+        "Only audio is written, so cover art is left out.",
+        "FFmpeg runs in your browser, so nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 files",
+      "markdown": "### What is an MP3 file?\n\nMP3 began as MPEG-1 Audio Layer III and became a standard in 1993 as ISO/IEC 11172-3. Its development took place at Fraunhofer IIS, which worked on it from the late 1980s. Patent licensing ended on 23 April 2017. The media type is audio/mpeg.\n\nThe format is lossy. A model of human hearing decides which sounds listeners are unlikely to notice, and those are discarded. Decoding an MP3 produces audio samples, but it does not undo those decisions, so the loss stays part of the signal handed to the next encoder.\n\nSong titles and other tags live in separate ID3 structures inside the file. Available bitrates range between 32 and 320 kbps. Take 128 kbps: that file comes to around one eleventh of the same audio on a CD. A request for FLAC can mean different things: a program may need that format as input, or someone may want an archival master, and a FLAC made from an MP3 is not one.\n\n### Programs that open MP3 files\n\n**Windows, Linux and Mac**\n\n- Audacity: imports MP3 into an editable project, which suits trimming and fixing a track.\n- ffplay: FFmpeg's own player, which plays MP3 through FFmpeg's MP3 demuxer from the command line.\n\n**Web**\n\n- Chrome and Firefox: both play MP3 directly, which makes a browser a quick way to confirm the file is readable.\n\n**Mobile**\n\n- VLC for Android: a free player, and its decoding follows from what the file contains.\n- mpv for Android: the Android port that the mpv project itself links to.\n\nIf you import many tracks into one Audacity project, the last file's tags can replace what came before.\n\n### MP3 and FLAC compared\n\n- **Compression**: MP3 is lossy. FLAC squeezes integer PCM audio down while keeping every sample intact.\n- **Standard**: FLAC's specification is open, and its reference implementation is open source. The format description was published as RFC 9639 in December 2024.\n- **Range**: from one through eight channels, and each sample can be stored at a depth between four and 32 bits, which covers everything from low-resolution speech to studio masters.\n- **Metadata**: seek points, pictures and Vorbis comments can all be stored in FLAC, and the media type is audio/flac.\n- **Integrity**: a damaged frame can fail its checksum, but lossless encoding does not prevent storage corruption.\n- **Size**: a FLAC can be far larger than an MP3 of the same song.\n- **Re-saving**: a FLAC can be saved again without further loss, while exporting another MP3 adds a second lossy stage.\n\nThe page decodes the MP3 and writes its samples through FFmpeg's FLAC encoder, so the numbers are exact but the music is the MP3's music. It sets no compression level or bit depth.\n\nFLAC suits a working copy. If you plan to trim or otherwise edit the track in several rounds, saving each round as FLAC avoids stacking another lossy encode on the MP3. When the edits are done, export to whatever format the destination needs.\n\n### Other ways to convert MP3 to FLAC\n\n- **Audacity:** load the MP3, choose File > Export Audio, select FLAC from Format, review channels, sample rate, bit depth and level, then export. The level changes packing efficiency, not quality.\n- **FFmpeg (command line):** run ffmpeg -i song.mp3 -vn -c:a flac decoded.flac. It decodes the MP3 and stores the samples losslessly, and the FLAC does not become a lossless original recording.\n\nBoth give the same kind of result: a bigger file with the MP3's sound. Pick Audacity if you want to fix the track first, and FFmpeg if you have many files and a terminal.\n\n### Problems with MP3 files\n\n- **An import error**: a badly formed MP3 can be refused by Audacity yet play elsewhere. Try a clean copy.\n- **No quality gain**: the samples the MP3 threw away stay gone. FLAC only stores what the MP3 decodes to.\n- **Editing adds loss**: editing an MP3 and exporting another MP3 introduces a second lossy encoding stage. Exporting FLAC avoids adding one.\n- **Tags change on import**: several files in one Audacity project can leave you with the latest file's tags in place of earlier metadata.\n- **A player rejects the FLAC**: native Android handling of FLAC is documented for mono or stereo and favors 16-bit samples. Try another player.\n"
+    }
+  }
+}

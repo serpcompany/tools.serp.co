@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@serp-tools/ui/components/card";
 import { Badge } from "@serp-tools/ui/components/badge";
-import { ToolVideoPanel } from "@/components/ToolVideoPanel";
 import { beginToolRun } from "@/lib/telemetry";
 
 type Stats = {
@@ -40,18 +39,17 @@ function computeStats(text: string): Stats {
 }
 
 type Props = {
-  // The H1 and the line under it, which the page's structured data repeats.
-  title: string;
+  // The page's H1 (toolHeading, lib/metadata.ts) and the line under it
+  // (content.tool.subtitle), so content:apply reaches them.
+  heading: string;
   subtitle: string;
-  videoEmbedId?: string;
 };
 
-export default function CharacterCounter({ title, subtitle, videoEmbedId }: Props) {
+export default function CharacterCounter({ heading, subtitle }: Props) {
   const [text, setText] = useState("");
   const [stats, setStats] = useState<Stats>(() => computeStats(""));
   const lastTelemetryAt = useRef(0);
   const telemetryTimer = useRef<number | null>(null);
-  const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
     setStats(computeStats(text));
@@ -109,7 +107,7 @@ export default function CharacterCounter({ title, subtitle, videoEmbedId }: Prop
     <section className="w-full bg-gradient-to-b from-gray-50 to-white py-16">
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">{title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">{heading}</h1>
           <p className="text-lg text-gray-600">{subtitle}</p>
         </div>
 
@@ -119,12 +117,7 @@ export default function CharacterCounter({ title, subtitle, videoEmbedId }: Prop
             <Card className="p-6">
               <textarea
                 value={text}
-                onChange={(e) => {
-                  if (!videoPlaying && e.target.value.trim()) {
-                    setVideoPlaying(true);
-                  }
-                  setText(e.target.value);
-                }}
+                onChange={(e) => setText(e.target.value)}
                 placeholder="Type or paste your text here..."
                 className="w-full h-96 p-4 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
@@ -258,12 +251,6 @@ export default function CharacterCounter({ title, subtitle, videoEmbedId }: Prop
             </Card>
           </div>
         </div>
-
-        {videoEmbedId && (
-          <div className="mt-10">
-            <ToolVideoPanel embedId={videoEmbedId} autoplay={videoPlaying} />
-          </div>
-        )}
       </div>
     </section>
   );

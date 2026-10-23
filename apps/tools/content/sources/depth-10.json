@@ -1,0 +1,146 @@
+{
+  "tools": {
+    "mpeg-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i archive.mpeg -c:v libx264 -c:a aac archive.mp4",
+          "limits": "Format list includes MPEG-1 System and MPEG-PS; libx264 is an external library; -i and -c are described in the command-line documentation.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "amr-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i memo.amr -c:a libmp3lame memo.mp3",
+          "limits": "3GPP AMR is in the format list; MP3 encoding uses the external LAME library (--enable-libmp3lame).",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "mpg-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i family.mpg -c:v libx264 -c:a aac family.mp4",
+          "limits": "Format list includes MPEG-1 System and MPEG-PS; libx264 is an external library.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "vob-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i clip.vob -c:v libx264 -c:a aac dvd-viewing.mp4",
+          "limits": "MPEG-PS is listed as also known as VOB; libx264 is an external library.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "aiff-to-mp3": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "File > Import > Audio and pick the AIFF; File > Export Audio; select MP3, set channels and sample rate, choose the entire project or the current selection; Export.",
+          "limits": "MP3 encoding settings are on a separate MP3 Export Options page.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html"
+        },
+        {
+          "app": "SoX",
+          "steps": "sox session.aiff -C 192 session.mp3",
+          "limits": "-C with a positive integer is the MP3 bitrate in kbps; MP3 writing needs SoX built with LAME.",
+          "source": "https://raw.githubusercontent.com/chirlu/sox/master/soxformat.7"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i session.aiff -c:a libmp3lame session.mp3",
+          "limits": "AIFF is in the format list; MP3 encoding uses the external LAME library.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "mp3-to-m4r": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "File > Import > Audio; File > Export Audio; with the optional FFmpeg library installed choose M4A (AAC) (FFmpeg) and type a name ending in .m4r; Export.",
+          "limits": "The M4A (AAC) (FFmpeg) choice needs the optional FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/faq_opening_and_saving_files.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i cue.mp3 -c:a aac -f ipod cue.m4r",
+          "limits": "MP3 is in the format list; the ipod muxer writes an MPEG-4 audio file limited to audio streams.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "nef-to-jpg": {
+      "methods": [
+        {
+          "app": "NX Studio",
+          "steps": "Select the photo; Export; set Export as to JPEG; set Quality; optionally Change image size under Resolution with a Long edge value; choose Save in; Export.",
+          "limits": "Nikon's own guide to file conversion.",
+          "source": "https://nps.nikonimaging.com/technical_info/technical_solutions/z8_tips/guide/en/nx_studio_file_conversion_guid-52ef67af-0777-1c66-fc6b-6bf685ca5355_5.html"
+        }
+      ]
+    },
+    "ogg-to-wav": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Open the OGG; File > Export Audio; name the file .wav; set Encoding (default Signed 16-bit PCM); choose the export range; Export.",
+          "limits": "WAV files are limited to 4 GB.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i interview.ogg -c:a pcm_s16le interview.wav",
+          "limits": "Ogg and PCM signed 16-bit little-endian are in the format and codec lists.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "SoX",
+          "steps": "sox interview.ogg interview.wav",
+          "limits": "Output type comes from the file extension unless -t is given.",
+          "source": "https://raw.githubusercontent.com/chirlu/sox/master/sox.1"
+        }
+      ]
+    },
+    "ai-to-png": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "Shift+Ctrl+E or File > Export PNG Image; choose Page, Drawing, Selection or Custom; set size in pixels or resolution; filename; Export.",
+          "limits": "Import manual lists Illustrator files from 9.0 onward.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick artwork.ai artwork.png",
+          "limits": "Format list shows AI as RW (Adobe Illustrator CS2).",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "svg-to-ico": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "Shift+Ctrl+E or File > Export PNG Image; choose Page, Drawing, Selection or Custom; set size in pixels or resolution; filename; Export.",
+          "limits": "Produces the PNG that the ImageMagick method starts from.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick image.png -alpha off -resize 256x256 -define icon:auto-resize=\"256,128,96,64,48,32,16\" favicon.ico",
+          "limits": "Input any image as long as it is square.",
+          "source": "https://usage.imagemagick.org/thumbnails/#favicon"
+        }
+      ]
+    }
+  }
+}

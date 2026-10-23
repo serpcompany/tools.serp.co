@@ -1,0 +1,440 @@
+{
+  "tools": {
+    "png-to-rgb": {
+      "methods": [
+        {
+          "app": "ImageMagick, raw samples",
+          "steps": "Run `magick texture.png -depth 8 rgb:texture.rgb`. ImageMagick's RGB format needs the size and depth supplied when it is read back, so write down the picture size.",
+          "limits": "RGB is a raw sample format; size and depth parameters are required to read it.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, `Image.open(\"texture.png\").convert(\"RGB\").tobytes()` returns the raw bytes, which you save to a file. Pillow registers the .rgb ending for its SGI writer, so its own save call would make an SGI image.",
+          "limits": "tobytes returns raw pixel data; Pillow's SGI plugin registers .rgb.",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/Image.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+            "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/PIL/SgiImagePlugin.py"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "ImageMagick, SGI",
+          "steps": "Run `magick texture.png sgi:texture.rgb` when the receiving program wants an SGI header.",
+          "limits": "SGI is listed as the Irix RGB image, distinct from raw RGB.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "png": [
+          "https://www.w3.org/TR/png/"
+        ],
+        "rgb": [
+          "https://imagemagick.org/formats/",
+          "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F09.json",
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json"
+      ]
+    },
+    "rm-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i lecture.rm -c:v libx264 -c:a aac lecture.mp4`. The -c:v and -c:a options choose the video and audio encoders, and FFmpeg takes the output format from the .mp4 extension.",
+          "limits": "General.html lists RealMedia; ffmpeg.html shows -i and -c:v/-c:a; libx264 and AAC encoders are documented.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "rm": [
+          "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        ],
+        "mp4": [
+          "https://gstreamer.freedesktop.org/documentation/isomp4/mp4mux.html",
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml",
+          "https://www.iana.org/assignments/media-types/video/mp4"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F09.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "tiff-to-gif": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick 'scan.tiff[0]' cover.gif`. The number in square brackets picks the image from a multi-image file, counting from 0, so `[1]` is the second one.",
+          "limits": "Index selection documented for multi-image files; the formats page lists TIFF and GIF as read/write.",
+          "source": "https://usage.imagemagick.org/files/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "IrfanView",
+          "steps": "Open the TIFF in IrfanView, which reads and saves both TIF and GIF, then use File > Save as and choose GIF as the output format.",
+          "limits": "Windows; formats page lists TIF and GIF with read and save; FAQ shows File > Save as with a chosen output format.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "tiff": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml",
+          "https://www.iana.org/assignments/media-types/image/tiff"
+        ],
+        "gif": [
+          "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+          "https://docs.gimp.org/3.0/en/file-gif-export.html",
+          "https://www.iana.org/assignments/media-types/image/gif"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json"
+      ]
+    },
+    "avi-to-mpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i capture.avi capture.mpeg`. FFmpeg reads AVI, and the .mpeg ending tells it to write an MPEG program stream.",
+          "limits": "General.html lists AVI and MPEG-PS; ffmpeg.html: output format guessed from the extension; ffmpeg-formats lists the mpeg (mpg,mpeg) muxer.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Prism",
+          "steps": "Run `prism.exe -convert \"C:\\Media\\capture.avi\" -format .mpg`. Prism lists AVI as an input and MPG as an output, It offers no completion message, so check its window yourself.",
+          "limits": "Windows; the command-line page shows -convert with -format .mpg and warns that Prism gives no completion feedback.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/prismcommandlinetool.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "avi": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        ],
+        "mpeg": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml",
+          "https://www.iana.org/assignments/media-types/video/mpeg"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "csv-to-jpg": {
+      "methods": [
+        {
+          "app": "Calc and ImageMagick",
+          "steps": "In Calc, choose File > Open for the CSV, then File > Export As > Export as PDF. Turn the first PDF page into an image with `magick 'table.pdf[0]' table.jpg`. ImageMagick relies on Ghostscript to read PDF.",
+          "limits": "Calc opens CSV with File > Open and exports through File > Export As > Export as PDF; ImageMagick reads the first PDF page with [0] via Ghostscript.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export_general.html",
+            "https://usage.imagemagick.org/files/",
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Excel and GIMP",
+          "steps": "Open the CSV in Excel with File > Open, select the cells, and choose Home > Copy arrow > Copy as Picture. In GIMP choose File > Create > From Clipboard, then File > Export As and type a name ending in .jpg.",
+          "limits": "Excel opens CSV with File > Open; Copy as Picture is on the Home tab; GIMP creates an image from the clipboard and exports by file name.",
+          "source": "https://support.microsoft.com/en-us/excel/get-started/import-or-export-text-txt-or-csv-files",
+          "supportSources": [
+            "https://support.microsoft.com/en-us/excel/create-a-picture-from-cells-a-chart-or-an-object-in-excel",
+            "https://docs.gimp.org/3.0/en/gimp-file-create.html",
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Python and Pillow",
+          "steps": "Read the rows with `csv.reader`, draw them on an image with `ImageDraw.multiline_text` and save with `image.save(\"table.jpg\", \"JPEG\")`. You choose the canvas size, fonts and column widths in the script.",
+          "limits": "Custom script from documented APIs, not a built-in CSV-to-image command.",
+          "source": "https://docs.python.org/3/library/csv.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/reference/Image.html",
+            "https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html",
+            "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "csv": [
+          "https://www.rfc-editor.org/rfc/rfc4180.txt",
+          "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html",
+          "https://support.microsoft.com/en-us/excel/get-started/import-or-export-text-txt-or-csv-files",
+          "https://docs.python.org/3/library/csv.html"
+        ],
+        "jpg": [
+          "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "https://www.iana.org/assignments/media-types/image/jpeg"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-05/apps/tools/content/sources/formats-F05.json",
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json"
+      ]
+    },
+    "dcm-to-jpeg": {
+      "methods": [
+        {
+          "app": "MicroDicom",
+          "steps": "Open the images, or a disc or folder with File > Scan for DICOM files, then choose File > Export > To a picture file or press Shift+P. Pick a destination folder, what to export and JPG as the image format, then click Export. More settings sets the JPEG quality and whether annotations and overlay text are drawn.",
+          "limits": "Windows viewer; whole series, study or patient export; JPEG quality and overlay settings.",
+          "source": "https://www.microdicom.com/microdicom-viewer-documentation/export-more-dicom-files.html",
+          "supportSources": [],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick image.dcm image.jpeg`. ImageMagick reads DICOM images and recognizes window center and width tags.",
+          "limits": "The formats page lists DCM as read-only with window center and width support; the command form is shown on the command-line page.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "IrfanView",
+          "steps": "Install the plug-ins IrfanView needs for DCM, open the file, then use File > Save as and choose JPG as the output format.",
+          "limits": "Windows; the formats page lists DCM as read-only and plug-in required; the FAQ shows File > Save as with a chosen format.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "dcm": [
+          "https://www.rfc-editor.org/rfc/rfc3240.txt",
+          "https://www.microdicom.com/microdicom-viewer-documentation/export-more-dicom-files.html",
+          "https://imagemagick.org/formats/"
+        ],
+        "jpeg": [
+          "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "https://www.iana.org/assignments/media-types/image/jpeg"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F10.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "divx-to-mp4": {
+      "methods": [
+        {
+          "app": "Prism",
+          "steps": "Prism lists AVI files encoded with DivX as an input. Run `prism.exe -convert \"C:\\Media\\feature.avi\" -format .mp4` on the AVI that holds your DivX video. Prism gives no sign that the job is done, so keep an eye on its window.",
+          "limits": "Windows; the formats page says avi includes divx, xvid and h264 encoded files and lists mp4 output; the command-line page shows -convert with -format .mp4 and warns of no completion feedback.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/prismcommandlinetool.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "divx": [
+          "https://www.divx.com/divx-11/",
+          "https://www.divx.com/press/divx-author-1-5-now-available-in-multiple-languages/",
+          "https://www.adobe.com/creativecloud/file-types/video/container/divx.html"
+        ],
+        "mp4": [
+          "https://gstreamer.freedesktop.org/documentation/isomp4/mp4mux.html",
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml",
+          "https://www.iana.org/assignments/media-types/video/mp4"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-05/apps/tools/content/sources/formats-F11.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "flv-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i interview.flv -c:v libx264 -c:a aac interview.mov`. FFmpeg lists FLV and MOV for both reading and writing, takes the output format from the .mov extension, and gets H.264 from the external library libx264, so your build must include it.",
+          "limits": "general.html lists Flash Video (FLV) and MOV/QuickTime for encoding and decoding and says libx264 is an external library; ffmpeg.html documents -c:v/-c:a and guessing output format from the extension; ffmpeg-codecs.html documents libx264 and aac.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "flv": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml",
+          "https://www.adobe.com/products/flashplayer/end-of-life.html"
+        ],
+        "mov": [
+          "https://gstreamer.freedesktop.org/documentation/isomp4/qtmux.html",
+          "https://www.iana.org/assignments/media-types/video/quicktime"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "flv-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i lesson.flv lesson.wmv`. FFmpeg lists Flash Video and ASF for both reading and writing, and it takes the output format from the .wmv extension, so no codec options are needed.",
+          "limits": "general.html lists Flash Video (FLV) and ASF for encoding and decoding; ffmpeg.html says the output format is guessed from the output file extension.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "flv": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml",
+          "https://www.adobe.com/products/flashplayer/end-of-life.html"
+        ],
+        "wmv": [
+          "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format",
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json"
+      ]
+    },
+    "gif-to-bmp": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick badge.gif'[0]' badge.bmp`. The number in brackets picks the frame, counting from 0, and the output format comes from the .bmp suffix.",
+          "limits": "usage.imagemagick.org/files says the first image is index zero and output format comes from a filename suffix; formats page lists GIF and BMP (BMP, BMP2, BMP3) as read and write.",
+          "source": "https://usage.imagemagick.org/files/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Pillow",
+          "steps": "Run `from PIL import Image; Image.open(\"badge.gif\").convert(\"RGB\").save(\"badge.bmp\")`. It converts the picture to RGB and takes the BMP format from the filename extension.",
+          "limits": "Image reference documents open, convert(\"RGB\") and save with the format taken from the filename extension; the formats handbook says Pillow reads and writes BMP with RGB data.",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/Image.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ],
+      "formatSources": {
+        "gif": [
+          "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+          "https://docs.gimp.org/3.0/en/file-gif-export.html",
+          "https://www.iana.org/assignments/media-types/image/gif"
+        ],
+        "bmp": [
+          "https://learn.microsoft.com/en-us/windows/win32/gdi/bitmap-storage",
+          "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        ]
+      },
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b05.md",
+        "basis": "Generated engine facts and converter appendix; no additional implementation behavior promoted to page claims."
+      },
+      "factSheetAvailability": "All required format sheets found in coordinated output directories; no unavailable-sheet dependency.",
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json"
+      ]
+    }
+  }
+}

@@ -9,7 +9,6 @@ import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { buildToolMetadata } from "@/lib/metadata";
 import { toolContent } from '@/lib/tool-content';
-import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "batch-compress-png";
 
@@ -21,10 +20,6 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
-  const videoEmbedId = getEnabledVideoEmbedId({
-    tool: content.tool,
-    videoSection: content.videoSection,
-  });
 
   return (
     <main className="min-h-screen bg-background">
@@ -38,7 +33,7 @@ export default function Page() {
         from={content.tool.from}
         to={content.tool.to}
         accept={content.tool.accept}
-        videoEmbedId={videoEmbedId}
+       
       />
 
       {/* About the Formats Section */}

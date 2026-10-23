@@ -1,0 +1,836 @@
+{
+  "formats": {
+    "eps": {
+      "background": [
+        {
+          "fact": "Adobe developed EPS in the late 1980s for placing illustrations in printed documents.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000246.shtml"
+        },
+        {
+          "fact": "An EPS represents one rectangular graphic through PostScript instructions.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000246.shtml"
+        },
+        {
+          "fact": "The format can combine vector drawing commands with raster images.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000246.shtml"
+        },
+        {
+          "fact": "EPS version 3 appeared in 1990; Adobe published its separate specification in 1992.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000246.shtml"
+        },
+        {
+          "fact": "The MIME type is application/postscript.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000246.shtml"
+        },
+        {
+          "fact": "PDF has replaced EPS in many publishing workflows, though EPS remains relevant to legacy artwork.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000246.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads EPS through Ghostscript; installed policy and delegates determine availability.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Ghostscript",
+            "note": "Interprets the PostScript instructions used by EPS.",
+            "source": "https://www.ghostscript.com/"
+          },
+          {
+            "app": "Adobe Illustrator",
+            "note": "Can open EPS or place it as linked artwork; unfamiliar objects can be lost during import.",
+            "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads EPS through Ghostscript; installed policy and delegates determine availability.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Ghostscript",
+            "note": "Interprets the PostScript instructions used by EPS.",
+            "source": "https://www.ghostscript.com/"
+          },
+          {
+            "app": "Adobe Illustrator",
+            "note": "Can open EPS or place it as linked artwork; unfamiliar objects can be lost during import.",
+            "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads EPS through Ghostscript; installed policy and delegates determine availability.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Ghostscript",
+            "note": "Interprets the PostScript instructions used by EPS.",
+            "source": "https://www.ghostscript.com/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Current macOS lacks a built-in EPS viewer; Preview support is limited to older releases such as macOS 12 and earlier.",
+          "source": "https://support.apple.com/en-us/108775"
+        },
+        {
+          "fact": "EPS cannot retain live transparency; Adobe recommends PDF 1.4 when placing transparent artwork.",
+          "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+        },
+        {
+          "fact": "Opening an EPS in Illustrator can discard objects that its importer does not recognize.",
+          "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+        },
+        {
+          "fact": "ImageMagick needs Ghostscript to decode EPS, so an installation without it cannot render the artwork.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "avchd": {
+      "background": [
+        {
+          "fact": "AVCHD is a camera recording system that packages its streams as MPEG-2 Transport Stream.",
+          "source": "https://www.avchd-info.org/format/index.html"
+        },
+        {
+          "fact": "Its standard video compression uses MPEG-4 AVC/H.264.",
+          "source": "https://www.avchd-info.org/format/index.html"
+        },
+        {
+          "fact": "Audio may use Dolby Digital AC-3 or uncompressed Linear PCM.",
+          "source": "https://www.avchd-info.org/format/index.html"
+        },
+        {
+          "fact": "The recording system includes interlaced and progressive HD modes.",
+          "source": "https://www.avchd-info.org/format/index.html"
+        },
+        {
+          "fact": "The published format includes 8-bit samples with 4:2:0 chroma sampling.",
+          "source": "https://www.avchd-info.org/format/index.html"
+        },
+        {
+          "fact": "AVCHD recording media include memory cards, built-in storage and 8 cm DVD media.",
+          "source": "https://www.avchd-info.org/format/index.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Can read MPEG transport streams and decode H.264 camera clips; this does not promise reconstruction of camera menus.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MPEG-TS and H.264 streams for inspection and conversion of camera clips.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Can read MPEG transport streams and decode H.264 camera clips; this does not promise reconstruction of camera menus.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MPEG-TS and H.264 streams for inspection and conversion of camera clips.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "iMovie",
+            "note": "Sony documents AVCHD PS-mode import with iMovie 10 and OS X 10.9 or later.",
+            "source": "https://www.sony.com.sg/electronics/support/e-mount-body-nex-3-series/nex-c3k/articles/00072276"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Can read MPEG transport streams and decode H.264 camera clips; this does not promise reconstruction of camera menus.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MPEG-TS and H.264 streams for inspection and conversion of camera clips.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Abrupt changes in brightness or camera angle can make compressed AVCHD pictures look unstable without indicating a camera fault.",
+          "source": "https://helpguide.sony.net/ilc/1540/v1/en/contents/TP0000808746.html"
+        },
+        {
+          "fact": "iMovie 08, 09 and 11 do not support AVCHD 2.0 recordings made in 1080/60p or 720/60p.",
+          "source": "https://www.sony.com/electronics/support/a-mount-body-slt-a30-series/slt-a35/articles/00016755"
+        },
+        {
+          "fact": "Importing 50p or 60p AVCHD PS-mode footage into iMovie requires iMovie 10 or later and OS X 10.9 or later.",
+          "source": "https://www.sony.com.sg/electronics/support/e-mount-body-nex-3-series/nex-c3k/articles/00072276"
+        }
+      ]
+    },
+    "oga": {
+      "background": [
+        {
+          "fact": "The .oga extension identifies general Ogg audio rather than a single audio codec.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "RFC 5334 registered audio/ogg and its .oga extension in September 2008.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "A .ogg extension is reserved by that RFC for Ogg containing a Vorbis-only bitstream.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "An Ogg audio stream can carry different codecs, including Vorbis, FLAC and Speex.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "The Xiph.Org Foundation controls the audio/ogg registration.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "Ogg files begin with an OggS capture pattern.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Opens Ogg containers; playback also depends on the enclosed codec.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Demuxes Ogg and decodes supported Vorbis, FLAC, Speex and Opus audio.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Opens Ogg containers; playback also depends on the enclosed codec.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Demuxes Ogg and decodes supported Vorbis, FLAC, Speex and Opus audio.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Opens Ogg containers; playback also depends on the enclosed codec.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Demuxes Ogg and decodes supported Vorbis, FLAC, Speex and Opus audio.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Its publisher lists Ogg container support with included decoders.",
+            "source": "https://play.google.com/store/apps/details?hl=en_US&id=org.videolan.vlc"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A player that recognizes the Ogg wrapper can still lack the decoder for the particular audio stream.",
+          "source": "https://www.xiph.org/ogg/"
+        },
+        {
+          "fact": "Treating every .oga as Vorbis misidentifies files encoded with other audio codecs.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "A codec-specific .ogg assumption can prevent an application from handling general .oga streams correctly.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        }
+      ]
+    },
+    "asf": {
+      "background": [
+        {
+          "fact": "Microsoft created ASF as a proprietary, publicly documented multimedia wrapper.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "An ASF can hold audio, video, still images and other stream types.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "WMA and WMV are ASF subtypes associated with Windows Media streams.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "ASF was designed for media delivery, including streaming.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "Header objects can carry titles, authorship, copyright and technical metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "Its registered MIME type is application/vnd.ms-asf.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF, WMV and WMA among its input formats.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Supports ASF input and output; supported stream decoders are still required.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF, WMV and WMA among its input formats.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Supports ASF input and output; supported stream decoders are still required.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF, WMV and WMA among its input formats.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Supports ASF input and output; supported stream decoders are still required.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "The ASF extension identifies a wrapper, so it does not establish which audio or video decoder is needed.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "Picture fidelity and multichannel support depend on the encoded streams rather than the ASF wrapper.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        },
+        {
+          "fact": "ASF metadata can include digital rights management information, which must not be mistaken for ordinary descriptive tags.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000067.shtml"
+        }
+      ]
+    },
+    "dcm": {
+      "background": [
+        {
+          "fact": "DICOM defines medical objects including images, waveforms, reports and related information.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        },
+        {
+          "fact": "The registered MIME type for DICOM files is application/dicom.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        },
+        {
+          "fact": "The registration recommends .dcm for disk files other than DICOMDIR.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        },
+        {
+          "fact": "DICOMDIR can index a collection of related DICOM files.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        },
+        {
+          "fact": "DICOM files use binary information and require lossless binary transfer.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        },
+        {
+          "fact": "A DICM marker following a 128-byte preamble identifies the Part 10 file structure.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        },
+        {
+          "fact": "The ACR-NEMA predecessor appeared in 1985; the renamed DICOM standard followed in 1993.",
+          "source": "https://www.dicomstandard.org/history"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "MicroDicom",
+            "note": "Windows viewer, free for noncommercial use, for CT, MRI and other DICOM studies.",
+            "source": "https://www.microdicom.com/"
+          },
+          {
+            "app": "3D Slicer",
+            "note": "Imports DICOM studies into a database, then loads the chosen series; extra objects may need extensions.",
+            "source": "https://slicer.readthedocs.io/en/latest/user_guide/modules/dicom.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads DICOM images and recognizes window center and width tags; it is not a full study-management viewer.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "3D Slicer",
+            "note": "Imports DICOM studies into a database, then loads the chosen series; extra objects may need extensions.",
+            "source": "https://slicer.readthedocs.io/en/latest/user_guide/modules/dicom.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads DICOM images and recognizes window center and width tags; it is not a full study-management viewer.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "3D Slicer",
+            "note": "Imports DICOM studies into a database, then loads the chosen series; extra objects may need extensions.",
+            "source": "https://slicer.readthedocs.io/en/latest/user_guide/modules/dicom.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads DICOM images and recognizes window center and width tags; it is not a full study-management viewer.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Opening one instance may show only one slice because an image series often spans many files.",
+          "source": "https://slicer.readthedocs.io/en/latest/user_guide/modules/dicom.html"
+        },
+        {
+          "fact": "Some DICOM information objects require Slicer extensions instead of its core image importer.",
+          "source": "https://slicer.readthedocs.io/en/latest/user_guide/modules/dicom.html"
+        },
+        {
+          "fact": "File and folder names do not reliably identify the patient, study or series; use the DICOM attributes.",
+          "source": "https://slicer.readthedocs.io/en/latest/user_guide/modules/dicom.html"
+        },
+        {
+          "fact": "DICOM objects can contain demographic information, so sharing an exported image and sharing the source study have different privacy consequences.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3240.txt"
+        }
+      ]
+    },
+    "ppt": {
+      "background": [
+        {
+          "fact": "PPT is the binary presentation format used by PowerPoint 97 through Office 2003.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        },
+        {
+          "fact": "The .ppt extension differs from the later XML-based .pptx format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        },
+        {
+          "fact": "A presentation holds slides, which can include text, graphics, transitions and animations.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        },
+        {
+          "fact": "The presentation model also supports notes, handouts and comments.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        },
+        {
+          "fact": "The MIME type is application/vnd.ms-powerpoint.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        },
+        {
+          "fact": "PPT cannot represent every feature introduced in PowerPoint 2007 and later.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Impress",
+            "note": "Opens .ppt and .pps through File > Open.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          },
+          {
+            "app": "Apache OpenOffice Impress",
+            "note": "Imports legacy PPT presentations and can save in PowerPoint format.",
+            "source": "https://www.openoffice.org/product/impress.html"
+          },
+          {
+            "app": "Microsoft PowerPoint",
+            "note": "Opens legacy PowerPoint 97-2003 presentations; newer features may require PPTX.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Impress",
+            "note": "Opens .ppt and .pps through File > Open.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          },
+          {
+            "app": "Apache OpenOffice Impress",
+            "note": "Imports legacy PPT presentations and can save in PowerPoint format.",
+            "source": "https://www.openoffice.org/product/impress.html"
+          },
+          {
+            "app": "Microsoft PowerPoint",
+            "note": "Opens legacy PowerPoint 97-2003 presentations; newer features may require PPTX.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Impress",
+            "note": "Opens .ppt and .pps through File > Open.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          },
+          {
+            "app": "Apache OpenOffice Impress",
+            "note": "Imports legacy PPT presentations and can save in PowerPoint format.",
+            "source": "https://www.openoffice.org/product/impress.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "PowerPoint for the web",
+            "note": "Reads PPT; save a copy as PPTX to edit it.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          },
+          {
+            "app": "Google Slides",
+            "note": "Imports Microsoft PowerPoint presentations into the browser editor.",
+            "source": "https://workspace.google.com/products/slides/"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Saving newer presentation features into PPT can lose functionality that the older format cannot store.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000511.shtml"
+        },
+        {
+          "fact": "PowerPoint for the web reads .ppt but requires a .pptx copy for editing.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+        },
+        {
+          "fact": "A file downloaded from the internet may be blocked by Office security and report that it cannot be opened.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/error-can-t-read-file-or-presentation-cannot-be-opened"
+        }
+      ]
+    },
+    "dxf": {
+      "background": [
+        {
+          "fact": "Autodesk publishes DXF to exchange AutoCAD drawing data.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000446.shtml"
+        },
+        {
+          "fact": "The first DXF documentation appeared in 1982.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000446.shtml"
+        },
+        {
+          "fact": "DXF exists in text and binary representations.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000446.shtml"
+        },
+        {
+          "fact": "A text DXF uses group codes paired with values.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000446.shtml"
+        },
+        {
+          "fact": "New drawing capabilities have introduced additional codes and format versions.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000446.shtml"
+        },
+        {
+          "fact": "The registered MIME type is image/vnd.dxf.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000446.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreCAD",
+            "note": "Reads DXF drawings in its 2D CAD workspace.",
+            "source": "https://docs.librecad.org/en/latest/about/"
+          },
+          {
+            "app": "QCAD Community Edition",
+            "note": "Free 2D CAD application with DXF support; advanced interchange features belong to QCAD Professional.",
+            "source": "https://github.com/qcad/qcad"
+          },
+          {
+            "app": "Adobe Illustrator",
+            "note": "Imports DXF from AutoCAD 2.5 through 2007, with unit and scale settings.",
+            "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+          },
+          {
+            "app": "AutoCAD",
+            "note": "Use Open Drawing and select DXF in the file-type list.",
+            "source": "https://help.autodesk.com/view/MAP/2024/ENU/?guid=GUID-0946DAF8-59C7-4C2A-9834-D4824838EE46"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreCAD",
+            "note": "Reads DXF drawings in its 2D CAD workspace.",
+            "source": "https://docs.librecad.org/en/latest/about/"
+          },
+          {
+            "app": "QCAD Community Edition",
+            "note": "Free 2D CAD application with DXF support; advanced interchange features belong to QCAD Professional.",
+            "source": "https://github.com/qcad/qcad"
+          },
+          {
+            "app": "Adobe Illustrator",
+            "note": "Imports DXF from AutoCAD 2.5 through 2007, with unit and scale settings.",
+            "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreCAD",
+            "note": "Reads DXF drawings in its 2D CAD workspace.",
+            "source": "https://docs.librecad.org/en/latest/about/"
+          },
+          {
+            "app": "QCAD Community Edition",
+            "note": "Free 2D CAD application with DXF support; advanced interchange features belong to QCAD Professional.",
+            "source": "https://github.com/qcad/qcad"
+          }
+        ],
+        "web": [
+          {
+            "app": "Autodesk Viewer",
+            "note": "Autodesk offers browser viewing for CAD interchange files including DXF.",
+            "source": "https://www.autodesk.com/viewers"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "LibreCAD does not implement every DXF feature and lists supported versions through DXF 2007.",
+          "source": "https://dokuwiki.librecad.org/doku.php/usage%3Afaq"
+        },
+        {
+          "fact": "Illustrator refuses AutoCAD drawings saved later than the 2007 format; an older export is needed.",
+          "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+        },
+        {
+          "fact": "An Illustrator DXF import can ask for missing external references because the drawing points to separate files.",
+          "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+        },
+        {
+          "fact": "Scale and unit mapping need attention when moving a CAD drawing into Illustrator.",
+          "source": "https://helpx.adobe.com/illustrator/using/importing-eps-dcs-autocad-files.html"
+        }
+      ]
+    },
+    "jp2": {
+      "background": [
+        {
+          "fact": "JP2 wraps a JPEG 2000 codestream in the Part 1 file format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        },
+        {
+          "fact": "The Joint Photographic Experts Group developed this still-image wrapper.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        },
+        {
+          "fact": "JPEG 2000 compression can be lossy or lossless.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        },
+        {
+          "fact": "The wrapper can store color profiles, opacity information and other metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        },
+        {
+          "fact": "Its standard extension is .jp2 and its registered media type is image/jp2.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        },
+        {
+          "fact": "The Library of Congress uses lossy JP2 service images for digitized maps and newspapers.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists read and write support for JP2; check the installed format list for a particular build.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "OpenJPEG",
+            "note": "Open-source JPEG 2000 codec and command-line utilities; decoding support is distinct from an interactive viewer.",
+            "source": "https://www.openjpeg.org/"
+          },
+          {
+            "app": "Adobe Photoshop",
+            "note": "Adobe documents opening JP2 images in Photoshop.",
+            "source": "https://www.adobe.com/creativecloud/file-types/image/raster/jpeg-2000-file.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists read and write support for JP2; check the installed format list for a particular build.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "OpenJPEG",
+            "note": "Open-source JPEG 2000 codec and command-line utilities; decoding support is distinct from an interactive viewer.",
+            "source": "https://www.openjpeg.org/"
+          },
+          {
+            "app": "Adobe Photoshop",
+            "note": "Adobe documents opening JP2 images in Photoshop.",
+            "source": "https://www.adobe.com/creativecloud/file-types/image/raster/jpeg-2000-file.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists read and write support for JP2; check the installed format list for a particular build.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "OpenJPEG",
+            "note": "Open-source JPEG 2000 codec and command-line utilities; decoding support is distinct from an interactive viewer.",
+            "source": "https://www.openjpeg.org/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A JP2 is not interchangeable with a JPX file: JPX belongs to JPEG 2000 Part 2 rather than the basic Part 1 wrapper.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+        },
+        {
+          "fact": "A lossy JPEG 2000 codestream does not recover discarded image information simply by being saved as JP2.",
+          "source": "https://jpeg.org/jpeg2000/"
+        }
+      ]
+    },
+    "av1": {
+      "background": [
+        {
+          "fact": "AV1 means AOMedia Video 1 and identifies a video codec rather than a complete multimedia container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "The Alliance for Open Media developed its bitstream and decoding specification.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "AV1 is an open, royalty-free video coding format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "Its bitstream is organized into open bitstream units called OBUs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "Its registered media type is video/av1.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "AV1 supports full-resolution chroma configurations, including 4:4:4.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "AOMedia announced the public release of the AV1 1.0 specification on March 28, 2018.",
+          "source": "https://aomedia.org/press%20releases/the-alliance-for-open-media-kickstarts-video-innovation-era-with-av1-release/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Can decode AV1 through documented decoders; build options determine available implementations.",
+            "source": "https://ffmpeg.org/ffmpeg-codecs.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg-based test player.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Can decode AV1 through documented decoders; build options determine available implementations.",
+            "source": "https://ffmpeg.org/ffmpeg-codecs.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg-based test player.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Can decode AV1 through documented decoders; build options determine available implementations.",
+            "source": "https://ffmpeg.org/ffmpeg-codecs.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg-based test player.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "AV1 has no required filename extension, so the suffix alone cannot establish the container or framing.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "AV1 encoding can take longer because the compression process is complex.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000541.shtml"
+        },
+        {
+          "fact": "A raw OBU stream and an AV1 image container are different inputs; FFmpeg documents them as separate formats.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "ts-to-mp4": {
+    "seo": {
+      "title": "Convert TS to MP4 Online (Free)",
+      "h1": "TS to MP4 Converter",
+      "description": "Convert TS to MP4 in your browser: the video is re-encoded as H.264 with AAC audio, up to 1920 px and 30 fps. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert TS to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a TS transport stream into an MP4 video, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the TS video re-encoded or just repackaged?",
+        "answer": "It is re-encoded. The video becomes H.264 and the sound becomes AAC at 96 kbps, so the MP4 is a new encode of your TS, not a copy of its streams."
+      },
+      {
+        "question": "Will the MP4 keep the TS frame size and frame rate?",
+        "answer": "Yes, up to a limit. The frame rate is kept up to 30 fps, and the size up to 1920 px on the longer side, where a larger frame is scaled down to fit. Each side is rounded down to an even number, so an odd width or height loses 1 px."
+      },
+      {
+        "question": "What happens to interlaced video?",
+        "answer": "Frames that are flagged as interlaced are deinterlaced with FFmpeg's yadif filter, which is common for TS files recorded from broadcasts. Other frames pass through unchanged."
+      },
+      {
+        "question": "Can I convert several TS files at once?",
+        "answer": "Yes. Choose them together and they convert one after another. Each one downloads as its own MP4, and there is no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "TS and MP4",
+      "fromFormat": {
+        "name": "TS",
+        "fullName": "MPEG transport stream",
+        "description": "A container format standardized in MPEG-2 Systems (ISO/IEC 13818-1) for broadcasting. It splits video, audio and data into small fixed-size packets so streams survive transmission errors.",
+        "details": [
+          "188-byte packets",
+          "Error resilience",
+          "Multiple streams in one file",
+          "Used for digital television and HLS segments"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TS to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with AAC audio at 96 kbps.",
+        "Frame size and frame rate are kept up to 1920 px on the longer side and 30 fps, with an odd side rounded down by 1 px.",
+        "Interlaced frames are deinterlaced.",
+        "Converting several TS files gives one MP4 for each.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "webm-to-mp3": {
+    "seo": {
+      "title": "Convert WebM to MP3 Online (Free)",
+      "h1": "WebM to MP3 Converter",
+      "description": "Convert WebM to MP3 in your browser: the soundtrack is saved as a 192 kbps MP3 and the video is dropped. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert WebM to MP3"
+    },
+    "tool": {
+      "subtitle": "Save the sound from a WebM video as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps. The sound is re-encoded to MP3 with the LAME encoder at that bitrate, whatever codec the WebM used for its audio."
+      },
+      {
+        "question": "What happens to the video in my WebM?",
+        "answer": "It is dropped. The MP3 holds only the audio, and the conversion doesn't touch your original WebM, which you can still use."
+      },
+      {
+        "question": "Why does my silent screen recording fail?",
+        "answer": "A WebM with no audio track leaves FFmpeg nothing to turn into an MP3, so you see \"FFmpeg failed with exit code\" and a number. Convert a clip that has sound."
+      },
+      {
+        "question": "Does converting change my WebM file?",
+        "answer": "No. Your original stays as it is, and you download the MP3 as a new file next to it."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebM and MP3",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebM to MP3",
+      "points": [
+        "Only the sound is kept: the video is dropped.",
+        "The MP3 is encoded at 192 kbps.",
+        "Converting several WebM files gives one MP3 for each.",
+        "A WebM without an audio track can't be converted.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  }
+}

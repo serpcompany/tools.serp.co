@@ -1,0 +1,3455 @@
+{
+  "3g2": {
+    "name": "3G2",
+    "fullName": "3GPP2 multimedia",
+    "kind": "video",
+    "summary": "A container format defined by 3GPP2 for video on CDMA mobile phones. It is similar to 3GP and based on the MPEG-4 container.",
+    "usedFor": [
+      "Video on older CDMA mobile phones",
+      "MMS video"
+    ],
+    "properties": [
+      "MPEG-4-based container",
+      "H.264 or MPEG-4 video",
+      "small files",
+      "3GPP2 standard"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player"
+    ]
+  },
+  "3gp": {
+    "name": "3GP",
+    "fullName": "3GPP multimedia",
+    "kind": "video",
+    "summary": "A container format defined by the 3rd Generation Partnership Project for video on mobile phones. It is a simplified version of the MP4 container and keeps files small.",
+    "usedFor": [
+      "Video on older mobile phones",
+      "MMS video"
+    ],
+    "properties": [
+      "MPEG-4-based container",
+      "H.263, H.264 and AAC or AMR audio",
+      "small files",
+      "3GPP standard"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player",
+      "Windows Media Player"
+    ]
+  },
+  "aac": {
+    "name": "AAC",
+    "fullName": "Advanced Audio Coding",
+    "kind": "audio",
+    "summary": "A lossy audio codec standardized by MPEG (ISO/IEC 13818-7 and 14496-3) as the successor to MP3. It generally gives better quality than MP3 at the same bitrate.",
+    "usedFor": [
+      "Streaming audio and music downloads",
+      "Audio in MP4 videos",
+      "Mobile devices"
+    ],
+    "properties": [
+      "lossy compression",
+      "better efficiency than MP3",
+      "raw .aac streams or MP4 containers",
+      "widely supported"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Apple Music",
+      "Windows Media Player",
+      "Any web browser"
+    ]
+  },
+  "actionscript": {
+    "name": "ActionScript",
+    "fullName": "ActionScript",
+    "kind": "text",
+    "summary": "The programming language of Adobe Flash, an ECMAScript-based language. Flash Player reached end of life at the end of 2020.",
+    "usedFor": [
+      "Flash animations and games",
+      "Legacy Adobe AIR apps"
+    ],
+    "properties": [
+      "ECMAScript-based",
+      "used with Flash and AIR",
+      "legacy language"
+    ],
+    "openWith": [
+      "Adobe Animate",
+      "VS Code",
+      "Any text editor"
+    ]
+  },
+  "ai": {
+    "name": "AI",
+    "fullName": "Adobe Illustrator artwork",
+    "kind": "vector",
+    "summary": "The native file format of Adobe Illustrator. It stores vector artwork such as paths, shapes, text and effects, and modern files embed a PDF-compatible stream.",
+    "usedFor": [
+      "Logos and illustrations",
+      "Print and packaging design"
+    ],
+    "properties": [
+      "vector artwork",
+      "layers and artboards",
+      "PDF-compatible content",
+      "proprietary Adobe format"
+    ],
+    "openWith": [
+      "Adobe Illustrator",
+      "Inkscape",
+      "Affinity Designer",
+      "CorelDRAW"
+    ]
+  },
+  "aif": {
+    "name": "AIF",
+    "fullName": "Audio Interchange File Format",
+    "kind": "audio",
+    "summary": "A short file extension for AIFF, the Audio Interchange File Format developed by Apple. The data is usually uncompressed PCM audio.",
+    "usedFor": [
+      "Audio production on macOS",
+      "Professional sound editing"
+    ],
+    "properties": [
+      "usually uncompressed PCM",
+      "lossless",
+      "same format as .aiff"
+    ],
+    "openWith": [
+      "Apple Music",
+      "Audacity",
+      "VLC media player",
+      "Logic Pro"
+    ]
+  },
+  "aifc": {
+    "name": "AIFC",
+    "fullName": "Compressed Audio Interchange File Format",
+    "kind": "audio",
+    "summary": "An extension of AIFF that adds support for compressed audio. It uses the same container but can hold compression types such as ULAW or ALAW alongside PCM.",
+    "usedFor": [
+      "Compressed audio on macOS",
+      "Audio production workflows"
+    ],
+    "properties": [
+      "AIFF container",
+      "optional compression",
+      "metadata chunks"
+    ],
+    "openWith": [
+      "Apple Music",
+      "Audacity",
+      "VLC media player"
+    ]
+  },
+  "aiff": {
+    "name": "AIFF",
+    "fullName": "Audio Interchange File Format",
+    "kind": "audio",
+    "summary": "An audio file format developed by Apple in 1988 and based on the IFF container. It usually stores uncompressed PCM audio.",
+    "usedFor": [
+      "Audio production on macOS",
+      "Professional sound editing"
+    ],
+    "properties": [
+      "usually uncompressed PCM",
+      "lossless",
+      "metadata chunks",
+      "large files"
+    ],
+    "openWith": [
+      "Apple Music",
+      "Audacity",
+      "VLC media player",
+      "Logic Pro"
+    ]
+  },
+  "alac": {
+    "name": "ALAC",
+    "fullName": "Apple Lossless Audio Codec",
+    "kind": "audio",
+    "summary": "A lossless audio codec developed by Apple, released as open source in 2011. It is usually stored in an MPEG-4 container with the .m4a extension.",
+    "usedFor": [
+      "Lossless music in the Apple ecosystem",
+      "CD archiving with iTunes"
+    ],
+    "properties": [
+      "lossless compression",
+      "MPEG-4 container",
+      "supported by Apple devices"
+    ],
+    "openWith": [
+      "Apple Music",
+      "VLC media player",
+      "foobar2000",
+      "iPhone and iPad"
+    ]
+  },
+  "amr": {
+    "name": "AMR",
+    "fullName": "Adaptive Multi-Rate audio",
+    "kind": "audio",
+    "summary": "A speech audio codec standardized by 3GPP and widely used in mobile phone networks. It is optimized for voice and compresses to very small files.",
+    "usedFor": [
+      "Voice recordings on phones",
+      "Voice messages",
+      "Mobile telephony"
+    ],
+    "properties": [
+      "lossy speech compression",
+      "8 kHz sampling",
+      "bitrates from 4.75 to 12.2 kbit/s",
+      "3GPP standard"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player",
+      "Audacity"
+    ]
+  },
+  "apng": {
+    "name": "APNG",
+    "fullName": "Animated Portable Network Graphics",
+    "kind": "image",
+    "summary": "An extension of PNG, originally proposed by Mozilla, that stores multiple frames in one file. It keeps PNG's lossless compression and full alpha transparency.",
+    "usedFor": [
+      "Animated stickers and graphics",
+      "Animations that need smooth transparency"
+    ],
+    "properties": [
+      "lossless compression",
+      "alpha transparency",
+      "animation",
+      "backward compatible with PNG viewers"
+    ],
+    "openWith": [
+      "Firefox",
+      "Chrome",
+      "Safari",
+      "GIMP"
+    ]
+  },
+  "arw": {
+    "name": "ARW",
+    "fullName": "Sony Alpha RAW",
+    "kind": "raster-camera",
+    "summary": "The raw image format of Sony Alpha cameras. It stores unprocessed sensor data, so white balance, exposure and color can be adjusted later without losing quality.",
+    "usedFor": [
+      "Professional and enthusiast photography",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "12 to 14 bits per channel",
+      "camera-specific proprietary format",
+      "TIFF-based structure"
+    ],
+    "openWith": [
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "Sony Imaging Edge",
+      "darktable"
+    ]
+  },
+  "ascii": {
+    "name": "ASCII",
+    "fullName": "ASCII table",
+    "kind": "text",
+    "summary": "A plain-text table drawn with ASCII characters, using +, - and | for borders and spaces to line up columns in a fixed-width font. ASCII is the 128-character set that UTF-8 also contains.",
+    "usedFor": [
+      "Tables in terminal output and logs",
+      "Tables in plain-text email and code comments"
+    ],
+    "properties": [
+      "plain text",
+      "fixed-width columns",
+      "+, - and | borders",
+      "7-bit ASCII characters"
+    ],
+    "openWith": [
+      "Notepad",
+      "TextEdit on macOS",
+      "VS Code"
+    ]
+  },
+  "asciidoc": {
+    "name": "AsciiDoc",
+    "fullName": "AsciiDoc",
+    "kind": "text",
+    "summary": "A plain-text markup language for writing documentation, articles and books. It can be converted to HTML, PDF and DocBook with tools such as Asciidoctor.",
+    "usedFor": [
+      "Technical documentation",
+      "Books and articles",
+      "Product manuals"
+    ],
+    "properties": [
+      "plain text markup",
+      "tables, admonitions and includes",
+      "converts to HTML and PDF",
+      "processed by Asciidoctor"
+    ],
+    "openWith": [
+      "Asciidoctor",
+      "VS Code",
+      "IntelliJ IDEA",
+      "Any text editor"
+    ]
+  },
+  "asf": {
+    "name": "ASF",
+    "fullName": "Advanced Systems Format",
+    "kind": "video",
+    "summary": "A container format from Microsoft for streaming audio and video. It is the container of WMA and WMV files.",
+    "usedFor": [
+      "Windows Media streaming",
+      "WMV and WMA files"
+    ],
+    "properties": [
+      "streaming-oriented container",
+      "holds WMA and WMV streams",
+      "metadata and markers",
+      "Microsoft format"
+    ],
+    "openWith": [
+      "Windows Media Player",
+      "VLC media player"
+    ]
+  },
+  "asp": {
+    "name": "ASP",
+    "fullName": "Active Server Pages",
+    "kind": "text",
+    "summary": "Microsoft's original server-side scripting technology for web pages, released in 1996. Files typically use VBScript and the .asp extension, and it was succeeded by ASP.NET.",
+    "usedFor": [
+      "Legacy Microsoft web applications",
+      "Dynamic web pages on IIS"
+    ],
+    "properties": [
+      "server-side scripting",
+      "usually VBScript",
+      "runs on IIS",
+      "legacy technology"
+    ],
+    "openWith": [
+      "Visual Studio",
+      "VS Code",
+      "Any text editor"
+    ]
+  },
+  "au": {
+    "name": "AU",
+    "fullName": "Sun/NeXT audio",
+    "kind": "audio",
+    "summary": "A simple audio file format from Sun Microsystems. A short header is followed by audio data, often 8-bit mu-law encoded.",
+    "usedFor": [
+      "Unix and Java system sounds",
+      "Legacy audio files"
+    ],
+    "properties": [
+      "short header",
+      "mu-law or PCM data",
+      "simple structure",
+      "legacy format"
+    ],
+    "openWith": [
+      "Audacity",
+      "VLC media player",
+      "QuickTime Player"
+    ]
+  },
+  "av1": {
+    "name": "AV1",
+    "fullName": "AOMedia Video 1",
+    "kind": "video",
+    "summary": "An open, royalty-free video codec released by the Alliance for Open Media in 2018. It compresses more efficiently than VP9 and H.264.",
+    "usedFor": [
+      "Online video streaming",
+      "Web video",
+      "4K and HDR video"
+    ],
+    "properties": [
+      "lossy compression",
+      "royalty-free",
+      "better efficiency than H.264 and VP9",
+      "supported by major browsers"
+    ],
+    "openWith": [
+      "Chrome",
+      "Firefox",
+      "VLC media player",
+      "mpv"
+    ]
+  },
+  "avchd": {
+    "name": "AVCHD",
+    "fullName": "Advanced Video Coding High Definition",
+    "kind": "video",
+    "summary": "A format for HD camcorders introduced by Sony and Panasonic in 2006. It records H.264 video in MPEG transport stream files on cards, discs or drives.",
+    "usedFor": [
+      "HD camcorder recordings",
+      "Consumer HD video"
+    ],
+    "properties": [
+      "H.264 video",
+      "Dolby Digital or PCM audio",
+      "MTS or M2TS files",
+      "Sony and Panasonic format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Adobe Premiere Pro",
+      "DaVinci Resolve"
+    ]
+  },
+  "avi": {
+    "name": "AVI",
+    "fullName": "Audio Video Interleave",
+    "kind": "video",
+    "summary": "A container format introduced by Microsoft in 1992 based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+    "usedFor": [
+      "Older Windows video",
+      "Camera and capture output",
+      "Archived video"
+    ],
+    "properties": [
+      "RIFF-based container",
+      "many codecs",
+      "limited support for modern features",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Windows Media Player",
+      "QuickTime Player"
+    ]
+  },
+  "avif": {
+    "name": "AVIF",
+    "fullName": "AV1 Image File Format",
+    "kind": "image",
+    "summary": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+    "usedFor": [
+      "Web images with small files",
+      "HDR and wide-gamut images"
+    ],
+    "properties": [
+      "lossy and lossless compression",
+      "alpha transparency",
+      "HDR and wide color gamut",
+      "10-bit and 12-bit depth"
+    ],
+    "openWith": [
+      "Chrome",
+      "Firefox",
+      "Safari",
+      "GIMP"
+    ]
+  },
+  "avro": {
+    "name": "Avro",
+    "fullName": "Apache Avro",
+    "kind": "data",
+    "summary": "A row-oriented data serialization format from the Apache Hadoop project. Each file embeds its JSON schema, and data is stored in a compact binary form.",
+    "usedFor": [
+      "Big-data pipelines",
+      "Apache Kafka messages",
+      "Data storage in Hadoop"
+    ],
+    "properties": [
+      "binary format",
+      "embedded JSON schema",
+      "schema evolution",
+      "splittable files"
+    ],
+    "openWith": [
+      "Apache Avro tools",
+      "Apache Spark",
+      "Python avro libraries"
+    ]
+  },
+  "bbcode": {
+    "name": "BBCode",
+    "fullName": "Bulletin Board Code",
+    "kind": "text",
+    "summary": "A lightweight markup language used in forums and message boards. Tags in square brackets, such as [b] and [url], format text.",
+    "usedFor": [
+      "Forum posts",
+      "Message boards"
+    ],
+    "properties": [
+      "tags in square brackets",
+      "safer than raw HTML",
+      "varies between forums"
+    ],
+    "openWith": [
+      "Forum editors",
+      "Any text editor"
+    ]
+  },
+  "bin": {
+    "name": "BIN",
+    "fullName": "Binary file",
+    "kind": "other",
+    "summary": "A generic extension for files that hold raw binary data. The contents can be an image, a disc image, firmware or an email attachment, so the real type depends on the file.",
+    "usedFor": [
+      "Email attachments such as ATT00001.bin",
+      "Firmware and disc images"
+    ],
+    "properties": [
+      "raw binary data",
+      "no fixed structure",
+      "type depends on the content"
+    ],
+    "openWith": [
+      "A hex editor",
+      "The program that created it"
+    ]
+  },
+  "bmp": {
+    "name": "BMP",
+    "fullName": "Windows Bitmap",
+    "kind": "image",
+    "summary": "A raster image format introduced with Microsoft Windows that stores pixel data, usually uncompressed. It is simple to read and write but produces large files.",
+    "usedFor": [
+      "Simple Windows graphics",
+      "Uncompressed image interchange"
+    ],
+    "properties": [
+      "usually uncompressed",
+      "1 to 32 bits per pixel",
+      "optional run-length compression",
+      "large files"
+    ],
+    "openWith": [
+      "Windows Paint",
+      "Windows Photos",
+      "Preview on macOS",
+      "GIMP"
+    ]
+  },
+  "caf": {
+    "name": "CAF",
+    "fullName": "Core Audio Format",
+    "kind": "audio",
+    "summary": "A container format developed by Apple for Core Audio. It has no 4 GB size limit and can hold many audio codecs.",
+    "usedFor": [
+      "Audio on macOS and iOS",
+      "Long recordings",
+      "Sound effects in Apple apps"
+    ],
+    "properties": [
+      "no 4 GB limit",
+      "many codecs supported",
+      "metadata and markers",
+      "Apple format"
+    ],
+    "openWith": [
+      "Apple Music",
+      "QuickTime Player",
+      "Logic Pro",
+      "Audacity"
+    ]
+  },
+  "cdda": {
+    "name": "CDDA",
+    "fullName": "Compact Disc Digital Audio",
+    "kind": "audio",
+    "summary": "The audio format of audio CDs, defined in the Red Book standard by Philips and Sony. It stores uncompressed 16-bit stereo PCM at 44.1 kHz.",
+    "usedFor": [
+      "Audio CDs",
+      "Ripping CDs to files"
+    ],
+    "properties": [
+      "uncompressed PCM",
+      "16-bit, 44.1 kHz stereo",
+      "74 to 80 minutes per disc",
+      "Red Book standard",
+      "raw PCM with no header"
+    ],
+    "openWith": [
+      "Audacity, via Import > Raw Data",
+      "CD-burning tools that accept raw audio"
+    ]
+  },
+  "cdr": {
+    "name": "CDR",
+    "fullName": "CorelDRAW drawing",
+    "kind": "vector",
+    "summary": "The native file format of CorelDRAW, the vector graphics editor from Corel. It stores vector shapes, text, effects and pages.",
+    "usedFor": [
+      "Logos and illustrations",
+      "Signage and print design"
+    ],
+    "properties": [
+      "vector artwork",
+      "multiple pages and layers",
+      "proprietary Corel format"
+    ],
+    "openWith": [
+      "CorelDRAW",
+      "Inkscape",
+      "LibreOffice Draw"
+    ]
+  },
+  "cr2": {
+    "name": "CR2",
+    "fullName": "Canon RAW version 2",
+    "kind": "raster-camera",
+    "summary": "The raw image format used by many Canon EOS cameras from the mid-2000s until CR3 replaced it. It stores unprocessed sensor data in a TIFF-based file.",
+    "usedFor": [
+      "Professional and enthusiast photography",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "TIFF-based structure",
+      "embedded JPEG preview",
+      "proprietary Canon format"
+    ],
+    "openWith": [
+      "Canon Digital Photo Professional",
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable"
+    ]
+  },
+  "cr3": {
+    "name": "CR3",
+    "fullName": "Canon RAW version 3",
+    "kind": "raster-camera",
+    "summary": "The raw image format Canon introduced in 2018 for newer EOS cameras. It uses a container based on the ISO base media file format and can use lossy or lossless compression.",
+    "usedFor": [
+      "Photography with recent Canon cameras",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "ISO base media file format container",
+      "lossy and lossless options",
+      "proprietary Canon format"
+    ],
+    "openWith": [
+      "Canon Digital Photo Professional",
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable"
+    ]
+  },
+  "crw": {
+    "name": "CRW",
+    "fullName": "Canon RAW (CIFF)",
+    "kind": "raster-camera",
+    "summary": "The raw image format of early Canon digital cameras, based on the Camera Image File Format (CIFF). Canon replaced it with CR2.",
+    "usedFor": [
+      "Photos from older Canon cameras",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "CIFF structure",
+      "embedded JPEG preview",
+      "proprietary Canon format"
+    ],
+    "openWith": [
+      "Canon Digital Photo Professional",
+      "Adobe Photoshop",
+      "darktable",
+      "RawTherapee"
+    ]
+  },
+  "csv": {
+    "name": "CSV",
+    "fullName": "Comma-Separated Values",
+    "kind": "data",
+    "summary": "A plain-text table format in which each line is a row and values are separated by commas. RFC 4180 describes the common form of the format.",
+    "usedFor": [
+      "Exporting and importing spreadsheet data",
+      "Database exports",
+      "Data exchange between programs"
+    ],
+    "properties": [
+      "plain text",
+      "one record per line",
+      "no formatting or formulas",
+      "opens in any spreadsheet app"
+    ],
+    "openWith": [
+      "Microsoft Excel",
+      "Google Sheets",
+      "LibreOffice Calc",
+      "Numbers on macOS"
+    ]
+  },
+  "cur": {
+    "name": "CUR",
+    "fullName": "Windows cursor",
+    "kind": "image",
+    "summary": "A cursor file format on Microsoft Windows that uses the same structure as ICO, with an added hotspot position that marks the point the pointer clicks.",
+    "usedFor": [
+      "Custom mouse pointers on Windows",
+      "Cursor themes"
+    ],
+    "properties": [
+      "same layout as ICO",
+      "stores a hotspot coordinate",
+      "alpha transparency",
+      "multiple sizes per file"
+    ],
+    "openWith": [
+      "Windows Mouse settings",
+      "GIMP",
+      "IrfanView"
+    ]
+  },
+  "dax": {
+    "name": "DAX",
+    "fullName": "Data Analysis Expressions",
+    "kind": "data",
+    "summary": "A formula and query language from Microsoft used in Power BI, Excel Power Pivot and SQL Server Analysis Services. The table is written as a DATATABLE(...) expression listing its columns and rows.",
+    "usedFor": [
+      "Power BI data models",
+      "Calculated tables and measures"
+    ],
+    "properties": [
+      "DATATABLE expression",
+      "formula language",
+      "used in Power BI and Power Pivot",
+      "made by Microsoft"
+    ],
+    "openWith": [
+      "Power BI Desktop",
+      "DAX Studio",
+      "Excel Power Pivot"
+    ]
+  },
+  "dcm": {
+    "name": "DCM",
+    "fullName": "DICOM image",
+    "kind": "image",
+    "summary": "The file extension for DICOM (Digital Imaging and Communications in Medicine), the standard for storing and exchanging medical images such as X-rays, CT and MRI scans together with patient and study metadata.",
+    "usedFor": [
+      "Medical imaging archives",
+      "Radiology exchange",
+      "Clinical research images"
+    ],
+    "properties": [
+      "image plus patient and study metadata",
+      "many compression options",
+      "16-bit grayscale data",
+      "maintained by NEMA"
+    ],
+    "openWith": [
+      "RadiAnt DICOM Viewer",
+      "Horos",
+      "3D Slicer",
+      "OsiriX"
+    ]
+  },
+  "dds": {
+    "name": "DDS",
+    "fullName": "DirectDraw Surface",
+    "kind": "image",
+    "summary": "A Microsoft container format for textures and cubemaps, originally from DirectX. It commonly stores GPU-compressed data in the DXT/BC block formats, with optional mipmaps.",
+    "usedFor": [
+      "Game textures",
+      "GPU-ready texture assets",
+      "Cubemaps and volume textures"
+    ],
+    "properties": [
+      "GPU block compression (DXT/BC)",
+      "mipmaps",
+      "cubemaps",
+      "alpha channel"
+    ],
+    "openWith": [
+      "GIMP",
+      "Adobe Photoshop with a plugin",
+      "Paint.NET",
+      "XnView MP"
+    ]
+  },
+  "divx": {
+    "name": "DivX",
+    "fullName": "DivX video",
+    "kind": "video",
+    "summary": "A brand of video codec and container software from DivX, Inc. Early versions were MPEG-4 Part 2 video, usually stored in AVI files, and later versions added H.264.",
+    "usedFor": [
+      "Older downloaded movies and videos",
+      "DivX-certified players"
+    ],
+    "properties": [
+      "MPEG-4 Part 2 video",
+      "usually in AVI",
+      "proprietary codec",
+      "legacy format"
+    ],
+    "openWith": [
+      "DivX Player",
+      "VLC media player",
+      "Windows Media Player with codecs"
+    ]
+  },
+  "dng": {
+    "name": "DNG",
+    "fullName": "Digital Negative",
+    "kind": "raster-camera",
+    "summary": "An open raw image format published by Adobe in 2004 as a single documented alternative to the many proprietary raw formats. It is based on TIFF/EP.",
+    "usedFor": [
+      "Archiving raw photos",
+      "Raw files from some phones and cameras",
+      "Interchange between raw editors"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "publicly documented specification",
+      "TIFF-based structure",
+      "optional lossless compression"
+    ],
+    "openWith": [
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable",
+      "RawTherapee"
+    ]
+  },
+  "docx": {
+    "name": "DOCX",
+    "fullName": "Microsoft Word document",
+    "kind": "document",
+    "summary": "The default word processing format of Microsoft Word since Word 2007. It is a ZIP package of XML files standardized as Office Open XML (ECMA-376, ISO/IEC 29500).",
+    "usedFor": [
+      "Letters, reports and essays",
+      "Editable documents shared by email",
+      "Resumes and contracts"
+    ],
+    "properties": [
+      "ZIP package of XML",
+      "styles, images and tables",
+      "tracked changes and comments",
+      "open standard"
+    ],
+    "openWith": [
+      "Microsoft Word",
+      "Google Docs",
+      "LibreOffice Writer",
+      "Pages on macOS"
+    ]
+  },
+  "dot": {
+    "name": "DOT",
+    "fullName": "Graphviz DOT graph",
+    "kind": "text",
+    "summary": "A plain-text graph description language from the Graphviz project, also saved as .gv. A file lists nodes, edges and their attributes, and Graphviz tools such as dot lay out and render the graph.",
+    "usedFor": [
+      "Diagrams of graphs and networks",
+      "Dependency and flow diagrams"
+    ],
+    "properties": [
+      "plain text",
+      "nodes, edges and attributes",
+      "directed and undirected graphs",
+      "rendered by Graphviz"
+    ],
+    "openWith": [
+      "Graphviz",
+      "Gephi",
+      "Any text editor"
+    ]
+  },
+  "dss": {
+    "name": "DSS",
+    "fullName": "Digital Speech Standard",
+    "kind": "audio",
+    "summary": "A compressed speech format developed by Olympus, Philips and Grundig for digital dictation recorders. It is designed for voice rather than music.",
+    "usedFor": [
+      "Dictation recorders",
+      "Transcription of recorded speech"
+    ],
+    "properties": [
+      "lossy speech compression",
+      "small files",
+      "used in dictation devices"
+    ],
+    "openWith": [
+      "OM System ODMS",
+      "Olympus DSS Player",
+      "NCH Switch on Windows"
+    ]
+  },
+  "dst": {
+    "name": "DST",
+    "fullName": "Tajima embroidery",
+    "kind": "other",
+    "summary": "A machine embroidery stitch file format developed by Tajima. It stores needle positions and commands such as jumps, color stops and trims rather than a picture.",
+    "usedFor": [
+      "Industrial embroidery machines",
+      "Digitized embroidery designs"
+    ],
+    "properties": [
+      "stitch coordinates",
+      "no color information",
+      "machine-readable stitch commands",
+      "widely supported by embroidery software"
+    ],
+    "openWith": [
+      "Wilcom EmbroideryStudio",
+      "Ink/Stitch for Inkscape",
+      "Embrilliance",
+      "Hatch"
+    ]
+  },
+  "dv": {
+    "name": "DV",
+    "fullName": "Digital Video",
+    "kind": "video",
+    "summary": "A video format and tape standard for consumer camcorders from the 1990s. It records intraframe-compressed video at about 25 Mbit/s.",
+    "usedFor": [
+      "MiniDV camcorder footage",
+      "Capturing tape-based video"
+    ],
+    "properties": [
+      "intraframe compression",
+      "about 25 Mbit/s",
+      "720 by 576 (PAL) or 720 by 480 (NTSC)",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player",
+      "Adobe Premiere Pro"
+    ]
+  },
+  "dxf": {
+    "name": "DXF",
+    "fullName": "Drawing Exchange Format",
+    "kind": "vector",
+    "summary": "A CAD data exchange format introduced by Autodesk in 1982 to share drawings between AutoCAD and other programs. It can be stored as text or binary.",
+    "usedFor": [
+      "Exchanging CAD drawings",
+      "CNC, laser cutting and plotting",
+      "Architectural and engineering drawings"
+    ],
+    "properties": [
+      "2D and 3D geometry",
+      "layers",
+      "text or binary encoding",
+      "documented by Autodesk"
+    ],
+    "openWith": [
+      "AutoCAD",
+      "LibreCAD",
+      "Inkscape",
+      "FreeCAD"
+    ]
+  },
+  "emf": {
+    "name": "EMF",
+    "fullName": "Enhanced Metafile",
+    "kind": "vector",
+    "summary": "A Microsoft vector graphics format that records Windows GDI drawing commands. It is used in Windows and Microsoft Office to embed graphics.",
+    "usedFor": [
+      "Charts and diagrams pasted into Office documents",
+      "Windows printing and clipboard graphics"
+    ],
+    "properties": [
+      "vector drawing commands",
+      "can embed bitmaps",
+      "Windows format",
+      "scales without loss"
+    ],
+    "openWith": [
+      "Microsoft Office",
+      "Inkscape",
+      "LibreOffice",
+      "IrfanView"
+    ]
+  },
+  "eps": {
+    "name": "EPS",
+    "fullName": "Encapsulated PostScript",
+    "kind": "vector",
+    "summary": "A file format from Adobe that wraps a PostScript program describing a single page of graphics. It is used to place artwork in other documents.",
+    "usedFor": [
+      "Print and prepress artwork",
+      "Logos supplied for printing",
+      "Exchange between design programs"
+    ],
+    "properties": [
+      "vector and raster content",
+      "PostScript language",
+      "optional bitmap preview",
+      "bounding box metadata"
+    ],
+    "openWith": [
+      "Adobe Illustrator",
+      "Inkscape",
+      "Ghostscript"
+    ]
+  },
+  "epub": {
+    "name": "EPUB",
+    "fullName": "Electronic Publication",
+    "kind": "ebook",
+    "summary": "An open e-book standard maintained by the W3C (formerly the International Digital Publishing Forum). Content is HTML, CSS and images in a ZIP package, and text reflows to fit the screen.",
+    "usedFor": [
+      "E-books",
+      "Reading on phones, tablets and e-readers"
+    ],
+    "properties": [
+      "reflowable text",
+      "ZIP package of HTML and CSS",
+      "embedded fonts and images",
+      "open standard"
+    ],
+    "openWith": [
+      "Apple Books",
+      "Kobo e-readers",
+      "Calibre",
+      "Thorium Reader"
+    ]
+  },
+  "excel": {
+    "aliasOf": "xlsx"
+  },
+  "exr": {
+    "name": "EXR",
+    "fullName": "OpenEXR image",
+    "kind": "image",
+    "summary": "A high-dynamic-range raster format created by Industrial Light & Magic and released as open source in 2003. It stores 16-bit half-float or 32-bit float pixel values.",
+    "usedFor": [
+      "Visual effects and film compositing",
+      "3D render output",
+      "HDR image storage"
+    ],
+    "properties": [
+      "high dynamic range",
+      "16-bit and 32-bit float",
+      "lossless and lossy compression",
+      "multiple channels and layers"
+    ],
+    "openWith": [
+      "Blender",
+      "GIMP",
+      "Adobe Photoshop",
+      "Nuke"
+    ]
+  },
+  "f4v": {
+    "name": "F4V",
+    "fullName": "Flash MP4 video",
+    "kind": "video",
+    "summary": "An Adobe Flash video format based on the ISO base media file format (MP4). It holds H.264 video with AAC audio.",
+    "usedFor": [
+      "Flash-era web video",
+      "Archived Flash content"
+    ],
+    "properties": [
+      "MP4-based container",
+      "H.264 video and AAC audio",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "mpv",
+      "Adobe Media Encoder"
+    ]
+  },
+  "firebase": {
+    "name": "Firebase",
+    "fullName": "Firebase Realtime Database JSON",
+    "kind": "data",
+    "summary": "JSON data in the shape used by Google's Firebase Realtime Database, which stores data as one large JSON tree. Data can be imported and exported as JSON.",
+    "usedFor": [
+      "Importing data into Firebase",
+      "Backups of Realtime Database data"
+    ],
+    "properties": [
+      "JSON tree",
+      "imported through the Firebase console",
+      "made by Google"
+    ],
+    "openWith": [
+      "Firebase console",
+      "VS Code",
+      "Any text editor"
+    ]
+  },
+  "flac": {
+    "name": "FLAC",
+    "fullName": "Free Lossless Audio Codec",
+    "kind": "audio",
+    "summary": "An open, royalty-free lossless audio codec developed by Xiph.Org. It typically reduces files to about half the size of uncompressed audio while keeping every sample.",
+    "usedFor": [
+      "Music archiving",
+      "Audiophile listening",
+      "Lossless backups of CDs"
+    ],
+    "properties": [
+      "lossless compression",
+      "open source",
+      "metadata tags",
+      "supports up to 32-bit depth"
+    ],
+    "openWith": [
+      "VLC media player",
+      "foobar2000",
+      "Apple Music",
+      "Audacity"
+    ]
+  },
+  "flv": {
+    "name": "FLV",
+    "fullName": "Flash Video",
+    "kind": "video",
+    "summary": "A container format created by Macromedia and later Adobe for delivering video through Flash Player. Flash reached end of life in 2020, so FLV is now a legacy format.",
+    "usedFor": [
+      "Older web video",
+      "Archived Flash content"
+    ],
+    "properties": [
+      "usually H.263 or H.264 video",
+      "MP3 or AAC audio",
+      "designed for streaming",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "mpv",
+      "Adobe Media Encoder"
+    ]
+  },
+  "gif": {
+    "name": "GIF",
+    "fullName": "Graphics Interchange Format",
+    "kind": "image",
+    "summary": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+    "usedFor": [
+      "Short looping animations",
+      "Simple graphics and icons",
+      "Reaction images and stickers"
+    ],
+    "properties": [
+      "256-color palette per frame",
+      "lossless LZW compression",
+      "animation",
+      "1-bit transparency"
+    ],
+    "openWith": [
+      "Any web browser",
+      "Preview on macOS",
+      "Windows Photos",
+      "GIMP"
+    ]
+  },
+  "gsm": {
+    "name": "GSM",
+    "fullName": "GSM 06.10 audio",
+    "kind": "audio",
+    "summary": "A speech codec used in GSM mobile networks, also known as Full Rate. It compresses telephone-quality speech to 13 kbit/s.",
+    "usedFor": [
+      "Voice recordings",
+      "Telephony systems and voicemail"
+    ],
+    "properties": [
+      "lossy speech compression",
+      "8 kHz sampling",
+      "13 kbit/s",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Audacity",
+      "SoX"
+    ]
+  },
+  "hdr": {
+    "name": "HDR",
+    "fullName": "Radiance HDR image",
+    "kind": "image",
+    "summary": "A high-dynamic-range image format created for the Radiance lighting simulation software, also known as RGBE. It stores each pixel as an RGB mantissa with a shared exponent.",
+    "usedFor": [
+      "Environment maps for 3D rendering",
+      "Lighting simulation",
+      "HDR image storage"
+    ],
+    "properties": [
+      "high dynamic range",
+      "shared-exponent RGBE pixels",
+      "run-length encoding",
+      "extension .hdr or .pic"
+    ],
+    "openWith": [
+      "Blender",
+      "GIMP",
+      "Adobe Photoshop",
+      "Luminance HDR"
+    ]
+  },
+  "heic": {
+    "name": "HEIC",
+    "fullName": "HEIF image with HEVC coding",
+    "kind": "image",
+    "summary": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12, the HEIF standard.",
+    "usedFor": [
+      "Photos taken on iPhone and iPad",
+      "Portrait-mode photos with depth data"
+    ],
+    "properties": [
+      "lossy HEVC compression",
+      "smaller files than JPEG at similar quality",
+      "supports depth maps and alpha",
+      "10-bit color"
+    ],
+    "openWith": [
+      "Preview on macOS",
+      "Apple Photos",
+      "Windows Photos with the HEIF and HEVC Video Extensions"
+    ]
+  },
+  "heif": {
+    "name": "HEIF",
+    "fullName": "High Efficiency Image File Format",
+    "kind": "image",
+    "summary": "A container format standardized by MPEG as ISO/IEC 23008-12 for single images and image sequences, most often compressed with HEVC. HEIC and AVIF files are HEIF variants.",
+    "usedFor": [
+      "Photographs from modern phones",
+      "Image sequences and bursts"
+    ],
+    "properties": [
+      "multiple images per file",
+      "supports alpha and depth maps",
+      "HEVC or other codecs",
+      "smaller files than JPEG"
+    ],
+    "openWith": [
+      "Preview on macOS",
+      "Apple Photos",
+      "Windows Photos with the HEIF extension"
+    ]
+  },
+  "hevc": {
+    "name": "HEVC",
+    "fullName": "High Efficiency Video Coding (H.265)",
+    "kind": "video",
+    "summary": "A video codec standardized as ITU-T H.265 and ISO/IEC 23008-2 in 2013. It compresses about as well as H.264 at roughly half the bitrate.",
+    "usedFor": [
+      "4K and HDR video",
+      "iPhone and camera recordings",
+      "Streaming"
+    ],
+    "properties": [
+      "lossy compression",
+      "about 50 percent lower bitrate than H.264",
+      "supports 8K and HDR",
+      "patent licensing required"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player",
+      "Windows Media Player with codecs"
+    ]
+  },
+  "html": {
+    "name": "HTML",
+    "fullName": "HyperText Markup Language",
+    "kind": "text",
+    "summary": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+    "usedFor": [
+      "Web pages",
+      "HTML email",
+      "Generated reports and tables"
+    ],
+    "properties": [
+      "text-based markup",
+      "elements and attributes",
+      "styled with CSS",
+      "rendered by every browser"
+    ],
+    "openWith": [
+      "Any web browser",
+      "VS Code",
+      "Notepad",
+      "TextEdit on macOS"
+    ]
+  },
+  "icns": {
+    "name": "ICNS",
+    "fullName": "Apple icon image",
+    "kind": "image",
+    "summary": "The icon file format of macOS. A single file holds an icon at several sizes and resolutions, including Retina versions.",
+    "usedFor": [
+      "macOS application icons",
+      "Folder and document icons on macOS"
+    ],
+    "properties": [
+      "multiple sizes in one file",
+      "alpha transparency",
+      "Retina variants",
+      "used for macOS app icons"
+    ],
+    "openWith": [
+      "Preview on macOS",
+      "Xcode"
+    ]
+  },
+  "ico": {
+    "name": "ICO",
+    "fullName": "Windows icon",
+    "kind": "image",
+    "summary": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+    "usedFor": [
+      "Windows application icons",
+      "Website favicons"
+    ],
+    "properties": [
+      "multiple sizes in one file",
+      "alpha transparency",
+      "PNG or bitmap entries"
+    ],
+    "openWith": [
+      "Windows File Explorer",
+      "GIMP",
+      "IrfanView",
+      "Any web browser"
+    ]
+  },
+  "image": {
+    "name": "Image",
+    "fullName": "Image file",
+    "kind": "image",
+    "summary": "A general term for a picture file such as JPG, PNG, WebP, GIF or BMP. Converters labelled Image accept several of these common formats as input.",
+    "usedFor": [
+      "Photos and graphics of any common type",
+      "Combining pictures into other documents"
+    ],
+    "properties": [
+      "raster formats",
+      "varies by file type",
+      "accepted types depend on the tool"
+    ],
+    "openWith": [
+      "Any web browser",
+      "Preview on macOS",
+      "Windows Photos"
+    ]
+  },
+  "ini": {
+    "name": "INI",
+    "fullName": "INI configuration file",
+    "kind": "data",
+    "summary": "A simple configuration file format of key-value pairs grouped in sections with names in square brackets. It originated in early versions of Windows.",
+    "usedFor": [
+      "Application settings",
+      "Legacy Windows configuration"
+    ],
+    "properties": [
+      "sections and key=value pairs",
+      "comments with ; or #",
+      "plain text",
+      "no formal standard"
+    ],
+    "openWith": [
+      "Notepad",
+      "VS Code",
+      "Any text editor"
+    ]
+  },
+  "jfif": {
+    "name": "JFIF",
+    "fullName": "JPEG File Interchange Format",
+    "kind": "image",
+    "summary": "A container convention for JPEG-compressed images that specifies color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+    "usedFor": [
+      "Images saved from some browsers and Windows tools",
+      "Interchange of JPEG photographs"
+    ],
+    "properties": [
+      "lossy JPEG compression",
+      "no alpha transparency",
+      "readable as a regular JPEG"
+    ],
+    "openWith": [
+      "Any web browser",
+      "Windows Photos",
+      "GIMP"
+    ]
+  },
+  "jif": {
+    "name": "JIF",
+    "fullName": "JPEG Interchange Format",
+    "kind": "image",
+    "summary": "The original file layout described in the JPEG standard for storing JPEG-compressed images. It was largely superseded by JFIF and Exif, and .jif files are rarely seen.",
+    "usedFor": [
+      "Legacy JPEG files",
+      "Interchange of JPEG photographs"
+    ],
+    "properties": [
+      "lossy JPEG compression",
+      "no alpha transparency"
+    ],
+    "openWith": [
+      "GIMP",
+      "XnView",
+      "IrfanView"
+    ]
+  },
+  "jira": {
+    "name": "Jira",
+    "fullName": "Jira wiki markup",
+    "kind": "text",
+    "summary": "The text formatting syntax of Atlassian Jira for issue descriptions and comments, with | and || marking table cells. Jira Cloud's editor stores Atlassian Document Format; wiki markup is the older format.",
+    "usedFor": [
+      "Jira issue descriptions and comments",
+      "Tables in Jira"
+    ],
+    "properties": [
+      "plain text markup",
+      "table syntax with | and ||",
+      "made by Atlassian"
+    ],
+    "openWith": [
+      "Jira",
+      "Any text editor"
+    ]
+  },
+  "jp2": {
+    "name": "JPEG 2000",
+    "fullName": "JPEG 2000 image",
+    "kind": "image",
+    "summary": "A wavelet-based image format standardized as ISO/IEC 15444 by the Joint Photographic Experts Group. It supports lossy and lossless compression in one codestream.",
+    "usedFor": [
+      "Digital cinema and archival imaging",
+      "Medical and satellite imagery",
+      "Scanned documents in PDF"
+    ],
+    "properties": [
+      "wavelet compression",
+      "lossy and lossless modes",
+      "alpha channel",
+      "high bit depth"
+    ],
+    "openWith": [
+      "Preview on macOS",
+      "GIMP",
+      "IrfanView",
+      "Adobe Photoshop"
+    ]
+  },
+  "jpeg": {
+    "aliasOf": "jpg"
+  },
+  "jpg": {
+    "name": "JPG",
+    "fullName": "JPEG image",
+    "kind": "image",
+    "summary": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+    "usedFor": [
+      "Photographs on the web",
+      "Digital camera output",
+      "Email attachments and photo sharing"
+    ],
+    "properties": [
+      "lossy compression",
+      "adjustable quality",
+      "no alpha transparency",
+      "supported everywhere"
+    ],
+    "openWith": [
+      "Any web browser",
+      "Preview on macOS",
+      "Windows Photos",
+      "GIMP"
+    ]
+  },
+  "jps": {
+    "name": "JPS",
+    "fullName": "JPEG Stereoscopic",
+    "kind": "image",
+    "summary": "A stereoscopic 3D image format that stores the left and right views side by side in one JPEG file.",
+    "usedFor": [
+      "Stereoscopic 3D photos",
+      "Images for 3D viewers and VR headsets"
+    ],
+    "properties": [
+      "JPEG compression",
+      "left and right views in one image",
+      "lossy"
+    ],
+    "openWith": [
+      "StereoPhoto Maker",
+      "XnView MP",
+      "IrfanView"
+    ]
+  },
+  "json": {
+    "name": "JSON",
+    "fullName": "JavaScript Object Notation",
+    "kind": "data",
+    "summary": "A text format for structured data derived from JavaScript syntax. It is standardized as ECMA-404 and RFC 8259, and is the usual format for web APIs.",
+    "usedFor": [
+      "Web APIs",
+      "Configuration files",
+      "Data exchange"
+    ],
+    "properties": [
+      "text-based",
+      "objects, arrays, strings, numbers and booleans",
+      "language independent",
+      "no comments"
+    ],
+    "openWith": [
+      "VS Code",
+      "Any web browser",
+      "Any text editor"
+    ]
+  },
+  "jsonlines": {
+    "name": "JSON Lines",
+    "fullName": "JSON Lines (JSONL)",
+    "kind": "data",
+    "summary": "A text format in which each line is one valid JSON value, usually an object. It lets large datasets be read and written one record at a time.",
+    "usedFor": [
+      "Log files",
+      "Large datasets and machine-learning data",
+      "Streaming records"
+    ],
+    "properties": [
+      "one JSON value per line",
+      "UTF-8 text",
+      "easy to append and stream",
+      "usually .jsonl"
+    ],
+    "openWith": [
+      "VS Code",
+      "jq",
+      "Any text editor"
+    ]
+  },
+  "jxl": {
+    "name": "JPEG XL",
+    "fullName": "JPEG XL image",
+    "kind": "image",
+    "summary": "An image format standardized as ISO/IEC 18181 by the Joint Photographic Experts Group. It supports lossy and lossless compression and can losslessly recompress existing JPEG files.",
+    "usedFor": [
+      "Photographs with smaller files",
+      "High-bit-depth and HDR images"
+    ],
+    "properties": [
+      "lossy and lossless compression",
+      "lossless JPEG recompression",
+      "alpha transparency",
+      "animation"
+    ],
+    "openWith": [
+      "Safari",
+      "GIMP",
+      "XnView MP",
+      "IrfanView"
+    ]
+  },
+  "ktx": {
+    "name": "KTX",
+    "fullName": "Khronos Texture",
+    "kind": "image",
+    "summary": "A container format from the Khronos Group for GPU textures used with OpenGL and OpenGL ES. It stores texture data together with the information needed to upload it.",
+    "usedFor": [
+      "OpenGL and OpenGL ES textures",
+      "Mobile and web 3D graphics"
+    ],
+    "properties": [
+      "GPU-compressed formats",
+      "mipmaps",
+      "cubemaps and arrays",
+      "defined by the Khronos Group"
+    ],
+    "openWith": [
+      "Khronos KTX-Software",
+      "AMD Compressonator"
+    ]
+  },
+  "ktx2": {
+    "name": "KTX2",
+    "fullName": "Khronos Texture 2.0",
+    "kind": "image",
+    "summary": "The second version of the Khronos texture container. It supports Vulkan and other APIs and can carry Basis Universal data that is transcoded to the GPU's native format.",
+    "usedFor": [
+      "Cross-platform GPU textures",
+      "WebGL and glTF assets",
+      "Vulkan textures"
+    ],
+    "properties": [
+      "Basis Universal supercompression",
+      "mipmaps",
+      "cubemaps and arrays",
+      "defined by the Khronos Group"
+    ],
+    "openWith": [
+      "Khronos KTX tools",
+      "Three.js",
+      "Babylon.js"
+    ]
+  },
+  "latex": {
+    "name": "LaTeX",
+    "fullName": "LaTeX",
+    "kind": "text",
+    "summary": "A document preparation system built on Donald Knuth's TeX, created by Leslie Lamport. Authors write plain text with commands and compile it into a typeset document.",
+    "usedFor": [
+      "Scientific and academic papers",
+      "Mathematical typesetting",
+      "Books and theses"
+    ],
+    "properties": [
+      "plain text source",
+      "mathematical typesetting",
+      "produces PDF",
+      "free software"
+    ],
+    "openWith": [
+      "Overleaf",
+      "TeX Live",
+      "TeXstudio",
+      "VS Code with LaTeX Workshop"
+    ]
+  },
+  "m2ts": {
+    "name": "M2TS",
+    "fullName": "Blu-ray MPEG transport stream",
+    "kind": "video",
+    "summary": "The file extension for video on Blu-ray discs and AVCHD camcorders. It is an MPEG-2 transport stream with a 4-byte timestamp added to each packet.",
+    "usedFor": [
+      "Blu-ray discs",
+      "AVCHD camcorder recordings"
+    ],
+    "properties": [
+      "MPEG-2 transport stream",
+      "H.264, VC-1 or MPEG-2 video",
+      "192-byte packets",
+      "supports HD video"
+    ],
+    "openWith": [
+      "VLC media player",
+      "MPC-HC",
+      "Adobe Premiere Pro"
+    ]
+  },
+  "m2v": {
+    "name": "M2V",
+    "fullName": "MPEG-2 video stream",
+    "kind": "video",
+    "summary": "A file extension for a raw MPEG-2 video elementary stream without audio. It is commonly used in DVD authoring.",
+    "usedFor": [
+      "DVD authoring",
+      "Video editing workflows"
+    ],
+    "properties": [
+      "MPEG-2 video only",
+      "no audio track",
+      "elementary stream"
+    ],
+    "openWith": [
+      "VLC media player",
+      "FFmpeg"
+    ]
+  },
+  "m4a": {
+    "name": "M4A",
+    "fullName": "MPEG-4 Audio",
+    "kind": "audio",
+    "summary": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+    "usedFor": [
+      "Music from iTunes and Apple Music",
+      "Podcasts",
+      "Voice memos on iPhone"
+    ],
+    "properties": [
+      "MPEG-4 container",
+      "AAC or ALAC audio",
+      "metadata tags and cover art",
+      "widely supported"
+    ],
+    "openWith": [
+      "Apple Music",
+      "VLC media player",
+      "Windows Media Player",
+      "Any web browser"
+    ]
+  },
+  "m4b": {
+    "name": "M4B",
+    "fullName": "MPEG-4 audiobook",
+    "kind": "audio",
+    "summary": "An audiobook file in the MPEG-4 container. It is the same as M4A but the extension tells players to remember playback position and supports chapter markers.",
+    "usedFor": [
+      "Audiobooks",
+      "Long spoken-word recordings"
+    ],
+    "properties": [
+      "MPEG-4 container",
+      "AAC audio",
+      "chapter markers",
+      "bookmarking in supporting players"
+    ],
+    "openWith": [
+      "Apple Books",
+      "VLC media player",
+      "Audiobookshelf",
+      "Smart AudioBook Player"
+    ]
+  },
+  "m4p": {
+    "name": "M4P",
+    "fullName": "Protected MPEG-4 audio",
+    "kind": "audio",
+    "summary": "An MPEG-4 audio file with Apple's FairPlay copy protection, used for songs bought from the early iTunes Store. Files can only be played by authorized Apple software or devices.",
+    "usedFor": [
+      "Older iTunes Store purchases",
+      "Music libraries on Apple devices"
+    ],
+    "properties": [
+      "MPEG-4 container",
+      "AAC audio",
+      "DRM copy protection",
+      "legacy format"
+    ],
+    "openWith": [
+      "Apple Music",
+      "iTunes",
+      "iPhone, iPad and Mac"
+    ]
+  },
+  "m4r": {
+    "name": "M4R",
+    "fullName": "iPhone ringtone",
+    "kind": "audio",
+    "summary": "The file extension for iPhone ringtones. It is an MPEG-4 audio file with AAC audio, renamed so iTunes and the iPhone treat it as a ringtone.",
+    "usedFor": [
+      "iPhone ringtones",
+      "iPhone alert tones"
+    ],
+    "properties": [
+      "MPEG-4 container",
+      "AAC audio",
+      "used by Apple devices"
+    ],
+    "openWith": [
+      "iPhone Settings",
+      "Apple Music on macOS",
+      "VLC media player"
+    ]
+  },
+  "m4v": {
+    "name": "M4V",
+    "fullName": "MPEG-4 video",
+    "kind": "video",
+    "summary": "A video file format developed by Apple that is very close to MP4. Files from the iTunes Store may be protected with FairPlay DRM.",
+    "usedFor": [
+      "Videos in iTunes and Apple TV",
+      "Phone and tablet video"
+    ],
+    "properties": [
+      "MPEG-4 container",
+      "H.264 video with AAC audio",
+      "optional DRM",
+      "Apple format"
+    ],
+    "openWith": [
+      "QuickTime Player",
+      "Apple TV app",
+      "VLC media player"
+    ]
+  },
+  "mac": {
+    "name": "MAC",
+    "fullName": "MacPaint image",
+    "kind": "image",
+    "summary": "The image format of MacPaint, the drawing program released with the original Apple Macintosh in 1984. Images are 576 by 720 pixels, black and white, and packed with PackBits.",
+    "usedFor": [
+      "Legacy Macintosh graphics",
+      "Retro computing archives"
+    ],
+    "properties": [
+      "monochrome",
+      "576 by 720 pixels",
+      "PackBits compression",
+      "legacy format"
+    ],
+    "openWith": [
+      "XnView MP",
+      "ImageMagick"
+    ]
+  },
+  "markdown": {
+    "name": "Markdown",
+    "fullName": "Markdown",
+    "kind": "text",
+    "summary": "A lightweight markup language created by John Gruber in 2004. Plain text with simple symbols for headings, lists, links and emphasis converts to HTML.",
+    "usedFor": [
+      "Documentation and README files",
+      "Notes and blog posts",
+      "Writing in developer tools"
+    ],
+    "properties": [
+      "plain text",
+      "readable without rendering",
+      "converts to HTML",
+      "several dialects such as CommonMark"
+    ],
+    "openWith": [
+      "VS Code",
+      "Obsidian",
+      "Typora",
+      "Any text editor"
+    ]
+  },
+  "matlab": {
+    "name": "MATLAB",
+    "fullName": "MATLAB",
+    "kind": "data",
+    "summary": "MATLAB is the numerical computing environment and language from MathWorks, in which matrices and arrays are the core data types.",
+    "usedFor": [
+      "Scientific computing and engineering",
+      "Loading data into MATLAB scripts"
+    ],
+    "properties": [
+      "matrix-based language",
+      "scripts in .m files",
+      "made by MathWorks"
+    ],
+    "openWith": [
+      "MATLAB",
+      "GNU Octave",
+      "VS Code"
+    ]
+  },
+  "mediawiki": {
+    "name": "MediaWiki",
+    "fullName": "MediaWiki markup",
+    "kind": "text",
+    "summary": "The wikitext markup used by MediaWiki, the software behind Wikipedia. It defines headings, links, lists and tables with plain-text symbols.",
+    "usedFor": [
+      "Wikipedia and other wikis",
+      "Wiki tables"
+    ],
+    "properties": [
+      "plain text markup",
+      "table syntax with {| and |}",
+      "internal links with [[ ]]",
+      "used by MediaWiki"
+    ],
+    "openWith": [
+      "MediaWiki editors",
+      "Any text editor"
+    ]
+  },
+  "mjpeg": {
+    "name": "MJPEG",
+    "fullName": "Motion JPEG",
+    "kind": "video",
+    "summary": "A video codec that compresses each frame as a separate JPEG image. It does not use compression between frames, so every frame can be edited alone.",
+    "usedFor": [
+      "Webcams and IP cameras",
+      "Video editing",
+      "Digital cameras' video modes"
+    ],
+    "properties": [
+      "each frame is a JPEG",
+      "intraframe only",
+      "larger files than H.264",
+      "easy to edit frame by frame"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player",
+      "FFmpeg"
+    ]
+  },
+  "mkv": {
+    "name": "MKV",
+    "fullName": "Matroska video",
+    "kind": "video",
+    "summary": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+    "usedFor": [
+      "High-quality video collections",
+      "Videos with multiple audio and subtitle tracks",
+      "Blu-ray rips"
+    ],
+    "properties": [
+      "open standard",
+      "multiple audio and subtitle tracks",
+      "chapters and metadata",
+      "supports almost any codec"
+    ],
+    "openWith": [
+      "VLC media player",
+      "mpv",
+      "Plex",
+      "Windows Media Player with codecs"
+    ]
+  },
+  "mov": {
+    "name": "MOV",
+    "fullName": "QuickTime Movie",
+    "kind": "video",
+    "summary": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+    "usedFor": [
+      "Video editing on macOS",
+      "iPhone recordings",
+      "Professional video workflows"
+    ],
+    "properties": [
+      "multi-track container",
+      "many codecs, including ProRes",
+      "timecode and metadata tracks",
+      "Apple format"
+    ],
+    "openWith": [
+      "QuickTime Player",
+      "VLC media player",
+      "Final Cut Pro",
+      "Adobe Premiere Pro"
+    ]
+  },
+  "mp2": {
+    "name": "MP2",
+    "fullName": "MPEG-1 Audio Layer II",
+    "kind": "audio",
+    "summary": "A lossy audio format standardized by MPEG, defined as Layer II of MPEG-1 Audio. It is used in digital radio, DVD-Video and broadcast television.",
+    "usedFor": [
+      "Digital radio and television broadcasting",
+      "DVD-Video soundtracks"
+    ],
+    "properties": [
+      "lossy compression",
+      "low decoding complexity",
+      "predecessor of MP3 Layer III"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Audacity",
+      "foobar2000"
+    ]
+  },
+  "mp3": {
+    "name": "MP3",
+    "fullName": "MPEG-1/2 Audio Layer III",
+    "kind": "audio",
+    "summary": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+    "usedFor": [
+      "Music libraries and downloads",
+      "Podcasts",
+      "Audio for portable players"
+    ],
+    "properties": [
+      "lossy compression",
+      "constant or variable bitrate",
+      "ID3 tags for metadata",
+      "plays on nearly every device"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Apple Music",
+      "Windows Media Player",
+      "Any web browser"
+    ]
+  },
+  "mp4": {
+    "name": "MP4",
+    "fullName": "MPEG-4 Part 14",
+    "kind": "video",
+    "summary": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+    "usedFor": [
+      "Online video and streaming",
+      "Phone and camera recordings",
+      "Sharing video files"
+    ],
+    "properties": [
+      "container for several codecs",
+      "H.264, H.265 and AV1 video",
+      "subtitles and chapters",
+      "plays on nearly every device"
+    ],
+    "openWith": [
+      "VLC media player",
+      "QuickTime Player",
+      "Windows Media Player",
+      "Any web browser"
+    ]
+  },
+  "mpeg": {
+    "aliasOf": "mpg"
+  },
+  "mpeg2": {
+    "name": "MPEG-2",
+    "fullName": "MPEG-2 video",
+    "kind": "video",
+    "summary": "A video and audio coding standard from MPEG (ISO/IEC 13818, ITU-T H.262). It is used for DVD-Video, digital television and broadcast.",
+    "usedFor": [
+      "DVDs",
+      "Digital television broadcasting"
+    ],
+    "properties": [
+      "lossy compression",
+      "interlaced video support",
+      "program and transport streams",
+      "H.262"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Windows Media Player",
+      "QuickTime Player"
+    ]
+  },
+  "mpg": {
+    "name": "MPG",
+    "fullName": "MPEG video",
+    "kind": "video",
+    "summary": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+    "usedFor": [
+      "Video CDs and DVD video",
+      "Older video downloads",
+      "Broadcast capture"
+    ],
+    "properties": [
+      "MPEG-1 or MPEG-2 video",
+      "MPEG program stream",
+      "lossy compression",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Windows Media Player",
+      "QuickTime Player"
+    ]
+  },
+  "mpv": {
+    "name": "MPV",
+    "fullName": "MPEG video",
+    "kind": "video",
+    "summary": "A file extension for an MPEG video elementary stream, typically MPEG-1 or MPEG-2 video without audio.",
+    "usedFor": [
+      "MPEG video editing workflows",
+      "Video authoring"
+    ],
+    "properties": [
+      "MPEG video only",
+      "no audio track",
+      "elementary stream"
+    ],
+    "openWith": [
+      "VLC media player",
+      "mpv"
+    ]
+  },
+  "mts": {
+    "name": "MTS",
+    "fullName": "AVCHD transport stream",
+    "kind": "video",
+    "summary": "The file extension for video recorded by AVCHD camcorders. It is an MPEG transport stream containing H.264 video.",
+    "usedFor": [
+      "AVCHD camcorder recordings",
+      "HD video from Sony and Panasonic cameras"
+    ],
+    "properties": [
+      "MPEG transport stream",
+      "H.264 video",
+      "Dolby Digital or PCM audio",
+      "192-byte packets"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Adobe Premiere Pro",
+      "DaVinci Resolve"
+    ]
+  },
+  "mxf": {
+    "name": "MXF",
+    "fullName": "Material Exchange Format",
+    "kind": "video",
+    "summary": "A container format standardized by SMPTE (SMPTE 377M) for professional video and audio. It carries essence data together with timecode and metadata.",
+    "usedFor": [
+      "Broadcast television production",
+      "Professional cameras",
+      "Archival of video"
+    ],
+    "properties": [
+      "SMPTE standard",
+      "timecode and metadata",
+      "many codecs",
+      "used by broadcasters"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Adobe Premiere Pro",
+      "DaVinci Resolve"
+    ]
+  },
+  "mysql": {
+    "name": "MySQL",
+    "fullName": "MySQL client table output",
+    "kind": "text",
+    "summary": "The boxed text table the MySQL command-line client prints for query results, with + and - border lines and a | between columns. The first row holds the column names.",
+    "usedFor": [
+      "Query results copied from a terminal",
+      "Turning query output or MySQL INSERT statements into tables"
+    ],
+    "properties": [
+      "plain text",
+      "columns separated by |",
+      "+ and - border lines",
+      "header row of column names"
+    ],
+    "openWith": [
+      "MySQL command-line client",
+      "Any text editor"
+    ]
+  },
+  "nef": {
+    "name": "NEF",
+    "fullName": "Nikon Electronic Format",
+    "kind": "raster-camera",
+    "summary": "The raw image format of Nikon digital cameras. It stores unprocessed sensor data in a TIFF-based file, with an embedded JPEG preview.",
+    "usedFor": [
+      "Professional and enthusiast photography",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "TIFF-based structure",
+      "embedded JPEG preview",
+      "proprietary Nikon format"
+    ],
+    "openWith": [
+      "Nikon NX Studio",
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable"
+    ]
+  },
+  "oga": {
+    "name": "OGA",
+    "fullName": "Ogg audio",
+    "kind": "audio",
+    "summary": "The Ogg container extension recommended for audio-only files. It can hold Vorbis, FLAC or Opus audio.",
+    "usedFor": [
+      "Open-source audio",
+      "Web audio"
+    ],
+    "properties": [
+      "Ogg container",
+      "Vorbis, FLAC or Opus audio",
+      "open, patent-free format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Audacity",
+      "Firefox"
+    ]
+  },
+  "ogg": {
+    "name": "OGG",
+    "fullName": "Ogg container",
+    "kind": "audio",
+    "summary": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+    "usedFor": [
+      "Game audio",
+      "Open-source and Linux music",
+      "Web audio"
+    ],
+    "properties": [
+      "open, patent-free format",
+      "usually Vorbis audio",
+      "lossy compression",
+      "streaming-friendly"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Audacity",
+      "Firefox",
+      "Chrome"
+    ]
+  },
+  "ogv": {
+    "name": "OGV",
+    "fullName": "Ogg video",
+    "kind": "video",
+    "summary": "The Ogg container extension for video files. It usually holds Theora video with Vorbis or Opus audio.",
+    "usedFor": [
+      "Open-source video",
+      "Web video in Firefox"
+    ],
+    "properties": [
+      "Ogg container",
+      "Theora video",
+      "Vorbis or Opus audio",
+      "royalty-free"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Firefox"
+    ]
+  },
+  "opus": {
+    "name": "Opus",
+    "fullName": "Opus audio",
+    "kind": "audio",
+    "summary": "An open lossy audio codec standardized by the IETF in RFC 6716. It works well for both speech and music and for low-delay use.",
+    "usedFor": [
+      "Voice chat and calls",
+      "Streaming",
+      "Low-bitrate speech recordings"
+    ],
+    "properties": [
+      "lossy compression",
+      "low latency",
+      "bitrates from 6 to 510 kbit/s",
+      "royalty-free"
+    ],
+    "openWith": [
+      "VLC media player",
+      "Firefox",
+      "Chrome",
+      "Audacity"
+    ]
+  },
+  "orf": {
+    "name": "ORF",
+    "fullName": "Olympus RAW Format",
+    "kind": "raster-camera",
+    "summary": "The raw image format of Olympus digital cameras, now OM System. It stores unprocessed sensor data in a TIFF-based file.",
+    "usedFor": [
+      "Photography with Olympus and OM System cameras",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "TIFF-based structure",
+      "embedded JPEG preview",
+      "proprietary format"
+    ],
+    "openWith": [
+      "OM Workspace",
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable"
+    ]
+  },
+  "otf": {
+    "name": "OTF",
+    "fullName": "OpenType font",
+    "kind": "font",
+    "summary": "A font format developed by Microsoft and Adobe, standardized as ISO/IEC 14496-22. OTF files usually contain PostScript-style (CFF) outlines and support advanced typographic features.",
+    "usedFor": [
+      "Desktop and web typography",
+      "Fonts with ligatures and alternates"
+    ],
+    "properties": [
+      "CFF outlines (or TrueType outlines)",
+      "advanced layout features",
+      "wide language support",
+      "cross-platform"
+    ],
+    "openWith": [
+      "Font Book on macOS",
+      "Windows Fonts settings",
+      "Adobe Illustrator",
+      "FontForge"
+    ]
+  },
+  "pam": {
+    "name": "PAM",
+    "fullName": "Portable Arbitrary Map",
+    "kind": "image",
+    "summary": "A Netpbm format that generalizes PBM, PGM and PPM. It adds a header describing the number of channels, so it can carry an alpha channel.",
+    "usedFor": [
+      "Image interchange with transparency",
+      "Image-processing pipelines"
+    ],
+    "properties": [
+      "arbitrary number of channels",
+      "supports alpha",
+      "binary encoding",
+      "part of Netpbm"
+    ],
+    "openWith": [
+      "Netpbm tools",
+      "GIMP",
+      "ImageMagick"
+    ]
+  },
+  "pandasdataframe": {
+    "name": "Pandas DataFrame",
+    "fullName": "pandas DataFrame",
+    "kind": "data",
+    "summary": "A two-dimensional table of labelled rows and columns from pandas, the data analysis library for Python. It is the most widely used structure for tabular data in Python.",
+    "usedFor": [
+      "Data analysis in Python",
+      "Loading tabular data into notebooks"
+    ],
+    "properties": [
+      "labelled rows and columns",
+      "columns can hold different types",
+      "part of the pandas library"
+    ],
+    "openWith": [
+      "Jupyter Notebook",
+      "VS Code",
+      "PyCharm"
+    ]
+  },
+  "pbm": {
+    "name": "PBM",
+    "fullName": "Portable Bitmap",
+    "kind": "image",
+    "summary": "The black-and-white member of the Netpbm family of formats. Each pixel is one bit, and files can be stored as plain text or in a binary form.",
+    "usedFor": [
+      "Simple one-bit images",
+      "Interchange between image tools"
+    ],
+    "properties": [
+      "1 bit per pixel",
+      "plain text or binary encoding",
+      "very simple structure",
+      "part of Netpbm"
+    ],
+    "openWith": [
+      "GIMP",
+      "IrfanView",
+      "XnView MP",
+      "Netpbm tools"
+    ]
+  },
+  "pcd": {
+    "name": "PCD",
+    "fullName": "Kodak Photo CD",
+    "kind": "image",
+    "summary": "The image format of Kodak's Photo CD system, introduced in 1992. Each file holds one photo at several resolutions, from thumbnail to high resolution.",
+    "usedFor": [
+      "Photos scanned to Photo CD discs",
+      "Archival film scans"
+    ],
+    "properties": [
+      "several resolutions in one file",
+      "YCC color encoding",
+      "proprietary Kodak format",
+      "legacy format"
+    ],
+    "openWith": [
+      "XnView MP",
+      "IrfanView"
+    ]
+  },
+  "pcx": {
+    "name": "PCX",
+    "fullName": "PC Paintbrush image",
+    "kind": "image",
+    "summary": "A raster image format created by ZSoft for the PC Paintbrush program in the 1980s. It uses run-length encoding and was widely used on DOS and early Windows.",
+    "usedFor": [
+      "Legacy DOS and Windows graphics",
+      "Old clip art collections"
+    ],
+    "properties": [
+      "run-length encoding",
+      "1 to 24 bits per pixel",
+      "palette-based images",
+      "legacy format"
+    ],
+    "openWith": [
+      "GIMP",
+      "IrfanView",
+      "XnView MP"
+    ]
+  },
+  "pdf": {
+    "name": "PDF",
+    "fullName": "Portable Document Format",
+    "kind": "document",
+    "summary": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+    "usedFor": [
+      "Sharing documents that must look the same everywhere",
+      "Forms and contracts",
+      "Print-ready files and e-books"
+    ],
+    "properties": [
+      "fixed page layout",
+      "embedded fonts",
+      "vector and raster content",
+      "optional encryption and signatures"
+    ],
+    "openWith": [
+      "Adobe Acrobat Reader",
+      "Preview on macOS",
+      "Any web browser",
+      "Microsoft Edge"
+    ]
+  },
+  "pes": {
+    "name": "PES",
+    "fullName": "Brother embroidery",
+    "kind": "other",
+    "summary": "A machine embroidery file format created by Brother and used by Brother and Babylock machines. It stores stitch data, thread colors and a design preview.",
+    "usedFor": [
+      "Home embroidery machines",
+      "Digitized embroidery designs"
+    ],
+    "properties": [
+      "stitch coordinates",
+      "thread color palette",
+      "proprietary Brother format"
+    ],
+    "openWith": [
+      "PE-Design",
+      "Ink/Stitch for Inkscape",
+      "Embrilliance",
+      "Hatch"
+    ]
+  },
+  "pgm": {
+    "name": "PGM",
+    "fullName": "Portable Graymap",
+    "kind": "image",
+    "summary": "The grayscale member of the Netpbm family of formats. Each pixel is a gray value, stored as plain text or in a binary form.",
+    "usedFor": [
+      "Grayscale image interchange",
+      "Image-processing experiments"
+    ],
+    "properties": [
+      "grayscale only",
+      "8-bit or 16-bit samples",
+      "plain text or binary encoding",
+      "part of Netpbm"
+    ],
+    "openWith": [
+      "GIMP",
+      "IrfanView",
+      "XnView MP",
+      "Netpbm tools"
+    ]
+  },
+  "php": {
+    "name": "PHP",
+    "fullName": "PHP: Hypertext Preprocessor",
+    "kind": "text",
+    "summary": "A general-purpose scripting language created by Rasmus Lerdorf in 1994, designed mainly for web development. It powers WordPress and many other web applications.",
+    "usedFor": [
+      "Server-side web applications",
+      "Content management systems",
+      "Scripts and APIs"
+    ],
+    "properties": [
+      "interpreted language",
+      "embedded in HTML",
+      "open source",
+      "runs on most web servers"
+    ],
+    "openWith": [
+      "VS Code",
+      "PhpStorm",
+      "Any text editor"
+    ]
+  },
+  "png": {
+    "name": "PNG",
+    "fullName": "Portable Network Graphics",
+    "kind": "image",
+    "summary": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+    "usedFor": [
+      "Screenshots and interface graphics",
+      "Logos and images with transparency",
+      "Web graphics that must stay sharp"
+    ],
+    "properties": [
+      "lossless compression",
+      "alpha transparency",
+      "8-bit and 16-bit channels",
+      "supported by every browser"
+    ],
+    "openWith": [
+      "Any web browser",
+      "Preview on macOS",
+      "Windows Photos",
+      "GIMP"
+    ]
+  },
+  "ppm": {
+    "name": "PPM",
+    "fullName": "Portable Pixmap",
+    "kind": "image",
+    "summary": "The color member of the Netpbm family of formats. Each pixel stores red, green and blue values, in a plain text or binary encoding.",
+    "usedFor": [
+      "Simple color image interchange",
+      "Image-processing experiments"
+    ],
+    "properties": [
+      "RGB only, no alpha",
+      "8-bit or 16-bit samples",
+      "plain text or binary encoding",
+      "part of Netpbm"
+    ],
+    "openWith": [
+      "GIMP",
+      "IrfanView",
+      "XnView MP",
+      "Netpbm tools"
+    ]
+  },
+  "ppt": {
+    "name": "PPT",
+    "fullName": "PowerPoint 97-2003 presentation",
+    "kind": "presentation",
+    "summary": "The binary presentation format of Microsoft PowerPoint from PowerPoint 97 to 2003. It was replaced by PPTX in PowerPoint 2007.",
+    "usedFor": [
+      "Legacy slide decks",
+      "Presentations shared with older PowerPoint versions"
+    ],
+    "properties": [
+      "legacy binary format",
+      "slides, notes and animations",
+      "embedded media",
+      "macros supported"
+    ],
+    "openWith": [
+      "Microsoft PowerPoint",
+      "LibreOffice Impress",
+      "Google Slides",
+      "Keynote on macOS"
+    ]
+  },
+  "pptx": {
+    "name": "PPTX",
+    "fullName": "PowerPoint presentation",
+    "kind": "presentation",
+    "summary": "The default presentation format of Microsoft PowerPoint since PowerPoint 2007. It is a ZIP package of XML files standardized as Office Open XML (ECMA-376, ISO/IEC 29500).",
+    "usedFor": [
+      "Slide decks and presentations",
+      "Training and sales material"
+    ],
+    "properties": [
+      "ZIP package of XML",
+      "slides, notes and animations",
+      "embedded media and charts",
+      "open standard"
+    ],
+    "openWith": [
+      "Microsoft PowerPoint",
+      "Google Slides",
+      "LibreOffice Impress",
+      "Keynote on macOS"
+    ]
+  },
+  "protobuf": {
+    "name": "Protobuf",
+    "fullName": "Protocol Buffers",
+    "kind": "data",
+    "summary": "A language-neutral binary serialization format developed by Google. Data structures are defined in .proto files, and code is generated for many programming languages.",
+    "usedFor": [
+      "gRPC services",
+      "Internal service communication",
+      "Compact data storage"
+    ],
+    "properties": [
+      "binary format",
+      "schema in .proto files",
+      "generated code",
+      "backward-compatible evolution"
+    ],
+    "openWith": [
+      "protoc",
+      "Language-specific protobuf libraries"
+    ]
+  },
+  "psd": {
+    "name": "PSD",
+    "fullName": "Adobe Photoshop Document",
+    "kind": "image",
+    "summary": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+    "usedFor": [
+      "Layered image editing",
+      "Design mockups",
+      "Photo retouching"
+    ],
+    "properties": [
+      "layers and masks",
+      "16-bit and 32-bit channels",
+      "CMYK and RGB modes",
+      "proprietary Adobe format"
+    ],
+    "openWith": [
+      "Adobe Photoshop",
+      "GIMP",
+      "Affinity Photo",
+      "Preview on macOS"
+    ]
+  },
+  "qlik": {
+    "name": "Qlik",
+    "fullName": "Qlik",
+    "kind": "data",
+    "summary": "Data prepared for Qlik, the business intelligence platform that includes Qlik Sense. The table is written as a LOAD * INLINE [ … ]; statement that a Qlik load script runs to load the rows.",
+    "usedFor": [
+      "Loading data into Qlik Sense",
+      "Business intelligence dashboards"
+    ],
+    "properties": [
+      "LOAD * INLINE load-script statement",
+      "comma-separated rows inside the brackets",
+      "used in Qlik Sense and QlikView"
+    ],
+    "openWith": [
+      "Qlik Sense",
+      "QlikView"
+    ]
+  },
+  "qt": {
+    "name": "QT",
+    "fullName": "QuickTime movie",
+    "kind": "video",
+    "summary": "An alternative file extension for Apple's QuickTime movie container, which is the same format as MOV.",
+    "usedFor": [
+      "QuickTime video files",
+      "Legacy Apple video"
+    ],
+    "properties": [
+      "same container as MOV",
+      "multi-track container",
+      "Apple format"
+    ],
+    "openWith": [
+      "QuickTime Player",
+      "VLC media player"
+    ]
+  },
+  "ra": {
+    "name": "RA",
+    "fullName": "RealAudio",
+    "kind": "audio",
+    "summary": "An audio format from RealNetworks, introduced in 1995 for streaming over the internet. It is now a legacy format.",
+    "usedFor": [
+      "Old internet radio and streaming archives",
+      "Legacy audio files"
+    ],
+    "properties": [
+      "lossy compression",
+      "designed for streaming",
+      "proprietary RealNetworks format",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "RealPlayer"
+    ]
+  },
+  "raf": {
+    "name": "RAF",
+    "fullName": "Fujifilm RAW",
+    "kind": "raster-camera",
+    "summary": "The raw image format of Fujifilm digital cameras. It stores unprocessed sensor data together with an embedded JPEG preview.",
+    "usedFor": [
+      "Photography with Fujifilm cameras",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "embedded JPEG preview",
+      "proprietary Fujifilm format"
+    ],
+    "openWith": [
+      "RawTherapee",
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable"
+    ]
+  },
+  "rdataframe": {
+    "name": "R data frame",
+    "fullName": "R data frame",
+    "kind": "data",
+    "summary": "The standard table structure of the R language, with named columns that can hold different types of data. It is built into R.",
+    "usedFor": [
+      "Statistical analysis in R",
+      "Loading tabular data into R scripts"
+    ],
+    "properties": [
+      "named columns of mixed types",
+      "built into R",
+      "used for statistical analysis"
+    ],
+    "openWith": [
+      "RStudio",
+      "R",
+      "VS Code"
+    ]
+  },
+  "rdf": {
+    "name": "RDF",
+    "fullName": "Resource Description Framework",
+    "kind": "data",
+    "summary": "A W3C standard model for describing resources as subject, predicate, object triples. It can be written in several syntaxes, such as RDF/XML, Turtle and JSON-LD.",
+    "usedFor": [
+      "Linked data and the semantic web",
+      "Knowledge graphs",
+      "Metadata exchange"
+    ],
+    "properties": [
+      "subject-predicate-object triples",
+      "W3C standard",
+      "multiple serializations",
+      "queried with SPARQL"
+    ],
+    "openWith": [
+      "Protege",
+      "Apache Jena",
+      "Any text editor"
+    ]
+  },
+  "restructuredtext": {
+    "name": "reStructuredText",
+    "fullName": "reStructuredText",
+    "kind": "text",
+    "summary": "A plain-text markup language from the Python Docutils project. Sphinx uses it for documentation, and PEP 287 proposes it as the markup for Python docstrings.",
+    "usedFor": [
+      "Python documentation",
+      "Technical manuals built with Sphinx"
+    ],
+    "properties": [
+      "plain text markup",
+      "directives and roles",
+      "converts to HTML and PDF",
+      "processed by Docutils and Sphinx"
+    ],
+    "openWith": [
+      "Sphinx",
+      "VS Code",
+      "PyCharm",
+      "Any text editor"
+    ]
+  },
+  "rgb": {
+    "name": "RGB",
+    "fullName": "Raw RGB image data",
+    "kind": "image",
+    "summary": "Raw pixel data holding interleaved 8-bit red, green and blue samples, as written by ImageMagick's RGB format. The file has no header, so the width and height must be supplied to read it.",
+    "usedFor": [
+      "Raw pixel input for image-processing programs",
+      "Exchanging pixels without an image file format"
+    ],
+    "properties": [
+      "no header",
+      "interleaved red, green and blue samples",
+      "8 bits per sample",
+      "width and height needed to read"
+    ],
+    "openWith": [
+      "GIMP, as Raw image data",
+      "ImageMagick with -size WxH rgb:file"
+    ]
+  },
+  "rm": {
+    "name": "RM",
+    "fullName": "RealMedia",
+    "kind": "video",
+    "summary": "A multimedia container from RealNetworks, introduced in 1997 for streaming audio and video over the internet. It is now a legacy format.",
+    "usedFor": [
+      "Old streaming video",
+      "Legacy media archives"
+    ],
+    "properties": [
+      "proprietary RealNetworks format",
+      "designed for streaming",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "RealPlayer"
+    ]
+  },
+  "rmvb": {
+    "name": "RMVB",
+    "fullName": "RealMedia Variable Bitrate",
+    "kind": "video",
+    "summary": "A variant of the RealMedia container that uses variable bitrate encoding. It was popular for sharing movies in the early 2000s.",
+    "usedFor": [
+      "Older downloaded movies",
+      "Legacy media archives"
+    ],
+    "properties": [
+      "variable bitrate",
+      "RealVideo codec",
+      "proprietary RealNetworks format",
+      "legacy format"
+    ],
+    "openWith": [
+      "VLC media player",
+      "RealPlayer"
+    ]
+  },
+  "ruby": {
+    "name": "Ruby",
+    "fullName": "Ruby",
+    "kind": "text",
+    "summary": "A dynamic programming language created by Yukihiro Matsumoto and first released in 1995. It is known for the web framework Ruby on Rails.",
+    "usedFor": [
+      "Web applications with Rails",
+      "Scripts and automation"
+    ],
+    "properties": [
+      "interpreted language",
+      "object-oriented",
+      "open source"
+    ],
+    "openWith": [
+      "VS Code",
+      "RubyMine",
+      "Any text editor"
+    ]
+  },
+  "rw2": {
+    "name": "RW2",
+    "fullName": "Panasonic RAW",
+    "kind": "raster-camera",
+    "summary": "The raw image format of Panasonic Lumix cameras. It stores unprocessed sensor data, and the .rw2 extension is also used by some Leica cameras built with Panasonic.",
+    "usedFor": [
+      "Photography with Panasonic Lumix cameras",
+      "Editing photos before conversion to JPEG"
+    ],
+    "properties": [
+      "unprocessed sensor data",
+      "embedded JPEG preview",
+      "proprietary format"
+    ],
+    "openWith": [
+      "Adobe Lightroom",
+      "Adobe Photoshop",
+      "darktable",
+      "RawTherapee"
+    ]
+  },
+  "sfw": {
+    "name": "SFW",
+    "fullName": "Seattle FilmWorks image",
+    "kind": "image",
+    "summary": "A proprietary image format used by Seattle FilmWorks, a mail-order film developer that delivered scans on disk and online in the 1990s. Files are JPEG-based with a modified header.",
+    "usedFor": [
+      "Old Seattle FilmWorks photo scans",
+      "Legacy photo archives"
+    ],
+    "properties": [
+      "JPEG-based data",
+      "modified file header",
+      "proprietary format",
+      "legacy format"
+    ],
+    "openWith": [
+      "XnView MP",
+      "IrfanView",
+      "ImageMagick"
+    ]
+  },
+  "sql": {
+    "name": "SQL",
+    "fullName": "Structured Query Language",
+    "kind": "data",
+    "summary": "The standard language for querying and managing relational databases, standardized as ISO/IEC 9075. .sql files hold statements such as CREATE TABLE and INSERT.",
+    "usedFor": [
+      "Database dumps and backups",
+      "Loading data into databases",
+      "Schema migrations"
+    ],
+    "properties": [
+      "plain text statements",
+      "ISO/IEC standard with vendor dialects",
+      "imported by database tools"
+    ],
+    "openWith": [
+      "DBeaver",
+      "MySQL Workbench",
+      "VS Code",
+      "Any text editor"
+    ]
+  },
+  "svg": {
+    "name": "SVG",
+    "fullName": "Scalable Vector Graphics",
+    "kind": "vector",
+    "summary": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+    "usedFor": [
+      "Logos and icons on the web",
+      "Illustrations and diagrams",
+      "Charts and maps"
+    ],
+    "properties": [
+      "resolution independent",
+      "XML text",
+      "supports animation and scripting",
+      "styleable with CSS"
+    ],
+    "openWith": [
+      "Any web browser",
+      "Inkscape",
+      "Adobe Illustrator",
+      "Figma"
+    ]
+  },
+  "swf": {
+    "name": "SWF",
+    "fullName": "Shockwave Flash",
+    "kind": "other",
+    "summary": "A file format for Adobe Flash animations, games and interactive content, originally from Macromedia. Flash Player reached end of life on 31 December 2020.",
+    "usedFor": [
+      "Flash animations and games",
+      "Archived web content"
+    ],
+    "properties": [
+      "vector animation",
+      "ActionScript interactivity",
+      "can embed video and audio",
+      "legacy format"
+    ],
+    "openWith": [
+      "Ruffle, in a browser or as a desktop app",
+      "JPEXS Free Flash Decompiler"
+    ]
+  },
+  "textile": {
+    "name": "Textile",
+    "fullName": "Textile",
+    "kind": "text",
+    "summary": "A lightweight markup language created by Dean Allen in 2002 that converts plain text into HTML. It is used by some content management systems and issue trackers.",
+    "usedFor": [
+      "Content in some CMS and wikis",
+      "Issue tracker descriptions"
+    ],
+    "properties": [
+      "plain text markup",
+      "converts to HTML",
+      "short syntax for tables and lists"
+    ],
+    "openWith": [
+      "Any text editor",
+      "VS Code",
+      "RedCloth"
+    ]
+  },
+  "tga": {
+    "name": "TGA",
+    "fullName": "Truevision TGA (Targa)",
+    "kind": "image",
+    "summary": "A raster image format introduced by Truevision in 1984. It stores 8 to 32 bits per pixel with optional run-length encoding and an alpha channel.",
+    "usedFor": [
+      "Game textures",
+      "Video and 3D rendering output"
+    ],
+    "properties": [
+      "optional run-length compression",
+      "alpha channel",
+      "8 to 32 bits per pixel",
+      "simple header"
+    ],
+    "openWith": [
+      "GIMP",
+      "Adobe Photoshop",
+      "IrfanView",
+      "Paint.NET"
+    ]
+  },
+  "tif": {
+    "aliasOf": "tiff"
+  },
+  "tiff": {
+    "name": "TIFF",
+    "fullName": "Tagged Image File Format",
+    "kind": "image",
+    "summary": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+    "usedFor": [
+      "Scanning and archiving",
+      "Professional photography and print",
+      "Fax and document imaging"
+    ],
+    "properties": [
+      "lossless or lossy compression",
+      "multiple pages in one file",
+      "high bit depth",
+      "CMYK support"
+    ],
+    "openWith": [
+      "Preview on macOS",
+      "Windows Photos",
+      "GIMP",
+      "Adobe Photoshop"
+    ]
+  },
+  "toml": {
+    "name": "TOML",
+    "fullName": "Tom's Obvious Minimal Language",
+    "kind": "data",
+    "summary": "A configuration file format created by Tom Preston-Werner. It maps clearly to a hash table and uses key-value pairs grouped in sections.",
+    "usedFor": [
+      "Configuration files",
+      "Python and Rust project settings"
+    ],
+    "properties": [
+      "key-value pairs and tables",
+      "supports comments",
+      "typed values such as dates",
+      "plain text"
+    ],
+    "openWith": [
+      "VS Code",
+      "Any text editor"
+    ]
+  },
+  "tracwiki": {
+    "name": "Trac Wiki",
+    "fullName": "Trac WikiFormatting",
+    "kind": "text",
+    "summary": "The wiki markup used by Trac, the open-source project management and bug tracking tool. It describes headings, lists, links and tables in plain text.",
+    "usedFor": [
+      "Trac wiki pages and tickets",
+      "Project documentation"
+    ],
+    "properties": [
+      "plain text markup",
+      "table syntax with ||",
+      "used by Trac"
+    ],
+    "openWith": [
+      "Trac",
+      "Any text editor"
+    ]
+  },
+  "ts": {
+    "name": "TS",
+    "fullName": "MPEG transport stream",
+    "kind": "video",
+    "summary": "A container format standardized in MPEG-2 Systems (ISO/IEC 13818-1) for broadcasting. It splits video, audio and data into small fixed-size packets so streams survive transmission errors.",
+    "usedFor": [
+      "Digital television broadcasting",
+      "HLS streaming segments",
+      "Blu-ray and camcorder recordings"
+    ],
+    "properties": [
+      "188-byte packets",
+      "error resilience",
+      "multiple streams in one file",
+      "MPEG-2 Systems standard"
+    ],
+    "openWith": [
+      "VLC media player",
+      "mpv",
+      "Windows Media Player with codecs"
+    ]
+  },
+  "ttf": {
+    "name": "TTF",
+    "fullName": "TrueType font",
+    "kind": "font",
+    "summary": "An outline font format developed by Apple and licensed to Microsoft in the late 1980s. It is supported by Windows, macOS, Linux and web browsers.",
+    "usedFor": [
+      "System and desktop fonts",
+      "Web fonts",
+      "Documents that embed fonts"
+    ],
+    "properties": [
+      "quadratic curve outlines",
+      "hinting instructions",
+      "cross-platform",
+      "one font per file"
+    ],
+    "openWith": [
+      "Font Book on macOS",
+      "Windows Fonts settings",
+      "FontForge"
+    ]
+  },
+  "txt": {
+    "name": "TXT",
+    "fullName": "Plain text file",
+    "kind": "text",
+    "summary": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+    "usedFor": [
+      "Notes and logs",
+      "Configuration and readme files",
+      "Exchanging text between programs"
+    ],
+    "properties": [
+      "no formatting",
+      "character encoding such as UTF-8",
+      "very small files",
+      "readable everywhere"
+    ],
+    "openWith": [
+      "Notepad",
+      "TextEdit on macOS",
+      "VS Code",
+      "Any web browser"
+    ]
+  },
+  "vob": {
+    "name": "VOB",
+    "fullName": "DVD Video Object",
+    "kind": "video",
+    "summary": "The container used for video, audio, subtitles and menus on DVD-Video discs. It is based on the MPEG-2 program stream.",
+    "usedFor": [
+      "DVD-Video discs",
+      "Ripping DVDs to files"
+    ],
+    "properties": [
+      "MPEG-2 program stream",
+      "multiple audio and subtitle streams",
+      "may be encrypted with CSS",
+      "files up to 1 GB"
+    ],
+    "openWith": [
+      "VLC media player",
+      "MPC-HC",
+      "Windows Media Player with codecs"
+    ]
+  },
+  "wav": {
+    "name": "WAV",
+    "fullName": "Waveform Audio File Format",
+    "kind": "audio",
+    "summary": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+    "usedFor": [
+      "Audio recording and editing",
+      "Professional sound production",
+      "Source files before compression"
+    ],
+    "properties": [
+      "usually uncompressed PCM",
+      "lossless",
+      "large files",
+      "4 GB file size limit"
+    ],
+    "openWith": [
+      "Audacity",
+      "VLC media player",
+      "Windows Media Player",
+      "Any web browser"
+    ]
+  },
+  "wbmp": {
+    "name": "WBMP",
+    "fullName": "Wireless Bitmap",
+    "kind": "image",
+    "summary": "A monochrome image format defined in the WAP (Wireless Application Protocol) specifications for early mobile phones. Each pixel is a single bit.",
+    "usedFor": [
+      "Graphics for early WAP phones",
+      "Legacy mobile content"
+    ],
+    "properties": [
+      "monochrome",
+      "1 bit per pixel",
+      "very small files",
+      "legacy format"
+    ],
+    "openWith": [
+      "GIMP",
+      "XnView MP",
+      "ImageMagick"
+    ]
+  },
+  "webm": {
+    "name": "WebM",
+    "fullName": "WebM video",
+    "kind": "video",
+    "summary": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+    "usedFor": [
+      "Web video",
+      "Browser screen recordings",
+      "Animated clips"
+    ],
+    "properties": [
+      "royalty-free",
+      "VP8, VP9 or AV1 video",
+      "Vorbis or Opus audio",
+      "supported by major browsers"
+    ],
+    "openWith": [
+      "Chrome",
+      "Firefox",
+      "VLC media player",
+      "Microsoft Edge"
+    ]
+  },
+  "webp": {
+    "name": "WebP",
+    "fullName": "WebP image",
+    "kind": "image",
+    "summary": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+    "usedFor": [
+      "Web images with smaller files",
+      "Images that need transparency",
+      "Short animations"
+    ],
+    "properties": [
+      "lossy and lossless compression",
+      "alpha transparency",
+      "animation",
+      "supported by current major browsers"
+    ],
+    "openWith": [
+      "Any modern web browser",
+      "Preview on macOS",
+      "GIMP",
+      "Windows Photos"
+    ]
+  },
+  "wma": {
+    "name": "WMA",
+    "fullName": "Windows Media Audio",
+    "kind": "audio",
+    "summary": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+    "usedFor": [
+      "Windows media libraries",
+      "Older portable music players"
+    ],
+    "properties": [
+      "lossy (and lossless) variants",
+      "ASF container",
+      "proprietary Microsoft format"
+    ],
+    "openWith": [
+      "Windows Media Player",
+      "VLC media player",
+      "foobar2000"
+    ]
+  },
+  "wmv": {
+    "name": "WMV",
+    "fullName": "Windows Media Video",
+    "kind": "video",
+    "summary": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+    "usedFor": [
+      "Older Windows video",
+      "Screen recordings",
+      "Streaming in Windows Media"
+    ],
+    "properties": [
+      "ASF container",
+      "proprietary Microsoft codec",
+      "lossy compression",
+      "legacy format"
+    ],
+    "openWith": [
+      "Windows Media Player",
+      "VLC media player"
+    ]
+  },
+  "wpg": {
+    "name": "WPG",
+    "fullName": "WordPerfect Graphics",
+    "kind": "image",
+    "summary": "The graphics format of the WordPerfect word processor. A file can contain vector drawing objects or bitmap data.",
+    "usedFor": [
+      "Clip art in WordPerfect documents",
+      "Legacy office graphics"
+    ],
+    "properties": [
+      "vector or raster content",
+      "used by WordPerfect",
+      "legacy format"
+    ],
+    "openWith": [
+      "Corel WordPerfect",
+      "LibreOffice Draw",
+      "Inkscape",
+      "XnView MP"
+    ]
+  },
+  "wtv": {
+    "name": "WTV",
+    "fullName": "Windows Recorded TV Show",
+    "kind": "video",
+    "summary": "The format Windows Media Center uses to record television. It arrived with the TV Pack 2008 update for Windows Vista, replacing DVR-MS, and became the default in Windows 7.",
+    "usedFor": [
+      "TV recordings from Windows Media Center",
+      "Archived broadcast recordings"
+    ],
+    "properties": [
+      "Microsoft proprietary container",
+      "often MPEG-2 or H.264 video",
+      "may be copy-protected",
+      "legacy format"
+    ],
+    "openWith": [
+      "Windows Media Player on Windows 7",
+      "VLC media player"
+    ]
+  },
+  "xbm": {
+    "name": "XBM",
+    "fullName": "X BitMap",
+    "kind": "image",
+    "summary": "A monochrome image format of the X Window System. The image is stored as C source code, an array of bytes that can be compiled into a program.",
+    "usedFor": [
+      "Cursors and icons in X11 programs",
+      "Small one-bit graphics"
+    ],
+    "properties": [
+      "monochrome",
+      "stored as C source text",
+      "1 bit per pixel",
+      "legacy format"
+    ],
+    "openWith": [
+      "GIMP",
+      "XnView MP",
+      "ImageMagick"
+    ]
+  },
+  "xcf": {
+    "name": "XCF",
+    "fullName": "GIMP image",
+    "kind": "image",
+    "summary": "The native file format of GIMP, the GNU Image Manipulation Program. It keeps layers, channels, paths and selections so an image can be edited again.",
+    "usedFor": [
+      "Layered image editing in GIMP",
+      "Saving work in progress"
+    ],
+    "properties": [
+      "layers and channels",
+      "paths and selections",
+      "lossless",
+      "native to GIMP"
+    ],
+    "openWith": [
+      "GIMP",
+      "Krita",
+      "XnView MP"
+    ]
+  },
+  "xls": {
+    "name": "XLS",
+    "fullName": "Excel 97-2003 workbook",
+    "kind": "spreadsheet",
+    "summary": "The binary workbook format of Microsoft Excel from Excel 97 to Excel 2003. It was replaced by XLSX in Excel 2007.",
+    "usedFor": [
+      "Legacy spreadsheets",
+      "Workbooks shared with older Excel versions"
+    ],
+    "properties": [
+      "legacy binary format",
+      "maximum 65,536 rows and 256 columns per sheet",
+      "formulas and charts",
+      "macros supported"
+    ],
+    "openWith": [
+      "Microsoft Excel",
+      "LibreOffice Calc",
+      "Google Sheets",
+      "Numbers on macOS"
+    ]
+  },
+  "xlsx": {
+    "name": "XLSX",
+    "fullName": "Excel workbook",
+    "kind": "spreadsheet",
+    "summary": "The default workbook format of Microsoft Excel since Excel 2007. It is a ZIP package of XML files standardized as Office Open XML (ECMA-376, ISO/IEC 29500).",
+    "usedFor": [
+      "Spreadsheets and budgets",
+      "Data analysis and reports",
+      "Importing and exporting tabular data"
+    ],
+    "properties": [
+      "ZIP package of XML",
+      "formulas and charts",
+      "multiple sheets",
+      "over one million rows per sheet"
+    ],
+    "openWith": [
+      "Microsoft Excel",
+      "Google Sheets",
+      "LibreOffice Calc",
+      "Numbers on macOS"
+    ]
+  },
+  "xml": {
+    "name": "XML",
+    "fullName": "Extensible Markup Language",
+    "kind": "data",
+    "summary": "A markup language for structured data, maintained by the W3C. Custom tags describe the data, and both people and programs can read it.",
+    "usedFor": [
+      "Data exchange between systems",
+      "Configuration files",
+      "Feeds and sitemaps"
+    ],
+    "properties": [
+      "text-based",
+      "user-defined tags",
+      "W3C Recommendation",
+      "validated with schemas"
+    ],
+    "openWith": [
+      "VS Code",
+      "Any web browser",
+      "Any text editor"
+    ]
+  },
+  "xpm": {
+    "name": "XPM",
+    "fullName": "X PixMap",
+    "kind": "image",
+    "summary": "A color image format of the X Window System. Like XBM, it is stored as C source code, with a color table and one character per pixel.",
+    "usedFor": [
+      "Icons in X11 programs",
+      "Small color graphics"
+    ],
+    "properties": [
+      "stored as C source text",
+      "color table",
+      "palette-based",
+      "legacy format"
+    ],
+    "openWith": [
+      "GIMP",
+      "XnView MP",
+      "ImageMagick"
+    ]
+  },
+  "xps": {
+    "name": "XPS",
+    "fullName": "XML Paper Specification",
+    "kind": "document",
+    "summary": "A fixed-layout document format developed by Microsoft and standardized as ECMA-388. It is a ZIP package of XML pages, similar in purpose to PDF.",
+    "usedFor": [
+      "Fixed-layout documents",
+      "Windows print output"
+    ],
+    "properties": [
+      "fixed page layout",
+      "ZIP package of XML",
+      "vector graphics",
+      "ECMA standard"
+    ],
+    "openWith": [
+      "XPS Viewer, an optional Windows feature",
+      "SumatraPDF"
+    ]
+  },
+  "yaml": {
+    "name": "YAML",
+    "fullName": "YAML Ain't Markup Language",
+    "kind": "data",
+    "summary": "A human-readable data format that uses indentation to show structure. It is widely used for configuration files and is a superset of JSON from version 1.2.",
+    "usedFor": [
+      "Configuration files",
+      "CI/CD pipelines",
+      "Kubernetes manifests"
+    ],
+    "properties": [
+      "indentation-based",
+      "supports comments",
+      "superset of JSON in version 1.2",
+      "plain text"
+    ],
+    "openWith": [
+      "VS Code",
+      "Any text editor"
+    ]
+  }
+}

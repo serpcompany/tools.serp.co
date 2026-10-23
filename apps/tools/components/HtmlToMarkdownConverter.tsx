@@ -14,19 +14,20 @@ const SAMPLE_HTML = `<h1>Welcome to HTML to Markdown</h1>
 <ul>
   <li>Instant, client-side conversion</li>
   <li>Supports headings, lists, links, and more</li>
-  <li>Powered by <a href="https://github.com/kreuzberg-dev/html-to-markdown">html-to-markdown</a></li>
+  <li>Powered by <a href="https://github.com/xberg-io/html-to-markdown">html-to-markdown</a></li>
 </ul>
 <blockquote><p>Paste any HTML on the left and get clean Markdown on the right.</p></blockquote>`;
 
 type ConvertFn = (html: string, options: null) => { content: string | null };
 
 type Props = {
-  // The H1 and the line under it, which the page's structured data repeats.
-  title: string;
+  // The page's H1 (toolHeading, lib/metadata.ts) and the line under it, which
+  // its structured data repeats.
+  heading: string;
   subtitle: string;
 };
 
-export default function HtmlToMarkdownConverter({ title, subtitle }: Props) {
+export default function HtmlToMarkdownConverter({ heading, subtitle }: Props) {
   const [html, setHtml] = useState(SAMPLE_HTML);
   const [markdown, setMarkdown] = useState("");
   const [wasmReady, setWasmReady] = useState(false);
@@ -134,7 +135,7 @@ export default function HtmlToMarkdownConverter({ title, subtitle }: Props) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-3">{title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-3">{heading}</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">{subtitle}</p>
         </div>
 

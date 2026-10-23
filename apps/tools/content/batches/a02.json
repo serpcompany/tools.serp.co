@@ -1,0 +1,460 @@
+{
+  "jpg-to-png": {
+    "seo": {
+      "title": "Convert JPG to PNG Online (Free)",
+      "h1": "JPG to PNG Converter",
+      "description": "Convert JPG to PNG in your browser: the photo is decoded and saved as a lossless PNG, one file per image. Free, with no sign-up.",
+      "howToHeading": "How to convert JPG to PNG"
+    },
+    "tool": {
+      "subtitle": "Save a JPG photo as a lossless PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the PNG look better than the JPG?",
+        "answer": "No. The JPG's compression loss is already in the pixels, and PNG only stores them without losing more. The PNG matches the JPG."
+      },
+      {
+        "question": "Does the PNG get a transparent background?",
+        "answer": "No. A JPG has no alpha channel, so there is nothing transparent to carry over. PNG can hold transparency, but this conversion doesn't add any."
+      },
+      {
+        "question": "Is my EXIF data kept?",
+        "answer": "No. The image passes through raw pixels, so EXIF, ICC profiles and XMP are dropped from the PNG. Keep the original JPG if you need that information."
+      },
+      {
+        "question": "Can I change several JPG files to PNG together?",
+        "answer": "Yes. Pick as many as you like. They convert one after another, and each PNG downloads as its own file, not in a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PNG",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Photographs and camera output",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to PNG",
+      "points": [
+        "The PNG is lossless, but it can't restore detail the JPG already lost.",
+        "A JPG has no transparency, so the PNG has none either.",
+        "EXIF, ICC profile and XMP data are not carried over.",
+        "Each image downloads as its own PNG file."
+      ]
+    }
+  },
+  "jpeg-to-jpg": {
+    "seo": {
+      "title": "Convert JPEG to JPG Online (Free)",
+      "h1": "JPEG to JPG Converter",
+      "description": "Convert JPEG to JPG in your browser: each image is decoded and saved again as a .jpg file. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert JPEG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a .jpeg image into a .jpg file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is there a difference between JPEG and JPG?",
+        "answer": "No. They are the same format, and the two extensions are interchangeable. Only the name of the file differs."
+      },
+      {
+        "question": "Is the image re-compressed when I convert it?",
+        "answer": "Yes. The converter doesn't just rename the file. It decodes the image and writes a new JPG at quality 0.85, so a little more detail can be lost."
+      },
+      {
+        "question": "Are my EXIF and colour profile kept?",
+        "answer": "No. The image goes through raw pixels, so EXIF, ICC profiles and XMP are left out of the new JPG."
+      },
+      {
+        "question": "Can I convert many JPEG files in one go?",
+        "answer": "Yes. Choose several files and they run one after another. Each JPG downloads separately, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and JPG",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The same lossy photo format as JPG, written with the longer .jpeg extension. It was defined by the Joint Photographic Experts Group (ISO/IEC 10918-1).",
+        "details": [
+          "Same format as JPG",
+          "Lossy compression",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "Digital camera output",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to JPG",
+      "points": [
+        "JPEG and JPG are one format; only the extension differs.",
+        "The file is decoded and saved again at quality 0.85, not just renamed, so a little detail can be lost.",
+        "EXIF, ICC profile and XMP data are dropped.",
+        "Your original file isn't changed; you download a new copy."
+      ]
+    }
+  },
+  "mp4-to-gif": {
+    "seo": {
+      "title": "Convert MP4 to GIF Online (Free)",
+      "h1": "MP4 to GIF Converter",
+      "description": "Convert MP4 to GIF in your browser: a looping animation at 15 fps, up to 480 px wide, with its own colour palette. Free, with no sign-up.",
+      "howToHeading": "How to convert MP4 to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 video into a looping GIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What size and frame rate is the GIF?",
+        "answer": "The GIF runs at 15 frames per second, and its longer side is at most 480 pixels. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape stays the same."
+      },
+      {
+        "question": "Does the GIF loop and have sound?",
+        "answer": "It loops without end. GIF is an image format that holds simple animation, so the video's soundtrack is not part of it."
+      },
+      {
+        "question": "Why do the colours look different in the GIF?",
+        "answer": "A GIF uses a palette of at most 256 colours per frame. The converter builds a palette from your video first, which keeps the colours as close as that limit allows."
+      },
+      {
+        "question": "Can I make a GIF from a long MP4?",
+        "answer": "Yes. There is no length limit of its own, but FFmpeg runs on your device, so a long video takes as long as your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and GIF",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to GIF",
+      "points": [
+        "The GIF is 15 fps and at most 480 px on its longer side.",
+        "A palette is generated from the video, because GIF allows 256 colours per frame.",
+        "The sound is not kept, and the GIF loops.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "compress-jpg": {
+    "seo": {
+      "title": "Compress JPG Files Online (Free)",
+      "h1": "JPG Compressor",
+      "description": "Compress JPG files in your browser: each image is re-encoded at quality 82, and you get the original back if it isn't smaller. Free, no sign-up.",
+      "howToHeading": "How to compress JPG files"
+    },
+    "tool": {
+      "subtitle": "Make a JPG smaller by re-encoding it at quality 82, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How does the JPG compressor shrink a file?",
+        "answer": "It decodes the image and writes it again as a JPG at quality 82. A lower quality means fewer details to store, which makes the file smaller."
+      },
+      {
+        "question": "Will compressing change how the JPG looks?",
+        "answer": "It can. JPG is a lossy format, and this re-encode is lossy too, so fine detail may soften. The original file isn't changed, so you can compare."
+      },
+      {
+        "question": "What if the compressed file isn't smaller?",
+        "answer": "Then you get your original JPG back. The compressor only hands over a new file when it is smaller than the one you chose."
+      },
+      {
+        "question": "Can I compress several JPG files at once?",
+        "answer": "Yes. Choose them together and they run one after another. Each smaller JPG downloads as its own file, not in a ZIP."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before compressing a JPG",
+      "points": [
+        "The JPG is re-encoded at quality 82, and that step is lossy.",
+        "If the result isn't smaller, you get your original file back.",
+        "Your original is never changed; you download a new copy.",
+        "The image never leaves your browser, and there is no size limit of its own."
+      ]
+    }
+  },
+  "compress-jpeg": {
+    "seo": {
+      "title": "Compress JPEG Files Online (Free)",
+      "h1": "JPEG Compressor",
+      "description": "Compress JPEG files in your browser: every image is saved again at quality 82, or returned unchanged if that isn't smaller. Free, no sign-up.",
+      "howToHeading": "How to compress JPEG files"
+    },
+    "tool": {
+      "subtitle": "Shrink a JPEG image by saving it again at quality 82, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I compress a JPEG?",
+        "answer": "Choose the JPEG in the compressor, wait while it is saved again at quality 82, then download the result. Nothing is uploaded, because the work happens in your browser."
+      },
+      {
+        "question": "Does compressing a JPEG lose quality?",
+        "answer": "Some. Quality 82 is a lossy setting, so fine detail may be reduced to save space. Your original JPEG stays as it was, and the result is a separate download."
+      },
+      {
+        "question": "Why did I get the same JPEG file back?",
+        "answer": "The new copy wasn't smaller than your file. In that case the compressor gives the original back, so the file you download is never bigger."
+      },
+      {
+        "question": "Can I compress multiple JPEG files at once?",
+        "answer": "Yes. Select several and they go through one after another. Each comes back as its own download, with no ZIP."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before compressing a JPEG",
+      "points": [
+        "A .jpeg file is the same format as .jpg, and it gets the same treatment.",
+        "Each image is re-encoded at quality 82, which is a lossy step.",
+        "A result that isn't smaller is swapped for your original file.",
+        "The work stays in your browser, so the image isn't uploaded."
+      ]
+    }
+  },
+  "mov-to-mp4": {
+    "seo": {
+      "title": "Convert MOV to MP4 Online (Free)",
+      "h1": "MOV to MP4 Converter",
+      "description": "Convert MOV to MP4 in your browser: video is re-encoded as H.264 with AAC audio, up to 1920 px and 30 fps. Free, with no sign-up.",
+      "howToHeading": "How to convert MOV to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a MOV video into an H.264 MP4, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What video and audio does the MP4 contain?",
+        "answer": "The video is re-encoded as H.264 and the sound as AAC at 96 kbps, in an MP4 set up to start playing quickly. The MOV's own codecs aren't copied."
+      },
+      {
+        "question": "Will a large or high-frame-rate MOV be reduced?",
+        "answer": "Yes, if it is bigger than the limits. The picture is capped at 1920 pixels on its longer side and 30 frames per second. Smaller or slower videos keep their rate and, apart from rounding an odd width or height down by 1 px, their size."
+      },
+      {
+        "question": "Is the MP4 the same quality as my MOV?",
+        "answer": "Not exactly. It is a fresh lossy encode, not a copy of the MOV's video, so it won't match the MOV pixel for pixel."
+      },
+      {
+        "question": "How long does converting a MOV take?",
+        "answer": "There is no time or size limit of its own, so a long MOV takes as long as your device needs. The work happens in your browser, and nothing is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and MP4",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "Multi-track container",
+          "Many codecs, including ProRes",
+          "Timecode and metadata tracks",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to MP4",
+      "points": [
+        "The video is re-encoded to H.264 and the sound to AAC, not copied across.",
+        "Frame size is capped at 1920 px and the frame rate at 30 fps.",
+        "Converting several MOV files gives one MP4 for each.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "svg-to-png": {
+    "seo": {
+      "title": "Convert SVG to PNG Online (Free)",
+      "h1": "SVG to PNG Converter",
+      "description": "Convert SVG to PNG in your browser: the vector graphic is drawn as a lossless PNG, and transparent areas stay transparent. Free, no sign-up.",
+      "howToHeading": "How to convert SVG to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn an SVG graphic into a PNG image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the PNG keep a transparent background?",
+        "answer": "Yes. PNG supports alpha transparency and this conversion keeps it, so areas your SVG leaves empty stay transparent."
+      },
+      {
+        "question": "Will the PNG stay sharp when I enlarge it?",
+        "answer": "No. An SVG describes shapes mathematically, so it scales to any size. A PNG is a grid of pixels, so keep the SVG if you need to resize later."
+      },
+      {
+        "question": "What size will the PNG be?",
+        "answer": "Your browser reports a size for the SVG and the PNG is drawn at that size, 1:1. The page adds no scale factor, size cap or viewBox handling, so there is no setting for a larger PNG."
+      },
+      {
+        "question": "Does this work for animated or scripted SVGs?",
+        "answer": "The PNG is a single still image. Your browser draws the SVG, and this page adds no handling of its own for animation or scripts."
+      },
+      {
+        "question": "Can I convert more than one SVG at once?",
+        "answer": "Yes. Choose several SVG files and they convert one after another. Each PNG downloads as its own file, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and PNG",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to PNG",
+      "points": [
+        "A PNG is made of pixels, so it loses the SVG's resolution independence.",
+        "Transparency is kept in the PNG.",
+        "The PNG takes the size your browser reports for the SVG, drawn 1:1, with no scale option.",
+        "The PNG is a single still image; the page adds no handling for animation or scripts.",
+        "The conversion happens in your browser, so the SVG isn't uploaded."
+      ]
+    }
+  },
+  "jfif-to-jpg": {
+    "seo": {
+      "title": "Convert JFIF to JPG Online (Free)",
+      "h1": "JFIF to JPG Converter",
+      "description": "Convert JFIF to JPG in your browser: the image is decoded and saved as a regular .jpg that opens in any viewer. Free, with no sign-up.",
+      "howToHeading": "How to convert JFIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a .jfif image into a regular .jpg file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What is a JFIF file?",
+        "answer": "JFIF is the JPEG File Interchange Format. A .jfif file holds ordinary JPEG image data, and some browsers and Windows tools save images with that extension."
+      },
+      {
+        "question": "Does converting JFIF to JPG lower the quality?",
+        "answer": "A little can be lost. The image is decoded and saved again as a JPG at quality 0.85, so it is a new lossy encode and not a plain rename."
+      },
+      {
+        "question": "Is the metadata kept in the JPG?",
+        "answer": "No. The image goes through raw pixels, so EXIF, ICC profiles and XMP are dropped from the new JPG."
+      },
+      {
+        "question": "Can I change several JFIF files at once?",
+        "answer": "Yes. Pick them together and they run one after another. Every JPG downloads as a separate file, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JFIF and JPG",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A container convention for JPEG-compressed images that specifies colour space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+        "details": [
+          "Lossy JPEG compression",
+          "No alpha transparency",
+          "Readable as a regular JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JFIF to JPG",
+      "points": [
+        "A JFIF file already holds JPEG data, so the .jpg opens anywhere a JPG does.",
+        "The new JPG is encoded again at quality 0.85, not just renamed, so a little detail can be lost.",
+        "EXIF, ICC profile and XMP data are not carried over.",
+        "Your original .jfif file isn't changed."
+      ]
+    }
+  }
+}

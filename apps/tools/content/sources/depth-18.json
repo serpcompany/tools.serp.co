@@ -1,0 +1,250 @@
+{
+  "tools": {
+    "avif-to-pdf": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the AVIF. Choose File > Export As, expand Select File Type and pick Portable Document Format (or end the name in .pdf), then click Export. The PDF dialog has an option to fill transparent areas with the background color.",
+          "limits": "AVIF import needs GIMP 2.10.22 or later.",
+          "source": "https://docs.gimp.org/3.2/en/file-pdf-export.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+            "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick artwork.avif document.pdf",
+          "limits": "ImageMagick lists AVIF and PDF as readable and writable; PDF needs Ghostscript.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "jpg-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG, choose File > Export As, type a new .jpg name and export; in the JPEG dialog set Quality (0 to 100) and which Exif, XMP or IPTC metadata to keep.",
+          "limits": "GIMP's quality scale is its own; a JPEG save is lossy.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick camera.jpg -quality 85 fresh.jpg",
+          "limits": "ImageMagick's quality is its own encoder setting; the command re-encodes rather than byte-copying.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "mkv-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i feature.mkv -c:v mpeg4 -c:a libmp3lame feature.avi",
+          "limits": "Needs the mpeg4 and libmp3lame encoders; map streams explicitly when you need a particular track.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Avidemux",
+          "steps": "Open the MKV with the Open button. Set AVI in the Output Format section on the left, choose the video and audio encoders, then Save.",
+          "limits": "Avidemux lists AVI with MPEG-4 ASP among many video codecs and calls MPEG-1 and MPEG-2 in AVI highly problematic.",
+          "source": "https://www.avidemux.org/admWiki/doku.php?id=using:quickstart",
+          "supportingSources": [
+            "https://www.avidemux.org/admWiki/doku.php?id=general:output_formats"
+          ]
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Choose Add File(s), select AVI in Output Format, check Encoder Options, set Save to Folder and click Convert.",
+          "limits": "Prism lists MKV input only with the Matroska DirectShow filter installed.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportingSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-mpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.mp4 -c:v mpeg2video -c:a mp2 legacy.mpeg",
+          "limits": "This page also sets quality, bitrate, scaling and a frame-rate cap; the bare command does not.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add the MP4 with Add File(s), choose MPEG or MPG in Output Format, check Encoder Options, set Save to Folder and click Convert.",
+          "limits": "Prism lists MP4 input only with an mp4 filter installed; its output list includes .mpeg and .mpg.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportingSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    },
+    "png-to-ai": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick logo.png logo.ai",
+          "limits": "ImageMagick lists PNG and AI as readable and writable; its AI entry is described as Adobe Illustrator CS2.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "aiff-to-wav": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "File > Import > Audio to load the AIFF; File > Export Audio, choose WAV and set the sample rate and channels, then export.",
+          "limits": "Muted or soloed-out tracks are not exported.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i studio.aiff -c:a pcm_s16le delivery.wav",
+          "limits": "FFmpeg lists PCM signed 16-bit little-endian as supported for encoding.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "arw-to-png": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Select the processed image, open the export module, choose file on disk, set the file format, size and bit depth options, then press export. Command line: darktable-cli capture.arw developed.png.",
+          "limits": "The command line takes its format from the output filename extension; some ARW variants are listed as unsupported.",
+          "source": "https://docs.darktable.org/usermanual/4.6/en/module-reference/utility-modules/shared/export/",
+          "supportingSources": [
+            "https://docs.darktable.org/usermanual/4.6/en/special-topics/program-invocation/darktable-cli/",
+            "https://www.darktable.org/resources/camera-support/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick camera.arw rendered.png",
+          "limits": "ImageMagick lists ARW as readable and PNG as readable and writable; raw processing defaults can differ.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "caf-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i session.caf -c:a libmp3lame -b:a 192k listening.mp3",
+          "limits": "MP3 encoding needs the external LAME library; the MP3 is a lossy copy.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Switch for Windows",
+          "steps": "Add the CAF; choose MP3 in Output Format, check Encoder Options, set Save to Folder and click Convert.",
+          "limits": "Switch lists CAF input and MP3 output for Windows, Mac and Android.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportingSources": [
+            "https://www.nch.com.au/switch/kb/1405.html"
+          ]
+        }
+      ]
+    },
+    "mp3-to-opus": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i podcast.mp3 -c:a libopus -b:a 128k podcast.opus",
+          "limits": "Needs libopus support. A lossy MP3 source is encoded again.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "Audacity with FFmpeg exporter",
+          "steps": "File > Import > Audio to load the MP3. File > Export Audio; select Opus (OggOpus) Files (FFmpeg) in the Format list, set the options and export.",
+          "limits": "Options include channels, sample rate, bit rate and quality.",
+          "source": "https://manual.audacityteam.org/man/opus_export_options.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html",
+            "https://manual.audacityteam.org/man/file_export_dialog.html"
+          ]
+        },
+        {
+          "app": "Switch for Windows",
+          "steps": "Add the MP3 files, choose Opus in Output Format, check Encoder Options and the destination, then click Convert.",
+          "limits": "The vendor table lists Opus output for Windows and Mac but not Android.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportingSources": [
+            "https://www.nch.com.au/switch/kb/1405.html"
+          ]
+        }
+      ]
+    },
+    "oga-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i archive.oga -c:a libmp3lame -b:a 192k portable.mp3",
+          "limits": "MP3 encoding needs the external LAME library and a decoder for the codec in the file.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "File > Import > Audio to load the Ogg audio; File > Export Audio and choose MP3.",
+          "limits": "Ogg Vorbis and FLAC import without extra software; other codecs can need the optional FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        },
+        {
+          "app": "Switch for Windows",
+          "steps": "Choose Add or File > Add and select the OGA. Choose MP3 in Output Format, check Encoder Options, set the Save to Folder field and click Convert.",
+          "limits": "The vendor lists OGA input only for Windows, not its Mac/Android editions.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportingSources": [
+            "https://www.nch.com.au/switch/kb/1405.html"
+          ]
+        }
+      ]
+    }
+  }
+}

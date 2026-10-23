@@ -4,14 +4,14 @@
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
     "commit": "59f77879b5b0cd766008cab1dd33153d1a6581e0",
-    "activeTools": 2534,
+    "activeTools": 2533,
     "counts": {
       "pass": 2108,
       "wrong_format": 0,
       "error": 62,
       "timeout": 0,
       "no_fixture": 49,
-      "skipped": 315
+      "skipped": 314
     },
     "runs": [
       {
@@ -4894,7 +4894,6 @@
     {"id":"download-streamate-videos","route":"/download-streamate-videos","from":"Streamate","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"download-stripchat-videos","route":"/download-stripchat-videos","from":"Stripchat","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"download-stripchat-vr-videos","route":"/download-stripchat-vr-videos","from":"Stripchat VR","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"download-tellatv-videos","route":"/download-tellatv-videos","from":"TellaTV","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"download-thinkific-videos","route":"/download-thinkific-videos","from":"Thinkific","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"download-thisvid-videos","route":"/download-thisvid-videos","from":"Thisvid","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"download-tiktok-videos","route":"/download-tiktok-videos","from":"TikTok","to":"mp4","handler":"DownloaderPageRenderer","engine":null,"status":"skipped","reason":"downloader: needs a real third-party media URL","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},

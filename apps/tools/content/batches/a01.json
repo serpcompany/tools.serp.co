@@ -1,0 +1,552 @@
+{
+  "image-to-pdf": {
+    "seo": {
+      "title": "Convert Image to PDF Online (Free)",
+      "h1": "Image to PDF Converter",
+      "description": "Convert an image to PDF in your browser, or combine several images into one PDF, one page each. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn one image, or several in the order you choose, into a PDF in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an image to PDF?",
+        "answer": "Choose the image above and the PDF downloads when it is made. Choose several images and they become one PDF, with one page for each image."
+      },
+      {
+        "question": "In what order do the images appear in the PDF?",
+        "answer": "In the order of the list. Images join the list in the order you pick them, and the move up, move down and remove buttons change it before the PDF is made. The image at the top of the list is page one."
+      },
+      {
+        "question": "Is there a limit on how many images go into one PDF?",
+        "answer": "Yes. One PDF takes up to 100 images, 250 MB in all, and each image can be up to 50 megapixels. For more, make a second PDF."
+      },
+      {
+        "question": "What happens to a JPEG or a transparent image?",
+        "answer": "A JPEG goes into the PDF as it is, and its ICC profile is kept. Transparency in an image becomes a soft mask, so see-through areas stay see-through."
+      },
+      {
+        "question": "Does my original image change?",
+        "answer": "No. Your original file is left alone and you download a new PDF."
+      }
+    ],
+    "aboutSection": {
+      "title": "Images and PDF",
+      "fromFormat": {
+        "name": "Image",
+        "fullName": "Image file",
+        "description": "A general term for a picture file such as JPG, PNG, WebP, GIF or BMP.",
+        "details": [
+          "Photos and graphics of any common type",
+          "Raster formats",
+          "Accepted types depend on the tool"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting images to PDF",
+      "points": [
+        "Several images become one PDF, one page each, in the list's order, which you can change.",
+        "One PDF takes up to 100 images, 250 MB in all, and 50 megapixels per image.",
+        "A JPEG goes in as it is, with its ICC profile kept.",
+        "Transparency becomes a soft mask in the PDF.",
+        "The PDF is made in your browser, with no server involved."
+      ]
+    }
+  },
+  "webp-to-jpg": {
+    "seo": {
+      "title": "Convert WebP to JPG Online (Free)",
+      "h1": "WebP to JPG Converter",
+      "description": "Convert WebP images to JPG in your browser. Choose several WebP files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert WebP to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn WebP images into JPG files that open almost anywhere, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a WebP to JPG?",
+        "answer": "Pick the WebP above, wait a moment and save the JPG that appears. A batch gives one JPG per WebP."
+      },
+      {
+        "question": "Can you convert WebP to JPG without losing quality?",
+        "answer": "Not entirely. JPG is a lossy format, and the JPG is written at quality 0.85, so a little detail is traded for file size."
+      },
+      {
+        "question": "Why is there only one picture from my animated WebP?",
+        "answer": "A JPG holds a single still picture, so only the first frame of the animation is used."
+      },
+      {
+        "question": "Is the WebP's metadata copied into the JPG?",
+        "answer": "No. The image passes through raw pixels, so EXIF data, ICC profiles and XMP are dropped."
+      },
+      {
+        "question": "What happens to a WebP's transparency?",
+        "answer": "JPG has no alpha transparency, so a JPG cannot hold see-through areas. Transparent WebP images are better converted to PNG, which keeps them."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and JPG",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010. It supports lossy and lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "An animated WebP gives a JPG of its first frame only.",
+        "EXIF data, ICC profiles and XMP aren't copied to the JPG.",
+        "A JPG can't hold transparency, which WebP can.",
+        "Choose several WebP files at once and each JPG downloads on its own."
+      ]
+    }
+  },
+  "heic-to-jpg": {
+    "seo": {
+      "title": "Convert HEIC to JPG Online (Free)",
+      "h1": "HEIC to JPG Converter",
+      "description": "Convert iPhone HEIC photos to JPG in your browser. Choose several HEIC files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert HEIC to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn HEIC photos from an iPhone or iPad into JPG files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HEIC to JPG?",
+        "answer": "Pick your iPhone photos above and each JPG downloads once it is decoded. Several HEIC files run one after another."
+      },
+      {
+        "question": "How do I change a HEIC to JPG on a Windows PC?",
+        "answer": "Open this page in your browser and choose the HEIC file. The conversion runs in the browser, so you need no extra software or HEIF extension."
+      },
+      {
+        "question": "Does the JPG keep the HEIC's EXIF data?",
+        "answer": "No. The photo is decoded to 8-bit RGB pixels, and EXIF data and ICC profiles aren't carried over to the JPG."
+      },
+      {
+        "question": "Will the JPG look worse than the HEIC?",
+        "answer": "A little detail can be lost. JPG is lossy and this JPG is written at quality 0.85."
+      },
+      {
+        "question": "What if my HEIC holds more than one image?",
+        "answer": "Only the primary image is decoded, so you get one JPG. A file that holds no image fails with the message \"No images in HEIF\"."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and JPG",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12.",
+        "details": [
+          "Lossy HEVC compression",
+          "Smaller files than JPEG at similar quality",
+          "Supports depth maps and alpha",
+          "Opens in Preview on macOS and Apple Photos"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Supported everywhere",
+          "Common for email attachments and photo sharing"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIC to JPG",
+      "points": [
+        "A HEIC with several images gives one JPG, from its primary image.",
+        "The photo is decoded to 8-bit RGB pixels.",
+        "EXIF data and ICC profiles aren't copied to the JPG.",
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "Choose several HEIC files at once and each JPG downloads on its own."
+      ]
+    }
+  },
+  "png-to-pdf": {
+    "seo": {
+      "title": "Convert PNG to PDF Online (Free)",
+      "h1": "PNG to PDF Converter",
+      "description": "Convert PNG images to PDF in your browser. Choose several PNG files at once and each downloads as its own PDF. Free, with no sign-up.",
+      "howToHeading": "How to convert PNG to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn PNG images, such as screenshots and logos, into PDF files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to PDF?",
+        "answer": "Pick the PNG above and a PDF with the same picture downloads. Several PNG files give several PDFs, not one."
+      },
+      {
+        "question": "Can I put several PNG files into one PDF?",
+        "answer": "Not on this page, which gives one PDF for each PNG with no ZIP. The Image to PDF converter joins images into a single PDF, one page each."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "The PDF has one page, the same size as the image: 1 pixel is 1 point, with no margin and no A4 or Letter page."
+      },
+      {
+        "question": "What happens to a PNG's transparency?",
+        "answer": "It stays. Nothing paints a background, so see-through pixels stay see-through in the PDF."
+      },
+      {
+        "question": "Is the PNG compressed again in the PDF?",
+        "answer": "No. The picture is embedded losslessly, as PNG data, so the PDF adds no lossy compression and no quality setting applies."
+      },
+      {
+        "question": "Is the PNG's metadata kept in the PDF?",
+        "answer": "No. Since the picture is passed through raw pixels, EXIF, ICC profiles and XMP are not carried into the PDF."
+      },
+      {
+        "question": "What happens to my original PNG?",
+        "answer": "Nothing. Your PNG is left unchanged and you download a new PDF."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and PDF",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Common for screenshots and logos",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to PDF",
+      "points": [
+        "Each PNG you choose becomes its own PDF; the files are not joined.",
+        "To put several images in one PDF, use the Image to PDF converter.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "The picture is embedded losslessly, and transparent pixels stay transparent.",
+        "EXIF data, ICC profiles and XMP aren't copied to the PDF.",
+        "Your original PNG isn't changed.",
+        "Everything happens in your browser, so the PNG isn't uploaded."
+      ]
+    }
+  },
+  "jpeg-to-pdf": {
+    "seo": {
+      "title": "Convert JPEG to PDF Online (Free)",
+      "h1": "JPEG to PDF Converter",
+      "description": "Convert JPEG photos to PDF in your browser. Choose several JPEG files at once and each downloads as its own PDF. Free, with no sign-up.",
+      "howToHeading": "How to convert JPEG to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn JPEG photos into PDF files you can share or print, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPEG to PDF?",
+        "answer": "Pick the JPEG above and the PDF is saved straight away. With several JPEG files you get a separate PDF for each."
+      },
+      {
+        "question": "Can I combine several JPEGs into one PDF here?",
+        "answer": "No. Every JPEG becomes a separate PDF on this page, without a ZIP. The Image to PDF converter builds one PDF from many photos."
+      },
+      {
+        "question": "Will the PDF be A4 or Letter size?",
+        "answer": "Neither. Your photo gets a single page cut to its own dimensions, at 1 point per pixel and with no margin."
+      },
+      {
+        "question": "Does the PDF make the photo smaller or lower quality?",
+        "answer": "No. The picture is embedded losslessly as a PNG and no quality setting applies. Because it is lossless, the PDF can be larger than the JPEG."
+      },
+      {
+        "question": "Does the PDF keep the JPEG's EXIF data?",
+        "answer": "No. EXIF, ICC profiles and XMP are dropped, because the photo is rebuilt from raw pixels on the way."
+      },
+      {
+        "question": "Is the PDF editable?",
+        "answer": "It holds your photo as an image, not as text, so you can't edit words in it."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and PDF",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression with adjustable quality",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Photographs on the web and digital camera output"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to PDF",
+      "points": [
+        "Each JPEG you choose becomes its own PDF; the files are not joined.",
+        "To put several photos in one PDF, use the Image to PDF converter.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "The photo is embedded losslessly as a PNG, so no quality setting applies.",
+        "EXIF data, ICC profiles and XMP aren't copied to the PDF.",
+        "Your original JPEG isn't changed.",
+        "Everything happens in your browser, so the JPEG isn't uploaded."
+      ]
+    }
+  },
+  "png-to-jpg": {
+    "seo": {
+      "title": "Convert PNG to JPG Online (Free)",
+      "h1": "PNG to JPG Converter",
+      "description": "Convert PNG images to JPG in your browser. Choose several PNG files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert PNG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn PNG images into JPG files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to JPG?",
+        "answer": "Pick the PNG above and save the JPG it produces. For several PNG files, each JPG downloads separately."
+      },
+      {
+        "question": "Does converting PNG to JPG lose quality?",
+        "answer": "Yes, a little. PNG is lossless and JPG is lossy, and this JPG is written at quality 0.85."
+      },
+      {
+        "question": "What happens to a PNG's transparency?",
+        "answer": "JPG has no alpha transparency, so the JPG can't hold see-through areas. Keep the PNG if you need them."
+      },
+      {
+        "question": "Is the PNG's metadata copied to the JPG?",
+        "answer": "No. Raw pixels are all that pass through, so the EXIF, ICC profile and XMP data of the PNG stay behind."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and JPG",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Common for screenshots, logos and graphics",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so it is lossy and the PNG isn't.",
+        "A JPG can't hold transparency, which PNG can.",
+        "EXIF data, ICC profiles and XMP aren't copied to the JPG.",
+        "Choose several PNG files at once and each JPG downloads on its own."
+      ]
+    }
+  },
+  "pdf-to-png": {
+    "seo": {
+      "title": "Convert PDF to PNG Online (Free)",
+      "h1": "PDF to PNG Converter",
+      "description": "Convert every page of a PDF to its own PNG image in your browser, on a white background. Free, with no sign-up.",
+      "howToHeading": "How to convert PDF to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn each page of a PDF into a PNG image in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PDF to PNG?",
+        "answer": "Choose the PDF above. Every page is drawn and downloads as its own PNG when it is ready."
+      },
+      {
+        "question": "How are the PNG files named?",
+        "answer": "Each file takes the PDF's name plus the page number, such as name_page1 and name_page2. There is no ZIP, so the pages download one by one."
+      },
+      {
+        "question": "Does every page of the PDF get converted?",
+        "answer": "Yes. Every page becomes its own PNG and there is no page limit."
+      },
+      {
+        "question": "How sharp are the PNG pages?",
+        "answer": "Pages are drawn at up to twice their size. The limit is on area, not on each side: a page is scaled down to stay within about 16.8 megapixels, so a very large page comes out at less than twice its size."
+      },
+      {
+        "question": "Will the PNG have a transparent background?",
+        "answer": "No. The background of each page is opaque white."
+      }
+    ],
+    "aboutSection": {
+      "title": "PDF and PNG",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Common for screenshots and interface graphics",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to PNG",
+      "points": [
+        "Every page becomes its own PNG, named after the PDF with the page number.",
+        "There is no page limit and no ZIP; the images download one by one.",
+        "Pages are drawn at up to twice their size, within about 16.8 megapixels a page.",
+        "The background of each page is opaque white.",
+        "The PDF is read in your browser, so it isn't uploaded."
+      ]
+    }
+  },
+  "avif-to-jpg": {
+    "seo": {
+      "title": "Convert AVIF to JPG Online (Free)",
+      "h1": "AVIF to JPG Converter",
+      "description": "Convert AVIF images to JPG in your browser. Choose several AVIF files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert AVIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn AVIF images into JPG files that open almost anywhere, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to JPG?",
+        "answer": "Pick the AVIF above and the JPG downloads after it is decoded. A batch of AVIF files yields one JPG for each."
+      },
+      {
+        "question": "Can you convert AVIF to JPG without losing detail?",
+        "answer": "Not entirely. JPG is a lossy format and this JPG is written at quality 0.85, so some detail is traded for file size."
+      },
+      {
+        "question": "What happens to AVIF's HDR and wide colour?",
+        "answer": "The JPG is a standard still image written from decoded pixels. EXIF data, ICC profiles and XMP are dropped, so the JPG doesn't carry them over from the AVIF."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "You get a JPG of its first frame. The other frames are left out."
+      },
+      {
+        "question": "Why does the page say it can't open my file?",
+        "answer": "Your browser decodes the AVIF itself. If it can't, you see \"This browser can't open … files\" and need a current Chrome, Edge, Firefox or Safari."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and JPG",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "HDR and wide colour gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "An animated AVIF gives a JPG of its first frame only.",
+        "EXIF data, ICC profiles and XMP aren't copied to the JPG.",
+        "A JPG can't hold transparency, which AVIF can.",
+        "Your browser must be able to open AVIF files for this page to work."
+      ]
+    }
+  }
+}

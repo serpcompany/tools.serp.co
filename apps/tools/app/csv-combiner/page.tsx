@@ -9,11 +9,10 @@ import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { buildToolMetadata } from "@/lib/metadata";
 import { toolContent } from "@/lib/tool-content";
-import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "csv-combiner";
-// The H1 and the line under it.
-const title = "CSV Combiner";
+// The H1 and the line under it, which the structured data repeats.
+const heading = "CSV Combiner";
 const subtitle = "Merge multiple CSV files into one clean dataset without uploads.";
 
 export const generateMetadata = () => buildToolMetadata(toolId);
@@ -24,16 +23,12 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
-  const videoEmbedId = getEnabledVideoEmbedId({
-    tool: content.tool,
-    videoSection: content.videoSection,
-  });
 
   return (
     <main className="min-h-screen bg-background">
-      <StructuredData toolId={toolId} name={title} description={subtitle} />
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
 
-      <CsvCombiner toolId={content.tool.id} title={title} subtitle={subtitle} videoEmbedId={videoEmbedId} />
+      <CsvCombiner toolId={content.tool.id} heading={heading} subtitle={subtitle} />
 
       {content.aboutSection && (
         <AboutFormatsSection

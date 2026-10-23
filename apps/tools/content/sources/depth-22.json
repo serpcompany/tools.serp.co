@@ -1,0 +1,170 @@
+{
+  "tools": {
+    "webm-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "ffmpeg -i recording.webm -vn -c:a pcm_s16le speech.wav",
+          "limits": "-vn disables video and -c:a pcm_s16le selects the audio encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "wmv-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "ffmpeg -i lecture.wmv -vn -c:a libmp3lame -b:a 192k lecture.mp3",
+          "limits": "-vn disables video and -b:a sets the audio bitrate; MP3 encoding goes through the external LAME library.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "aac-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "ffmpeg -i interview.aac -c:a pcm_s16le interview.wav",
+          "limits": "-c:a selects the audio codec; the command sets no sample rate.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "avif-to-webp": {
+      "methods": [
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the AVIF and choose File > Export As, then save with a .webp name. The WebP Export dialog offers Lossless, Image quality, and options to save Exif, XMP and the color profile.",
+          "limits": "GIMP does not support animated AVIF.",
+          "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-webp-export.html"
+        },
+        {
+          "app": "ImageMagick (command line)",
+          "steps": "Run magick source.avif result.webp.",
+          "limits": "WebP needs the WebP delegate library.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "cr2-to-jpeg": {
+      "methods": [
+        {
+          "app": "Canon Digital Photo Professional",
+          "steps": "Select the CR2; File > Convert and save; choose JPEG and save the new file.",
+          "limits": "Requires a camera supported by that DPP version; applies development recipes.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-04_EditImage_0170.html",
+          "supportSource": "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+        },
+        {
+          "app": "darktable",
+          "steps": "Select the image; open export; target storage file on disk; file format JPEG; start export.",
+          "limits": "Camera support, development history and export profile affect the rendered photograph.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSource": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick cr2:photo.cr2 photo.jpeg",
+          "limits": "ImageMagick lists CR2 as read-only and requires the explicit cr2: specifier.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "cr3-to-png": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Develop the CR3; export module > file on disk; choose PNG, depth and profile; start export.",
+          "limits": "The camera must be one darktable supports.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSource": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+        }
+      ]
+    },
+    "dcm-to-jpg": {
+      "methods": [
+        {
+          "app": "MicroDicom",
+          "steps": "File > Export > To a picture file; choose source scope, destination and JPG; Export.",
+          "limits": "Windows viewer; frame, annotation and image-size options change the picture output.",
+          "source": "https://www.microdicom.com/dicom-viewer-user-manual/to-a-picture-file.html"
+        },
+        {
+          "app": "RadiAnt",
+          "steps": "Click Export or Ctrl+E; select JPEG and image/series scope; Export; choose a folder.",
+          "limits": "Rendered image exports do not replace the original DICOM study.",
+          "source": "https://www.radiantviewer.com/dicom-viewer-manual/export_images.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick scan.dcm preview.jpg",
+          "limits": "The DCM reader is read-only and handles window center and width tags.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "dng-to-jpeg": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Develop DNG; export module: file on disk and JPEG; set destination; start export.",
+          "limits": "Supported DNG variants and the current development history determine the result.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSource": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick dng:negative.dng photograph.jpeg",
+          "limits": "ImageMagick lists DNG as read-only and requires the explicit dng: specifier.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "exr-to-png": {
+      "methods": [
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the EXR and choose File > Export As. The PNG Export dialog offers a Pixel format of 8 or 16 bits per channel, with or without alpha.",
+          "limits": "A single PNG does not retain every EXR production channel.",
+          "source": "https://www.gimp.org/news/2025/06/23/gimp-3-1-2-released/",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        },
+        {
+          "app": "Krita (Windows, Mac, Linux)",
+          "steps": "Open EXR; File > Export; choose PNG.",
+          "limits": "EXR stores no color space, so Krita assigns a default on load.",
+          "source": "https://docs.krita.org/en/reference_manual/main_menu/file_menu.html",
+          "supportSource": "https://docs.krita.org/en/general_concepts/file_formats/file_exr.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick render.exr preview.png",
+          "limits": "ImageMagick lists EXR as read and write and requires the OpenEXR library.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "flac-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "ffmpeg -i master.flac -c:a aac -b:a 192k portable-copy.m4a",
+          "limits": "Makes AAC, not ALAC.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Import FLAC; File > Export Audio; select M4A (AAC) Files (FFmpeg) from the format menu.",
+          "limits": "AAC export needs the optional FFmpeg library; the manual records that the bit rate setting is not always honored.",
+          "source": "https://manual.audacityteam.org/man/aac_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,899 @@
+{
+  "m4a-to-mp4": {
+    "seo": {
+      "title": "Convert M4A to MP4 Online (Free)",
+      "h1": "M4A to MP4 Converter",
+      "description": "Convert M4A to MP4 in your browser. The sound is re-encoded as AAC at 96 kbps and nothing is uploaded. Free, with no sign-up.",
+      "howToHeading": "How to convert M4A to MP4"
+    },
+    "tool": {
+      "subtitle": "Save an M4A recording as an MP4 file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4A to MP4?",
+        "answer": "Choose the M4A above and save the MP4 when it's done. If you pick more than one M4A, every file is converted in turn and downloads separately."
+      },
+      {
+        "question": "Will the MP4 have video?",
+        "answer": "The converter adds no picture, slideshow or waveform. It re-encodes the sound from your M4A and writes it into an MP4, so the result is the same recording in a different container."
+      },
+      {
+        "question": "Is an M4A already an MP4?",
+        "answer": "Nearly. Both are MPEG-4 files, and .m4a is the extension for the ones that hold only audio. A site that checks the extension can still turn an .m4a away when it asks for .mp4."
+      },
+      {
+        "question": "What audio is inside the MP4?",
+        "answer": "AAC at 96 kbps, whatever the M4A held. The page has no bitrate setting, so there is nothing to choose."
+      },
+      {
+        "question": "Will a high-bitrate M4A get worse?",
+        "answer": "It can. The sound is decoded and encoded again at 96 kbps, so a recording above that bitrate loses detail the M4A kept. To keep the audio untouched, use the FFmpeg method below."
+      },
+      {
+        "question": "Does Apple Lossless stay lossless?",
+        "answer": "No. An ALAC M4A is decoded and written as lossy AAC. Keep the M4A if you may want the lossless copy again."
+      },
+      {
+        "question": "Can I just rename the .m4a to .mp4?",
+        "answer": "Renaming changes the label only, so the file still holds what the M4A held. A player that reads the contents will usually open it, while an upload form that checks the extension and the contents can still refuse it."
+      },
+      {
+        "question": "Can I turn an M4A into a video with a picture?",
+        "answer": "Not here, because the converter adds no video. To show an image while the sound plays, put the audio and the picture on the timeline of a video editor."
+      },
+      {
+        "question": "Are the title and artist still in the MP4?",
+        "answer": "In a test run on an M4A with a title and an artist, both were still in the MP4. An M4A with embedded cover art failed in our test runs, so remove the cover image first if you get an FFmpeg error."
+      },
+      {
+        "question": "How long does a long recording take?",
+        "answer": "The converter sets no size limit or timeout. How long a long file takes depends on your device, because the work happens in your browser."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and MP4",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4A to MP4",
+      "points": [
+        "The converter adds no picture to the MP4.",
+        "The audio is re-encoded as AAC at 96 kbps, with no way to change it.",
+        "A higher-bitrate M4A loses detail, and Apple Lossless stops being lossless.",
+        "Several M4A files each become their own MP4, one after another.",
+        "Your browser does the work, so the file isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About M4A files",
+      "markdown": "### What is an M4A file?\n\nAn M4A file is an audio-only file in the MPEG-4 container. Apple adopted the .m4a extension for unprotected music files, and the sound inside is usually AAC, the codec defined in MPEG-4 Part 3 (ISO/IEC 14496-3). An M4A can also hold Apple Lossless (ALAC). Its media type is audio/mp4.\n\nAAC is a lossy codec that aims at better sound than MP3 for a given bitrate. Its sample rates span 8 to 96 kHz and its bitrates reach 512 kbps, and iTunes sold its songs as AAC. You meet M4A files as music from iTunes and Apple Music, as podcasts and as iPhone voice memos. Both Android and every major browser play AAC in this container, so an M4A rarely needs converting just to be heard.\n\n### Programs that open M4A files\n\n**Windows and Linux**\n\n- VLC media player: plays M4A.\n\n**Windows**\n\n- Windows Media Player: plays M4A.\n\n**Mac**\n\n- Apple Music: plays M4A.\n\n**Web**\n\n- Chrome and Firefox: play AAC in MP4 and M4A files. Firefox can depend on the codecs your system has.\n\n**Mobile**\n\n- Android: every version handles AAC audio in .m4a files, and VLC for Android and mpv for Android decode whatever codec the file holds.\n\n**Windows, Mac and Linux**\n\n- Audacity: imports M4A, along with MP4, AC3 and WMA files, once you install its optional FFmpeg library. It can't import files that are DRM-protected to work only in particular software.\n- ffplay: the player that comes with FFmpeg. Its decoders must be part of your FFmpeg build.\n\n### M4A and MP4 compared\n\n- **Extensions and media types**: .m4a is registered as audio/mp4. MP4 files use .mp4 or .m4v, and the MP4 media types are video/mp4 and audio/mp4.\n- **Container**: both are built from nested boxes, the structure MPEG-4 Part 14 (ISO/IEC 14496-14) describes, so an M4A is an MPEG-4 file kept for audio. MP4 first appeared in 2003. The container uses the ISO Base Media File Format, itself a descendant of Apple's QuickTime format. What QuickTime calls atoms, the MP4 family calls boxes.\n- **Codecs**: an M4A holds AAC or Apple Lossless. An MP4 most often pairs H.264 video with AAC audio, but AV1, VP9, MP3 and Opus can ride in it too.\n- **Picture**: an M4A is sound only. An MP4 can have video, subtitles and chapters, but this page doesn't create any.\n- **Tags**: M4A holds metadata tags and cover art.\n- **Reach**: every major browser plays MP4.\n\nIn this conversion the container hardly changes and the sound does. The converter decodes your audio and writes it again as AAC at 96 kbps. If the destination only checks the name, the FFmpeg method below keeps your original audio untouched.\n\n### Other ways to convert M4A to MP4\n\n- **FFmpeg:** in a terminal, `ffmpeg -i input.m4a -c copy output.mp4` rewraps the file. The `-c copy` option selects stream copy, which the FFmpeg manual describes as copying the stream without decoding or encoding it, so the original AAC or ALAC data goes into the new file as it is.\n- **Audacity (Windows, Mac, Linux):** with the FFmpeg library installed, choose File > Export Audio, pick M4A (AAC) Files (FFmpeg) and give the file the .mp4 extension, which Audacity permits. The same list of permitted extensions also names .m4r for ringtones and .3gp for mobile phones. This encodes the sound again. M4A (AAC) is a lossy format. Audacity's installer doesn't include the FFmpeg library, so install it separately before the format shows in the list.\n\n### Problems with M4A files\n\n- **Audacity won't open the file**: install the optional FFmpeg library first. A copy-protected recording still won't import.\n- **Tags run together in Audacity**: importing several recordings into one project replaces the project's tags with the last file's tags. Give each file its own window so its tags survive.\n- **The file plays with no sound or won't play**: a player that supports the container may still lack the decoder for what's inside. Try VLC.\n- **An M4A with cover art fails to convert**: in our test runs, M4A files with an embedded PNG or JPEG cover ended in an FFmpeg error. Remove the cover image in a tag editor and try again.\n- **The page says it produced something else**: the converter checks that its result is an MP4 and stops with a message naming the format it got instead when it isn't. Try the file again or use a different browser.\n"
+    }
+  },
+  "mp3-to-m4a": {
+    "seo": {
+      "title": "Convert MP3 to M4A Online (Free)",
+      "h1": "MP3 to M4A Converter",
+      "description": "Convert MP3 to M4A in your browser. The sound is re-encoded as AAC set to 192 kbps, so it is not lossless. Free, with no sign-up.",
+      "howToHeading": "How to convert MP3 to M4A"
+    },
+    "tool": {
+      "subtitle": "Turn an MP3 into an AAC M4A file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP3 to M4A?",
+        "answer": "Choose the MP3 above and download the M4A when it finishes. Pick several MP3 files and each one comes back as its own M4A, one after another."
+      },
+      {
+        "question": "Is the M4A lossless?",
+        "answer": "No. The page decodes the MP3 and encodes it again as AAC with the bitrate set to 192 kbps. An M4A can hold lossless Apple Lossless audio, but this page doesn't write that."
+      },
+      {
+        "question": "Will the M4A sound better than the MP3?",
+        "answer": "No. Whatever the MP3 discarded is gone for good, and AAC can't restore it. The M4A is the MP3's sound with one more round of lossy coding added."
+      },
+      {
+        "question": "Why is my M4A bigger than the MP3?",
+        "answer": "The M4A is encoded at a 192 kbps setting, whatever bitrate the MP3 used. An MP3 at a lower bitrate can come out larger with no gain in sound, and one at a higher bitrate can come out smaller."
+      },
+      {
+        "question": "Is M4A better than MP3?",
+        "answer": "AAC aims at better sound for the same bitrate, and iTunes sold its songs in it. MP3 plays in every major browser. For a file you already have as MP3, the move only pays off if something needs M4A."
+      },
+      {
+        "question": "Does the M4A keep the album art?",
+        "answer": "No. The conversion leaves out video streams, and embedded cover art counts as one, so a test MP3 with a cover image came out as an M4A without it. Add the art again in your music app."
+      },
+      {
+        "question": "Does the M4A keep the song title and artist?",
+        "answer": "In a test run, an MP3's title and artist tags were still there in the M4A. Check the result in your music app if the tags matter to you."
+      },
+      {
+        "question": "Can I use Audacity to turn an MP3 into an M4A?",
+        "answer": "Yes, if you install its optional FFmpeg library. Audacity opens the MP3 as an editable project, and its M4A (AAC) Files (FFmpeg) export writes the new file."
+      },
+      {
+        "question": "Can I turn the M4A back into an MP3?",
+        "answer": "Yes, with the M4A to MP3 converter, but each round adds another lossy stage. Keep the original MP3 or a lossless copy rather than going back and forth."
+      },
+      {
+        "question": "What should I convert from if I have a WAV or FLAC master?",
+        "answer": "Convert from that, not from the MP3. An M4A made from a lossless master has been encoded once. One made from an MP3 has been encoded twice."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and M4A",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to M4A",
+      "points": [
+        "The M4A holds AAC audio with the bitrate set to 192 kbps, not Apple Lossless.",
+        "Encoding an MP3 again can't restore what it already lost.",
+        "A lower-bitrate MP3 can give a larger M4A, and a higher-bitrate one a smaller M4A.",
+        "Embedded cover art isn't carried over, because the conversion leaves video streams out.",
+        "Several MP3 files each become their own M4A."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 files",
+      "markdown": "### What is an MP3 file?\n\nMP3 stands for MPEG-1 Audio Layer III, a lossy codec. Development began at Fraunhofer IIS in the late 1980s alongside other members of the MPEG audio group. It was first standardized in 1993 as ISO/IEC 11172-3, with an extension in 1995 as ISO/IEC 13818-3. Its encoder follows a model of human hearing and throws away sound a listener probably won't notice. Set against a CD, an MP3 at 128 kbit/s is roughly an eleventh of the size for the same audio.\n\nTitles and further tags live in separate ID3 structures within the file. The allowed bitrates go from 32 to 320 kbps, with sampling rates of 32, 44.1 and 48 kHz. On 23 April 2017 the MP3 patent licensing program ended. You come across MP3 in music libraries and downloads, in podcasts and on portable players, and every major browser plays it. Its registered media type is audio/mpeg.\n\n### Programs that open MP3 files\n\n**Windows and Linux**\n\n- VLC media player: can play MP3 files.\n\n**Windows**\n\n- Windows Media Player: plays MP3.\n\n**Mac**\n\n- Apple Music: plays MP3.\n\n**Web**\n\n- Chrome and Firefox: play MP3 directly.\n\n**Mobile**\n\n- Android: VLC for Android plays MP3, and mpv for Android does too.\n\n**Windows, Mac and Linux**\n\n- Audacity: turns MP3 audio into an editable project, and exports M4A after you install its optional FFmpeg library.\n- ffplay: the player that comes with FFmpeg.\n\n### MP3 and M4A compared\n\n- **Extensions and media types**: .mp3 uses audio/mpeg. .m4a uses audio/mp4.\n- **Container**: an MP3 is a stream of audio frames. M4A wraps its audio in the MPEG-4 container, the one MP4 files use.\n- **Codec**: MP3 is always lossy. An M4A usually holds AAC, which is also lossy, or lossless Apple Lossless. AAC covers sample rates of 8 to 96 kHz and bitrates reaching 512 kbps, a wider range than MP3's 32 to 320 kbps.\n- **Quality for size**: AAC aims for better sound than MP3 at an equal bitrate.\n- **Tags**: MP3 stores them in ID3 structures. M4A has metadata tags and cover art in the MPEG-4 container.\n- **Editing**: M4A import in Audacity depends on the optional FFmpeg library, and a DRM-protected recording will not load. The converter here writes a fresh AAC encode, which has no DRM.\n- **Reach**: every major browser plays MP3, and every Android version handles AAC audio in .m4a files.\n\nThe converter decodes the MP3 and writes AAC into an M4A, with a 192 kbps setting and video streams left out. The new file has the MP3's audio plus one more generation of loss. If your MP3 was 128 kbps, the swap can cost space and buys nothing audible; do it because an app or device asks for M4A, not for the sound.\n\n### Other ways to convert MP3 to M4A\n\n- **Audacity:** after opening the MP3, File > Export Audio leads to a Format menu, where M4A (AAC) Files (FFmpeg) is the entry to choose. FFmpeg's library isn't bundled with Audacity, so you add it yourself first. M4A (AAC) is a lossy format.\n- **FFmpeg:** in a terminal, `ffmpeg -i source-track.mp3 -b:a 192k -c:a aac listening-copy.m4a` encodes AAC at the bitrate you give it. The `-c:a aac` option selects FFmpeg's native AAC encoder, and `-b:a` sets the audio bitrate. Because the MP3 is already lossy, this adds a second lossy encoding.\n\n### Problems with MP3 files\n\n- **A damaged MP3 won't import**: Audacity may refuse a malformed file with an import error, although some other player still plays it. Play it to the end elsewhere, then get another copy.\n- **Tags replaced in Audacity**: importing several MP3 files into one project can replace earlier metadata with the tags of the latest file. Open every file in a separate project window to hold on to its tags.\n- **Editing and re-exporting adds loss**: an MP3 edited and saved as MP3 is encoded a second time. Cut from a lossless source when you have one.\n- **The cover picture is gone**: the converter treats embedded cover art as a video stream and drops video streams. Add the picture again in your music app.\n- **A very long MP3 takes a while**: there is no size limit or timeout, and your own device does the encoding, so the time follows its speed.\n"
+    }
+  },
+  "pdf-to-html": {
+    "seo": {
+      "title": "Convert PDF to HTML Online (Free)",
+      "h1": "PDF to HTML Converter",
+      "description": "Convert PDF to HTML in your browser, with no upload. Each page's text becomes a section of paragraphs; layout, tables and images aren't kept."
+    },
+    "tool": {
+      "subtitle": "Turn the text of a PDF into one HTML page, with a section for each page."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PDF to HTML?",
+        "answer": "Choose the PDF above and download the HTML when it finishes. You get one HTML file named after your PDF, with a section for each page."
+      },
+      {
+        "question": "How do I convert PDF to HTML for free?",
+        "answer": "This page is free, needs no sign-up and doesn't upload the PDF: your browser reads the text and writes the file on your device."
+      },
+      {
+        "question": "What does the HTML keep from my PDF?",
+        "answer": "Its words, in paragraphs, in page order. A paragraph's lines are joined with spaces, so the text rewraps to fit the window."
+      },
+      {
+        "question": "Why are my tables, images and links missing?",
+        "answer": "Only text is extracted. A table's cells come out as lines of text, and fonts, layout, images, links and form fields are left behind."
+      },
+      {
+        "question": "Why does it say my PDF has no text to extract?",
+        "answer": "The pages hold no letters to read. A scan is a picture of text and a blank page has nothing on it. Reading words from a picture needs OCR, which this page doesn't do."
+      },
+      {
+        "question": "Can I convert a password-protected PDF?",
+        "answer": "Not one that needs a password to open. Open it with the password, save or print a copy without one, and convert that. A PDF with only an owner password for printing or copying converts as usual."
+      },
+      {
+        "question": "Why are my two columns mixed together?",
+        "answer": "The words follow the order inside the file, not the order you read them. A PDF that saves one column and then the next stays tidy, but one that saves each row across both columns comes out jumbled."
+      },
+      {
+        "question": "How large a PDF can I convert to HTML?",
+        "answer": "Up to 2,000 pages and 20 million characters of text, and the reading must finish in two minutes. A PDF over a limit is refused with a message that names the limit."
+      },
+      {
+        "question": "Is the HTML file safe to open?",
+        "answer": "The text goes into the page as escaped text, so a PDF that contains something that looks like a script becomes characters on the page. The file's Content-Security-Policy lets it load and run nothing."
+      },
+      {
+        "question": "Why is my Chinese, Japanese or Korean text missing?",
+        "answer": "Some PDFs write those characters with a font that relies on Adobe's predefined character maps, and this page doesn't include them. That text is dropped, so a PDF made only of it is refused for having no text."
+      }
+    ],
+    "aboutSection": {
+      "title": "PDF and HTML",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "fixed page layout",
+          "embedded fonts",
+          "vector and raster content"
+        ]
+      },
+      "toFormat": {
+        "name": "HTML",
+        "fullName": "HyperText Markup Language",
+        "description": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+        "details": [
+          "text-based markup",
+          "elements and attributes",
+          "styled with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to HTML",
+      "points": [
+        "Only the text is kept: no layout, fonts, tables, images or links.",
+        "Each page becomes a section, and each paragraph a p element.",
+        "A scanned PDF has no text to read, and there is no OCR.",
+        "A PDF that needs a password to open can't be converted.",
+        "The limits are 2,000 pages, 20 million characters and two minutes."
+      ]
+    },
+    "guide": {
+      "title": "About PDF files",
+      "markdown": "### What is a PDF file?\n\nPDF stands for Portable Document Format, and Adobe made it. The idea came out of John Warnock's Camelot project, started in 1991, and by 1992 it was PDF. Warnock wanted one file that any application could produce and any device could show or print identically. The way it draws a page derives from PostScript and is free of any device or resolution. ISO took in PDF 1.7 as standard 32000-1 in 2008, then PDF 2.0 as 32000-2 in 2017.\n\nInside, a PDF blends text, vector drawings and raster pictures, plus links, bookmarks, form fields, annotations and media. Images in it can be compressed losslessly with Flate or with JPEG. Fonts have to be embedded for the pages to match on every machine. Particular jobs have their own subsets, namely PDF/A to archive, PDF/X to print and PDF/UA for accessibility. You meet PDFs as forms and contracts, as e-books and as print-ready files. The difference between real text and a picture of text matters here: a scanned invoice looks readable to you but gives a converter no characters.\n\n### Programs that open PDF files\n\n**Windows**\n\n- GIMP: brings PDF pages in as images, and wants the password for a protected file.\n\n**Mac**\n\n- Apple Preview: shows pages and thumbnails.\n\n**Linux**\n\n- Evince: the GNOME document viewer.\n- Okular: renders through Poppler.\n\n**Web**\n\n- Acrobat online: opens an uploaded PDF in the browser for annotation, and may need an account.\n\n**Mobile**\n\n- Adobe Acrobat Reader shows PDFs on both Android and iOS, and a PDF saved on an Android device opens in Firefox for Android.\n\n**Windows and Mac**\n\n- Firefox: has a built-in PDF viewer with annotations.\n\n### PDF and HTML compared\n\n- **Extensions and media types**: .pdf uses application/pdf.\n- **What each stores**: a PDF fixes where each word and picture sits on a page. HTML describes a document's structure with elements and attributes, and CSS supplies how it looks.\n- **Who maintains it**: ISO 32000 for PDF, and the WHATWG's Living Standard for HTML.\n- **Resources**: a PDF embeds fonts and images. The HTML this page writes holds only text and one inline style, so it has no separate files to lose when you move it.\n\nThis converter writes one HTML page from the PDF's text. Each source page becomes a section, and each paragraph a p element. A paragraph breaks at an empty line, at a font size change of more than a fifth, or at a gap well above the page's usual line spacing, and a word split with a hyphen at a line's end keeps its hyphen. Nothing else survives: no images, tables, links, annotations or form fields.\n\n### Other ways to convert PDF to HTML\n\n- **Poppler pdftohtml (command line):** run `pdftohtml input.pdf output.html`. The `-s` option makes one HTML file for all pages, `-c` asks for complex output and `-i` skips images. It writes into the current working directory.\n- **pdf2htmlEX (command line):** run `pdf2htmlEX input.pdf`, which writes an HTML file named after the PDF into the current directory, or into the folder you give with `--dest-dir`. For CJK characters it needs `poppler-data`, which it bundles a copy of.\n\nChoose one of these when you need more than the text, for example the images, and this page when you want the words as light HTML.\n\n### Problems with PDF files\n\n- **No words to extract**: the PDF is a scan or blank. Use an OCR program first. When only some pages lack text, this page converts the rest and names the ones without.\n- **Two columns run together**: the PDF stores text in a different order than you see it. Compare the HTML with the page, especially where a sentence crosses a column.\n- **A password blocks it**: open the PDF with the password in a viewer and save or print an unprotected copy.\n- **A damaged PDF is refused**: a file that is empty, isn't a PDF or is cut short past repair stops with a message saying it may be damaged or incomplete.\n- **A viewer shows wrong fonts or a blank page**: Firefox can do this with some PDFs. Download the file and try another viewer.\n- **A site's PDF won't open in Firefox**: an incorrect MIME type on the server can stop Firefox from using its viewer. Download the file and open it from disk.\n- **Asian characters disappear**: those fonts need character-map data this page doesn't include. Use another extractor for that file.\n"
+    }
+  },
+  "psd-to-png": {
+    "seo": {
+      "title": "Convert PSD to PNG Online (Free)",
+      "h1": "PSD to PNG Converter",
+      "description": "Convert a PSD to a PNG in your browser, no Photoshop needed. You get one picture, not layers. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert PSD to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a Photoshop PSD into a single PNG picture, without opening Photoshop."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PSD to a PNG?",
+        "answer": "Choose the PSD above and save the PNG when it's done. Pick several PSD files and they convert one by one, with a separate PNG for each."
+      },
+      {
+        "question": "How do I change a PSD to PNG without Photoshop?",
+        "answer": "Use this page: ImageMagick runs in your browser and reads the PSD there. GIMP, XnView MP and Photopea also open PSD files if you want to look at the layers first."
+      },
+      {
+        "question": "Are the layers kept?",
+        "answer": "No. A PNG holds a single picture, so you don't get one per layer. Layers, masks and editable text stay in the PSD."
+      },
+      {
+        "question": "Can I get each layer as its own PNG?",
+        "answer": "Not here, since one PSD gives one PNG. Open the file in an editor that reads layers, such as Photoshop or GIMP, and export the layers you need from there."
+      },
+      {
+        "question": "Can I edit the PNG like the PSD?",
+        "answer": "You can paint over it, but you can't move the text or the objects on their own. Keep the PSD as your editable master."
+      },
+      {
+        "question": "What is the difference between a PSD and a PNG?",
+        "answer": "A PSD is Photoshop's native format and stores layers, masks, adjustment layers and text so a design stays editable. A PNG stores one raster picture with lossless compression and an optional alpha channel."
+      },
+      {
+        "question": "Is the PNG lossy?",
+        "answer": "No. PNG compression is lossless, so the pixels the page writes are stored exactly. What you lose in the conversion is the layer structure, not picture detail."
+      },
+      {
+        "question": "How large a PSD can I convert?",
+        "answer": "The page sets no file-size limit. A picture above about 537 megapixels is refused with a too-large message, and a big file takes longer on a slow device."
+      },
+      {
+        "question": "Does the PSD leave my computer?",
+        "answer": "No. ImageMagick runs in your browser, and the file is read and written on your device."
+      },
+      {
+        "question": "Should I make a JPG instead of a PNG?",
+        "answer": "A PNG is lossless and can carry transparency. JPG is lossy and carries no alpha channel. If you want a JPG, use the PSD to JPG converter."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and PNG",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A raster image format that stores pixels with lossless compression and supports transparency. PNG is standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to PNG",
+      "points": [
+        "One PSD gives one PNG picture, with no layers, masks or editable text.",
+        "PNG compression is lossless, so the picture itself isn't degraded.",
+        "A picture above about 537 megapixels is refused.",
+        "Several PSD files give several PNG files, downloaded one by one.",
+        "ImageMagick runs in your browser, so the PSD isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About PSD files",
+      "markdown": "### What is a PSD file?\n\nPhotoshop saves its work as PSD, and the format exists so a design stays editable: layers, masks, channels and other editing information stay together instead of being merged into one finished picture. Every PSD starts with the signature 8BPS in its header, which supports sample depths of 1, 8, 16 or 32 bits. Image resources and layer and mask information occupy separate sections, and the pixel data can be stored raw or compressed with RLE or ZIP. The registered media type is image/vnd.adobe.photoshop.\n\nA PSD is limited to 30,000 pixels a side. A larger document uses PSB, which raises that limit. You meet PSD files as the source of a design, with layers, masks, adjustment layers and text that a designer can still change. Clients often receive the PSD when they only needed the picture, and a PNG is the lighter thing to open, share and upload.\n\n### Programs that open PSD files\n\n**Mac**\n\n- Preview: opens PSD files.\n\n**Web**\n\n- Photopea: uses PSD as its main document format and opens files through File > Open.\n\nAn application that opens the extension doesn't promise to reproduce every Photoshop feature. Other programs have to interpret data structures specific to Photoshop, so compare masks, type and effects with the original before relying on one.\n\n**Windows, Mac and Linux**\n\n- ImageMagick: reads PSD images from the command line and writes PNG.\n- XnView MP: lists PSD among its supported formats. Company use needs a license.\n- GIMP: imports PSD for editing.\n\n### PSD and PNG compared\n\n- **Extensions and media types**: .psd uses image/vnd.adobe.photoshop. .png uses image/png.\n- **Layers**: a PSD holds layers and masks. The converter writes one picture into the PNG.\n- **Compression**: a PSD stores pixels raw or with RLE or ZIP. A PNG always uses lossless DEFLATE, which is LZ77 plus Huffman coding.\n- **Color depth**: a PSD allows 1, 8, 16 or 32 bits a sample. A PNG allows 1 to 16 bits a sample and an optional alpha channel for per-pixel transparency.\n- **Who reads it**: every major browser displays PNG. PSD needs an editor or a viewer that knows Photoshop's structures.\n\nPNG began as a patent-free successor to GIF. In October 1996 the W3C published it, the first format to get Recommendation status, and ISO later adopted it as ISO/IEC 15948:2004. A PNG begins with a set signature and then holds chunks: IHDR carries the header, IDAT holds the pixels, and IEND closes the file. The third edition of the specification became a W3C Recommendation on 24 June 2025. What this conversion changes is the structure: the layer stack stays behind, and one picture goes into the PNG. Because PNG compression is lossless, the PNG holds that picture as it was read.\n\n### Other ways to convert PSD to PNG\n\n- **GIMP (Windows, Mac, Linux):** open the PSD, then choose File > Export As (Shift+Ctrl+E) to save a copy outside the XCF format, and pick PNG. A PNG Export dialog then offers pixel format, compression level, interlacing and background-color options. Look at the imported picture first, since GIMP's reading of Photoshop features may differ.\n- **Photopea (web):** open the PSD with File > Open, then choose File > Export As > PNG.\n- **ImageMagick (command line):** run `magick 'input.psd[0]' output.png`. The brackets pick the first image in the file, and shells usually need the quotes. Without them, a test PSD with two images produced two PNG files.\n\n### Problems with PSD files\n\n- **Only one picture arrives**: a single image is read out of the PSD. Use Photoshop or GIMP to export separate layers or artboards.\n- **Too large to convert**: the converter refuses pictures above about 537 megapixels. Reduce the document in an editor first.\n- **The document is bigger than 30,000 pixels a side**: that needs PSB, which a PSD can't hold. Use an application that reads PSB.\n- **The design looks different**: third-party readers interpret Photoshop-specific data themselves. Compare against Photoshop's own rendering.\n- **The recipient needs to edit it**: send the PSD too. The PNG has none of the original text, masks or separate objects.\n- **A viewer says it can't open the PSD**: many programs list PSD but read only part of it. Try GIMP or Photopea, or convert it here and open the PNG.\n"
+    }
+  },
+  "jpg-to-ico": {
+    "seo": {
+      "title": "Convert JPG to ICO Online (Free)",
+      "h1": "JPG to ICO Converter",
+      "description": "Convert JPG to ICO in your browser. The ICO holds one image, fitted inside 256 x 256 if the JPG is larger. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert JPG to ICO"
+    },
+    "tool": {
+      "subtitle": "Turn a JPG into an ICO icon file with one image, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to ICO?",
+        "answer": "Choose the JPG above and save the ICO when it's done. A batch of JPG files is converted one by one, and each gets its own ICO."
+      },
+      {
+        "question": "Does the ICO work as a website favicon?",
+        "answer": "Yes. Browsers use ICO files for favicons, so this one can serve as one. It holds a single image, so look at how it reads at the small size your site shows."
+      },
+      {
+        "question": "What size will the icon be?",
+        "answer": "A JPG larger than 256 px on either side is shrunk to fit a 256 x 256 box, keeping its shape. A smaller JPG stays as it is. At 256 px the picture is kept as PNG data in the ICO."
+      },
+      {
+        "question": "Does the ICO hold several sizes?",
+        "answer": "No. An ICO file can bundle several images, but this page writes just one."
+      },
+      {
+        "question": "Will a small JPG be enlarged?",
+        "answer": "No. A JPG that is 256 px or less on both sides keeps its own size, so the icon is only as big as the picture you start from. Begin with a JPG that is at least 256 px on a side."
+      },
+      {
+        "question": "Can I make the white background transparent?",
+        "answer": "Not here. A JPG has no transparency, so its white is ordinary pixels and the page doesn't cut anything out. Remove the background in an editor, save a PNG, and use the PNG to ICO converter."
+      },
+      {
+        "question": "What happens to a photo that isn't square?",
+        "answer": "It keeps its proportions, so the icon is wider or taller than it is square. Crop the JPG to a square first if the icon should fill its slot."
+      },
+      {
+        "question": "Is the JPG data copied into the ICO?",
+        "answer": "No. The page decodes the JPG into pixels and ImageMagick writes them as icon image data. The JPEG compression is gone from the file, but any blockiness already in the picture is still there."
+      },
+      {
+        "question": "Does the ICO keep my camera's EXIF data?",
+        "answer": "No. The page works from raw pixels, so camera EXIF, color profile and XMP data are left behind."
+      },
+      {
+        "question": "Why would a logo look worse as an icon?",
+        "answer": "An icon is often seen very small. Thin lines and small lettering that read on a poster can vanish at that size, so a simpler version of the logo works better."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and ICO",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "multiple sizes in one file",
+          "alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "Anything beyond 256 px a side is shrunk to fit 256 x 256, shape kept; a smaller image is left alone.",
+        "A 256 px image is stored as PNG data inside the ICO.",
+        "A JPG has no transparency, so the icon has a solid background.",
+        "EXIF, ICC profile and XMP data aren't carried over."
+      ]
+    },
+    "guide": {
+      "title": "About ICO files",
+      "markdown": "### What is a JPG file?\n\nPhotographs from cameras, phones and scanners almost always end up as JPG, the extension for the picture format that the Joint Photographic Experts Group began designing in 1986. Its US patents lapsed on 27 October 2006, one reason it spread so widely. The compression is lossy, and a progressive JPG shows a rough picture first and sharpens it while the remainder downloads. JPG cannot store layers, and it has no alpha channel for transparency. Editors score quality from 0 to 100, with GIMP starting at 85, though one program's number does not match another's. The registered media type is image/jpeg.\n\nLogos and avatars travel the same way, which is where this conversion starts: you hold a JPG of the artwork, and a browser tab or a Windows program wants an icon instead.\n\n### Programs that open JPG files\n\n**Mac**\n\n- Preview: opens JPG files.\n\n**Web**\n\n- Any web browser: displays a JPG with no extra software.\n\n**Windows**\n\n- Windows Photos: shows JPG pictures.\n\n**Windows, Mac and Linux**\n\n- GIMP: opens and edits JPG files.\n\n### JPG and ICO compared\n\n- **Names and media types**: JPEG goes by .jpg or .jpeg and image/jpeg. ICO goes by .ico and image/vnd.microsoft.icon.\n- **Compression**: baseline JPEG is lossy and splits the picture into 8x8 pixel blocks. An ICO entry holds a bitmap or a PNG, which don't lose detail the way JPEG does.\n- **Images per file**: a JPG holds one picture. An ICO can hold several.\n- **Layers**: JPEG cannot store layers, so the picture you hand over is already one set of pixels. An ICO entry is one bitmap or PNG as well.\n- **Transparency**: JPEG has none, since it stores 8 bits per channel and no alpha. ICO images can have it.\n- **Typical use**: photographs for JPG, interface icons and favicons for ICO.\n- **Reach**: every major browser displays JPEG. ICO is the icon format on Windows and a favicon format in browsers.\n\nICO is Microsoft's image format for the icons in a graphical interface. A single file may contain the same icon at several sizes, and its numbers are stored in little-endian byte order. Windows Vista's icon guidance added a 256-by-256 image for high-DPI displays, and an ICO can store that image as PNG data. You meet ICO as the icon of a Windows program and as a website's favicon.\n\nWhat this page does: it decodes the JPG, fits it inside 256 x 256 if it is larger, and has ImageMagick write one image into an ICO. A smaller picture keeps its size. The result is a plain, single-size icon, with no transparency added and no metadata.\n\n### Other ways to convert JPG to ICO\n\n- **GIMP (image editor):** open the JPG, then File > Export As (Shift+Ctrl+E) lets you write an ICO with GIMP's ICO plug-in. Get the artwork and its size right before you export.\n- **ImageMagick (command line):** run `magick input.jpg -resize 256x256 output.ico`. The resize fits the picture inside 256 x 256, and it enlarges a smaller picture to fill that box.\n- **FFmpeg (command line):** run `ffmpeg -i input.jpg -s 256x256 -frames:v 1 -c:v png -pix_fmt rgba output.ico`. The size is set outright, so a rectangular JPG is stretched into a square. FFmpeg's ICO writer wants PNG images in RGBA with no side over 256 px.\n\n### Problems with JPG files\n\n- **A JPG can't be transparent**: a logo saved as JPG has a solid background, and the icon built from it keeps that background.\n- **Blocky edges around text and lines**: the lossy compression shows on sharp logo edges and thin lettering. Start from the largest, least compressed copy you have.\n- **Quality numbers don't match**: two programs saving at \"85\" can produce different results.\n- **No layers**: a JPG keeps no editable stack of layers, so go back to the project file if the artwork needs fixing before it becomes an icon.\n- **An old photo frame or player refuses it**: some older ones reject progressive JPG. Re-save without progressive mode, then convert.\n- **The picture isn't square**: a wide photo produces a wide icon, because the converter keeps the JPG's proportions when it shrinks it to 256 px. Crop first.\n- **The icon looks soft on a high-DPI screen**: a small icon enlarged for such a display may look soft. Begin with a big JPG rather than a thumbnail.\n"
+    }
+  },
+  "wav-to-ogg": {
+    "seo": {
+      "title": "Convert WAV to OGG Online (Free)",
+      "h1": "WAV to OGG Converter",
+      "description": "Convert WAV to OGG in your browser. The sound is encoded as Ogg Vorbis at quality 5, so the file is lossy and far smaller. Free, with no sign-up.",
+      "howToHeading": "How to convert WAV to OGG"
+    },
+    "tool": {
+      "subtitle": "Shrink a WAV recording into an Ogg Vorbis file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WAV to OGG?",
+        "answer": "Choose the WAV above and save the OGG when it's done. With several WAV files selected, each is encoded in order and saved on its own."
+      },
+      {
+        "question": "Is an OGG smaller than a WAV?",
+        "answer": "Usually by a wide margin. Linear PCM, the common payload of a WAV, is stored uncompressed, while Vorbis is a lossy codec that gives up some of the sound to save space."
+      },
+      {
+        "question": "Is the OGG lossless?",
+        "answer": "No. Vorbis is lossy, and the page encodes at quality 5. Keep the WAV if you may edit the recording again, since edits made from the OGG start with sound that has already been through lossy coding."
+      },
+      {
+        "question": "Does the page make an Opus file?",
+        "answer": "No. It writes Vorbis audio in an Ogg container. The .ogg extension is conventionally for Vorbis, and .oga is the broader extension for Ogg audio."
+      },
+      {
+        "question": "Can I choose the bitrate?",
+        "answer": "No. The page sets Vorbis quality 5 and offers no other setting. In quality mode the encoder chooses the bitrate."
+      },
+      {
+        "question": "Why do two OGG files of the same length differ in size?",
+        "answer": "Quality-based encoding follows the sound. In a local test, five seconds of noise gave a much larger OGG than five seconds of a steady tone, so equal running times can give different file sizes."
+      },
+      {
+        "question": "What plays an OGG file?",
+        "answer": "VLC, Audacity, Firefox and Chrome open OGG files. The container doesn't say which codec is inside, so a player needs the Vorbis decoder as well."
+      },
+      {
+        "question": "Do the title and artist tags come across?",
+        "answer": "Usually. The page passes no option that removes tags, so FFmpeg copies the WAV's title, artist and similar tags to the OGG where it can hold them. In a local test a WAV's title and artist both came through."
+      },
+      {
+        "question": "Does a WAV always contain PCM?",
+        "answer": "No. WAV is a RIFF-based wrapper that can hold several encodings. Some recorders put compressed sound inside it, and Audacity recommends its optional FFmpeg library for those files."
+      },
+      {
+        "question": "Should I delete the WAV after converting?",
+        "answer": "Keep it if it's your master. An OGG is a listening copy, and re-encoding it to another lossy format adds loss on top of loss."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and OGG",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "RIFF-based sound wrapper",
+          "Often contains uncompressed PCM",
+          "Can also contain compressed audio"
+        ]
+      },
+      "toFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "Open container format",
+          "Usually Vorbis in .ogg files",
+          "Vorbis output is lossy"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WAV to OGG",
+      "points": [
+        "The OGG holds Vorbis audio at quality 5, not Opus.",
+        "Vorbis is lossy, so the OGG can't give back the WAV's exact samples.",
+        "Quality-based encoding means file size follows the complexity of the sound.",
+        "The page offers no bitrate or sample-rate setting.",
+        "Several WAV files each become their own OGG."
+      ]
+    },
+    "guide": {
+      "title": "About WAV files",
+      "markdown": "### What is a WAV file?\n\nWAV, or WAVE, is a wrapper for sound built on RIFF, not one particular audio encoding. The format was set out by Microsoft and IBM in a multimedia specification dated August 1991. Linear PCM is the common payload, but compressed encodings can appear too, so the .wav ending alone doesn't tell you what is inside. The usual media-type labels are audio/wav and audio/x-wav. Broadcast WAVE extends the format with metadata for production and preservation, and the Library of Congress lists WAVE among its recommended formats for digital audio.\n\nYou come across WAV files from audio recorders, editing software and sound libraries: anywhere sound is kept untouched. The cost is size. An uncompressed recording takes far more space than a Vorbis copy of it, which is why many people look for a smaller file to send or store. The .wav ending also doesn't tell you whether a file holds plain PCM or something compressed.\n\n### Programs that open WAV files\n\n**Windows**\n\n- Windows Media Player: opens WAV files.\n\n**Windows, Mac and Linux**\n\n- Audacity: imports most WAV files, all PCM variants included.\n\n**Web**\n\n- Any web browser: plays a WAV with no extra software.\n\n**Android, iOS, Linux, Mac and Windows**\n\n- VLC media player: plays back WAV files.\n\n### WAV and OGG compared\n\n- **Extensions and media types**: .wav uses audio/wav or audio/x-wav. .ogg uses audio/ogg for an audio-only stream.\n- **Container**: WAV is a RIFF wrapper. Ogg is Xiph.Org's open container, which supports sequential reading and writing, so it suits streaming. Its framing includes timestamps and error detection.\n- **Codec**: a WAV usually holds linear PCM. An OGG usually holds Vorbis, while .oga is the broader extension for audio in Ogg.\n- **Size**: PCM is uncompressed. Vorbis is lossy and much smaller.\n- **Metadata**: WAV keeps INFO chunks or Broadcast WAVE fields, which store different information.\n- **Standards**: the IETF registered the Ogg media types in September 2008.\n\nOgg is Xiph.Org's open container for compressed multimedia streams. It can interleave sound and video, and the codec decides how each stream is compressed, which is why a bare .ogg ending doesn't name an encoding on its own.\n\nThis page decodes the WAV and writes Vorbis at quality 5 into an Ogg container. It is a quality setting, not a bitrate, so the size follows the sound. The command sets no bitrate, sample rate or channel count of its own, only the quality.\n\nThe practical split is simple. Keep a WAV for anything you will edit again, archive or hand to someone who mixes it. Make an OGG for a copy you will listen to, share or stream, where a small file matters more than the last bit of detail. Because Vorbis has already discarded sound, converting an OGG back to WAV gives you a large file with the same reduced content, not the original recording.\n\n### Other ways to convert WAV to OGG\n\n- **Audacity (Windows, Mac, Linux):** open the WAV, choose File > Export Audio, pick Ogg Vorbis from the Format dropdown and choose a quality from 0 to 10. The default is 5.\n- **FFmpeg (command line):** run `ffmpeg -i input.wav -c:a libvorbis -q:a 5 output.ogg`. The quality scale runs from -1 to 10.\n- **oggenc (command line):** run `oggenc -q 5 -o output.ogg input.wav`. The tool comes in Xiph's vorbis-tools and reads raw, Wave or AIFF audio.\n\n### Problems with WAV files\n\n- **Audacity won't import the recording**: a recorder may use proprietary compression inside the WAV. Audacity recommends installing its FFmpeg library for those.\n- **A very large recording**: WAV files past the original RIFF size limit need RF64.\n- **The WAV plays in one program but not another**: WAV is a wrapper, so a player needs the decoder for whatever encoding sits inside it. Convert it here or open it in Audacity to find out.\n- **The OGG sounds worse than the WAV**: Vorbis is lossy. Keep the WAV, or re-run from the original recording rather than from another lossy copy.\n- **A device rejects the OGG**: it may expect Opus or another codec. The extension doesn't identify one, and RFC 5334 keeps .ogg for Vorbis audio and gives general audio and video other extensions, .oga and .ogv.\n- **A damaged OGG**: the container detects damaged pages but can't rebuild missing audio. Convert again from the WAV.\n"
+    }
+  },
+  "avif-to-jpeg": {
+    "seo": {
+      "title": "Convert AVIF to JPEG Online (Free)",
+      "h1": "AVIF to JPEG Converter",
+      "description": "Convert AVIF to JPEG in your browser. The image is decoded to 8-bit pixels and saved at quality 0.85, with no upload. Free, with no sign-up.",
+      "howToHeading": "How to convert AVIF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save an AVIF image as a JPEG that older programs and websites accept."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to JPEG?",
+        "answer": "Choose the AVIF above and save the JPEG when it's done. Select several files and each is decoded in turn and downloaded as its own JPEG."
+      },
+      {
+        "question": "Is JPEG different from JPG?",
+        "answer": "No. Both endings label one format, so a .jpeg file opens in the same places a .jpg does."
+      },
+      {
+        "question": "What quality is the JPEG saved at?",
+        "answer": "0.85, with no setting to change it. JPEG is lossy, so the result is a new compressed copy of the AVIF's pixels, not an exact one."
+      },
+      {
+        "question": "Why does my browser show the AVIF when my editor can't open it?",
+        "answer": "Each program needs its own AVIF decoder. Newer releases of Chrome, Firefox, Safari and Edge include one, while older editors and browsers may not."
+      },
+      {
+        "question": "What if the page refuses my AVIF?",
+        "answer": "Your browser does the decoding. If it lacks AVIF support the page asks for a newer browser, and a corrupt file ends in an \"Image decode failed.\" error."
+      },
+      {
+        "question": "Will an animated AVIF give a JPEG for every frame?",
+        "answer": "No. A JPEG holds one still picture, so you get the first frame only."
+      },
+      {
+        "question": "What happens to transparency in an AVIF?",
+        "answer": "A JPEG stores no transparency at all, so the clear areas of an AVIF can't stay clear. The converter keeps transparency only for PNG and WebP, so use the AVIF to PNG converter when you need it."
+      },
+      {
+        "question": "Does it keep the 10-bit or 12-bit color of my AVIF?",
+        "answer": "No. AVIF allows up to 12 bits a channel for HDR, but the pixels pass through the page as 8-bit RGBA, so the extra depth is lost before the JPEG is written."
+      },
+      {
+        "question": "Are the EXIF, XMP and ICC profile copied?",
+        "answer": "No. AVIF can carry all three, but the image goes through raw pixels and the JPEG has none of them. Keep the AVIF if you need the camera details or the color profile."
+      },
+      {
+        "question": "Can the JPEG be larger than the AVIF?",
+        "answer": "Yes. AVIF is used for web images with small files, and this page gives you no setting to ask for a smaller JPEG."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and JPEG",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to JPEG",
+      "points": [
+        "The JPEG is written at quality 0.85, and you can't change it.",
+        "JPEG has no alpha transparency, which AVIF supports.",
+        "An animated AVIF gives its first frame only.",
+        "The pixels pass through as 8-bit color, so 10-bit and 12-bit depth is lost.",
+        "EXIF, XMP and ICC profiles are dropped."
+      ]
+    },
+    "guide": {
+      "title": "About AVIF files",
+      "markdown": "### What is an AVIF file?\n\nAn AVIF file is a still picture, or a short run of pictures, encoded with AV1 and wrapped in a HEIF container. The Alliance for Open Media wrote it. That group formed in 2015 to build media formats free of royalties, and AV1 itself came out in 2018. Release 1.0.0 of the AVIF specification carries the date 19 February 2019, and the media type is image/avif.\n\nInside one file you can have lossy or lossless coding, an alpha channel, an image sequence, and color depth as high as 12 bits for each channel, which covers HDR and wide gamut. Exif, XMP and an ICC profile can ride along. AVIF is royalty-free. In the Baseline profile a single image item can be no wider than 8,192 pixels or taller than 4,352, with 8,912,896 pixels as the total, and larger pictures are stored as a grid of such images. The price is processing time: AVIF decodes slowly, and encoding a single image may take several seconds. Most people meet it on the web, in browsers that support it.\n\n### Programs that open AVIF files\n\n**Windows**\n\n- Microsoft's AV1 Video Extension and HEIF Image Extension: needed before .avif files display.\n\n**Web**\n\n- Chrome 85, Firefox 93, Safari 16.1 and Edge 121 were the first releases to show AVIF. Those browsers are what lets this page work at all.\n\n**Mobile**\n\n- Android: AVIF decoding starts at version 12.\n\n**Windows, Mac and Linux**\n\n- GIMP: has imported and exported AVIF since version 2.10.22 (October 2020).\n- ImageMagick: its formats table lists AVIF as readable and writable.\n\n### AVIF and JPEG compared\n\n- **Extensions and media types**: .avif goes with image/avif. The .jpg and .jpeg endings both go with image/jpeg and mean the same format.\n- **Compression**: AVIF applies AV1 coding in lossy or lossless form. JPEG splits the picture into 8x8 blocks, runs each through a cosine transform, and packs the result with Huffman codes; the usual baseline mode is lossy.\n- **Transparency**: AVIF has an alpha channel, and JPEG does not.\n- **Color depth**: AVIF goes to 12 bits a channel; JPEG stops at 8.\n- **Animation**: AVIF can store a sequence, while a JPEG is exactly one picture.\n- **Metadata**: AVIF can hold Exif, XMP and an ICC profile, and the JPEG written here holds none.\n- **Compatibility**: every major browser displays JPEG. AVIF depends on an up-to-date browser or on software from the list above.\n\nConverting swaps AVIF's compact files and extra precision for that wider acceptance. The page decodes the AVIF in your browser, flattens it into 8-bit RGBA pixels, and writes the JPEG with quality set to 0.85.\n\n### Other ways to convert AVIF to JPEG\n\n- **GIMP (Windows, Mac, Linux):** load the AVIF in GIMP 2.10.22 or later, then File > Export As (Shift+Ctrl+E) saves a JPEG copy. A dialog with a quality setting follows, and its default is 85.\n- **ImageMagick (command line):** run `magick input.avif output.jpeg`. The command takes an input file and an output file, and the output's extension picks the format.\n- **avifdec (command line):** run `avifdec input.avif output.jpeg`. The quality defaults to 90 for JPEG output, and only the first frame of a sequence is decoded unless you name another with --index.\n\n### Problems with AVIF files\n\n- **An editor refuses the AVIF**: that program lacks an AVIF decoder or has an outdated one. Convert the file here, or update the software. GIMP releases before 2.10.22 lack the AVIF importer.\n- **Windows shows no preview**: AVIF needs the two Microsoft extensions listed above before it displays.\n- **An older browser draws nothing**: AVIF is a recent format, so offer visitors a JPEG, PNG or WebP fallback.\n- **The JPEG has a solid background where the AVIF was clear**: JPEG can't store transparency. The [AVIF to PNG converter](/avif-to-png/) keeps it.\n- **You expected motion but got one frame**: an animated AVIF yields its first frame only. Hold on to the AVIF if you need the animation.\n- **Colors differ from the original**: HDR range and bit depth beyond 8 don't carry over to the JPEG, and the color profile isn't copied. Keep the AVIF for showing on capable screens.\n- **A phone can't open the file**: Android decodes AVIF from version 12, so older systems need an app or browser with its own decoder.\n"
+    }
+  },
+  "flv-to-mp4": {
+    "seo": {
+      "title": "Convert FLV to MP4 Online (Free, No Upload)",
+      "h1": "FLV to MP4 Converter",
+      "description": "Convert old Flash Video files to MP4 with H.264 video and AAC audio, right in your browser. Output reaches 1920 px and 30 fps at most.",
+      "howToHeading": "How to convert FLV to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn an old Flash Video clip into an MP4 that plays almost anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert FLV to MP4?",
+        "answer": "Choose the FLV above and download the MP4 when it finishes. The video is re-encoded to H.264 with AAC audio at 96 kbps, so the result is a new file and your FLV stays as it was."
+      },
+      {
+        "question": "Does this page re-encode the FLV?",
+        "answer": "Yes. Every FLV gets new H.264 video and AAC audio, whatever codec it held, so a clip with Sorenson video converts too."
+      },
+      {
+        "question": "Do I need Flash Player to play an FLV?",
+        "answer": "No. Flash Player is no longer supported, and VLC plays FLV files without it. Converting here gives you an MP4 any current player opens."
+      },
+      {
+        "question": "Will a 4K or 1080p FLV keep its size?",
+        "answer": "Anything bigger than 1920 px on its long edge is shrunk until it fits, and the proportions stay the same. Smaller clips keep their size, though an odd width or height gives up 1 px."
+      },
+      {
+        "question": "What happens to an FLV above 30 fps?",
+        "answer": "Frames beyond 30 a second are dropped, and the clip keeps its length rather than slowing down. A clip that runs slower keeps its own rate."
+      },
+      {
+        "question": "Does the converted video look worse than the FLV?",
+        "answer": "Some detail is lost. The video goes through a second decode and encode at CRF 32 on the ultrafast preset, after the FLV was compressed once already."
+      },
+      {
+        "question": "Why is my MP4 smaller or larger than the FLV?",
+        "answer": "The two files use different codecs, and the new one is encoded from scratch with its own settings, so the size depends on the clip."
+      },
+      {
+        "question": "Is interlaced video fixed?",
+        "answer": "The command includes the yadif deinterlacing filter, so interlaced footage is deinterlaced."
+      },
+      {
+        "question": "What if the FLV has more than one audio or video track?",
+        "answer": "An FLV can hold a single picture track and a single sound track, so a second audio track cannot be inside it. The converter takes whatever FFmpeg picks by default."
+      },
+      {
+        "question": "Does the MP4 keep my FLV's title?",
+        "answer": "Yes, where the FLV has one. FFmpeg's defaults carry global tags to an MP4, and in a local test a title and an artist set in an FLV were both present in the MP4."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and MP4",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A container format created by Macromedia and later Adobe for delivering video through Flash Player. Flash reached end of life, so FLV is now a legacy format.",
+        "details": [
+          "usually H.263 or H.264 video",
+          "MP3 or AAC audio",
+          "designed for streaming"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 for video and audio. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting FLV to MP4",
+      "points": [
+        "The video is re-encoded to H.264 and the sound to AAC at 96 kbps.",
+        "The longer side is capped at 1920 px and the frame rate at 30 fps.",
+        "Width and height are rounded down to even numbers.",
+        "The encode is fast (ultrafast preset, CRF 32), not tuned for the smallest file."
+      ]
+    },
+    "guide": {
+      "title": "About FLV files",
+      "markdown": "### What is an FLV file?\n\nFLV is a binary format created at Macromedia for delivering Flash video, later maintained by Adobe. One file can carry only a single video stream and a single audio stream. Video is usually Sorenson or On2 VP6, with MP3, PCM or ADPCM for sound. Flash movies in SWF files could pull in a separate FLV through ActionScript.\n\nFlash Player support from Adobe stopped on December 31, 2020, so the browser plug-in that once played these files no longer exists. FLV lives on as older web video and as archived Flash content. Nothing in the extension tells you which codec is inside, and a program needs the matching decoder to show the picture.\n\n### Programs that open FLV files\n\n**Linux, Mac, Windows, Android and iOS**\n\n- VLC media player: lists FLV (Flash) among its input formats, and its video decoders include Sorenson and On2 VP6.\n\n**Windows, Mac and Linux**\n\n- mpv: opens FLV files.\n\n### FLV and MP4 compared\n\n- **Extensions and standards**: .flv for Flash Video, .mp4 for MPEG-4 Part 14, which is ISO/IEC 14496-14, first published in 2003. MP4's media types are video/mp4 and audio/mp4.\n- **Streams**: an FLV is limited to one video and one audio stream. MP4 is a container for several codecs.\n- **Codecs**: the usual FLV contents are Sorenson or VP6 video with MP3, PCM or ADPCM sound. This page writes H.264 and AAC, the common MP4 pair.\n- **Streaming**: FLV was designed for streaming. The MP4 written here has its index placed first (the faststart option), so playback can begin before the download ends.\n- **Players**: FLV opens in VLC and mpv today. Every major browser plays MP4, depending on the codecs inside.\n\nConverting trades the original encoding for a format that current software expects. The video is decoded and encoded again, so quality drops a little, the audio becomes AAC at 96 kbps, and the settings are fixed: the ultrafast preset at CRF 32, shrunk to fit 1920 px and held to 30 fps at most.\n\n### Other ways to convert FLV to MP4\n\n- **FFmpeg stream copy (command line):** run `ffmpeg -i input.flv -c copy output.mp4`. This moves the streams into an MP4 without re-encoding them, so it is fast and loses nothing. It only works when MP4 can carry the source codecs: in a test, an FLV with H.264 video copied, but one with Sorenson video was refused.\n- **FFmpeg transcoding (command line):** the command `ffmpeg -i input.flv -c:a aac -c:v libx264 output.mp4` encodes new H.264 and AAC streams, so both the picture and the sound are re-encoded.\n- **HandBrake (desktop app):** open the FLV with the Open Source button, pick a preset such as Fast 1080p30, make sure the container is MP4, type a file name in Save As and press Start. HandBrake can open web videos in FLV and create MP4 files.\n\n### Problems with FLV files\n\n- **An old web page won't play its video**: the Flash player is retired. Convert the FLV itself; the MP4 doesn't bring back the page's Flash interface.\n- **Stream copy fails or gives an MP4 that won't play**: the FLV's codecs aren't ones MP4 carries. Re-encode with this converter or the transcoding command.\n- **The picture is smaller than the source**: a frame wider or taller than 1920 px is scaled down to fit, and an odd dimension loses a pixel. Keep the FLV if you need the exact original dimensions.\n- **Motion looks less smooth**: a source above 30 fps is brought down to 30. Keep the FLV if the original timing matters. A clip at 25 or 30 fps is not affected.\n- **The MP4 has no sound**: check whether the FLV had an audio stream. Play it in VLC first; a conversion can't add sound that was never there.\n- **A SWF file won't play**: an old Flash movie (SWF) loaded its FLV through ActionScript. Converting the FLV does not rebuild that movie, so only the video comes across.\n- **The FLV plays with no picture**: the video codec may be one your player has no decoder for. Try VLC, which decodes Sorenson and VP6.\n- **A partial FLV gives a short MP4**: a download cut off midway has no data past that point, so the MP4 ends there too. Fetch the whole file again.\n"
+    }
+  },
+  "hevc-to-mp4": {
+    "seo": {
+      "title": "Convert HEVC to MP4 Online (Free, No Upload)",
+      "h1": "HEVC to MP4 Converter",
+      "description": "Convert a raw .hevc video stream to an H.264 MP4 in your browser, with the longer side capped at 1920 px and 30 fps. The MP4 has no audio, as .hevc has none.",
+      "howToHeading": "How to convert HEVC to MP4"
+    },
+    "tool": {
+      "subtitle": "Re-encode a raw HEVC (H.265) video stream as an H.264 MP4 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HEVC to MP4?",
+        "answer": "Pick your .hevc file, wait for the progress bar to finish, then save the MP4. FFmpeg decodes the stream inside your browser tab and writes new H.264 video, which far more players accept than raw H.265."
+      },
+      {
+        "question": "Can you convert HEVC to MP4 for free?",
+        "answer": "Yes. It costs nothing, needs no account, and the file stays on your device because FFmpeg runs in the page."
+      },
+      {
+        "question": "Why does the MP4 have no sound?",
+        "answer": "Raw H.265 streams carry pictures and nothing else. The page labels the conversion as video only, and the MP4 is silent because the source never held a sound track."
+      },
+      {
+        "question": "Is HEVC the same as MP4?",
+        "answer": "No. HEVC is a way of compressing video, also called H.265, and MP4 is a container that can hold video compressed that way. A .hevc file is the bare stream with no container around it."
+      },
+      {
+        "question": "Is the MP4 the same quality as the HEVC video?",
+        "answer": "No. The video is re-encoded, not copied, so the MP4 is a new lossy encoding made with the ultrafast preset at CRF 32."
+      },
+      {
+        "question": "Does the MP4 keep my video's size and frame rate?",
+        "answer": "Only within limits. A frame whose long edge passes 1920 px shrinks to fit, keeping its shape, and a stream faster than 30 fps is thinned to 30. Width and height must come out even, which costs an odd-sized video one pixel."
+      },
+      {
+        "question": "Which players open the MP4 this page writes?",
+        "answer": "MP4 files open in VLC, QuickTime Player, Windows Media Player and any web browser. The video inside is H.264, the pairing most MP4s use with AAC audio, though this MP4 has no audio."
+      },
+      {
+        "question": "Why would I re-encode to H.264 instead of wrapping the HEVC?",
+        "answer": "Wrapping keeps HEVC, so the player still needs an H.265 decoder for your stream. H.264 inside MP4 is the more widely accepted choice, which is what this page writes."
+      },
+      {
+        "question": "How long does a conversion take?",
+        "answer": "The page sets no file size cap and no timeout, so a long file simply runs for however long your device requires. FFmpeg runs in the page on a single thread."
+      },
+      {
+        "question": "Is HEVC the same as H.265?",
+        "answer": "Yes, they are two names for one standard, which also goes by MPEG-H Part 2."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEVC and MP4",
+      "fromFormat": {
+        "name": "HEVC",
+        "fullName": "High Efficiency Video Coding (H.265)",
+        "description": "HEVC, also named H.265, is a video compression standard used for camera recordings and other compressed video.",
+        "details": [
+          "Video coding rather than a container",
+          "Can be carried inside MP4",
+          "Raw .hevc input contains no audio"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 for video, audio and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting HEVC to MP4",
+      "points": [
+        "A .hevc file is a raw video stream, so the MP4 has no audio.",
+        "The video is re-encoded as H.264, not copied.",
+        "The longer side is capped at 1920 px and the frame rate at 30 fps.",
+        "An odd width or height loses 1 px."
+      ]
+    },
+    "guide": {
+      "title": "About HEVC files",
+      "markdown": "### What is an HEVC file?\n\nHEVC stands for High Efficiency Video Coding. It is also called H.265 or MPEG-H Part 2, and ISO/IEC and ITU-T developed it together. The first edition appeared in 2013. It covers storage, television, streaming and video calls, and its profiles select different combinations of coding features, including higher bit depths and full-resolution chroma.\n\nHEVC is a codec, not a container. An MP4 can carry H.265 video, but a file ending in .hevc is the raw compressed stream by itself. FFmpeg accepts a raw stream as input, but it is not a general audio and video container, and it holds no audio track. If you were expecting sound, look for the camera's original file or a separate recording, because converting the pictures can't bring back sound that was never in the stream.\n\n### Programs that open HEVC files\n\n**Mac, Windows, Linux, iOS and Android**\n\n- VLC media player: opens HEVC video.\n\n**Windows, Mac and Linux**\n\n- FFmpeg: takes a raw HEVC stream as input, and its FFplay player decodes it.\n\n**Mac**\n\n- QuickTime Player: opens HEVC video.\n\n**Windows**\n\n- Windows Media Player: opens HEVC video once codecs are installed.\n\n### HEVC and MP4 compared\n\n- **What they are**: HEVC is a video codec. MP4 (MPEG-4 Part 14, ISO/IEC 14496-14) is a container for video, audio and metadata, and the two sit at different layers.\n- **Standard and types**: MP4 was first published in 2003 and uses the media types video/mp4 and audio/mp4.\n- **Audio**: a raw .hevc stream has none. An MP4 can hold an audio track, though this one has none because the source has none.\n- **Codecs**: an MP4 can carry H.264, H.265 and AV1 video. This page writes H.264.\n- **Container**: HEVC can sit inside MP4, so the two aren't alternatives. Wrapping and re-encoding are separate jobs.\n- **Playback**: an MP4 that holds HEVC still needs a player that decodes H.265 at the stream's profile and level.\n\nThis page takes the re-encoding route. FFmpeg decodes the HEVC in software on your device and writes H.264 video into an MP4 with the index at the front of the file. The long edge is capped at 1920 px, the rate is held to 30 fps at most, and an odd width or height is trimmed to an even one. The preset is ultrafast with CRF 32, so the encode is quick and lossy.\n\nThe original recording is the better source when you have it, because it keeps the audio beside the picture. When all you have is the raw stream, the picture is what you get, and re-encoding it makes an MP4 that opens in ordinary players.\n\n### Other ways to convert HEVC to MP4\n\n- **FFmpeg remux (command line):** run `ffmpeg -i input.hevc -c:v copy output.mp4`. It keeps the HEVC compression and only changes the packaging, so the player must support HEVC.\n- **FFmpeg H.264 encoding (command line):** the command `ffmpeg -i input.hevc -c:v libx264 output.mp4` decodes the HEVC and writes a new H.264 stream, much like the converter here.\n- **GPAC MP4Box (command line):** run `MP4Box -add input.hevc -new output.mp4`. It creates a new MP4 and adds the stream to it, and the -fps option can force the frame rate on import.\n\n### Problems with HEVC files\n\n- **There is no sound**: that is expected, since a .hevc file has no audio. Use a source file that has an audio track if you need one.\n- **The MP4 won't play**: that player has no decoder for what is inside. The profile and level of the stream matter, and older Apple hardware may fall short on resolution or frame rate.\n- **The video is smaller or has fewer frames than the source**: the long edge never exceeds 1920 px, and the rate never exceeds 30 frames per second. Hold on to the .hevc if you need the original size and rate.\n- **A remuxed MP4 still won't open**: it holds HEVC, so the problem is the missing H.265 decoder. Convert it with this page for H.264 instead.\n- **Your phone or an older Apple device stutters on the HEVC**: Hardware from before iOS 11 and macOS 10.13 may struggle with large frames or high frame rates. The H.264 MP4 from this page plays on more hardware.\n- **A long clip takes a while**: the whole conversion runs on your device in one thread, so time follows your hardware.\n"
+    }
+  },
+  "webp-to-pdf": {
+    "seo": {
+      "title": "Convert WebP to PDF Online (Free, No Upload)",
+      "h1": "WebP to PDF Converter",
+      "description": "Convert a WebP image to a one-page PDF the size of the picture, with transparency kept and no re-compression. Runs in your browser, no sign-up.",
+      "howToHeading": "How to convert WebP to PDF"
+    },
+    "tool": {
+      "subtitle": "Put a WebP image on a single PDF page the size of the picture, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WebP to PDF?",
+        "answer": "Choose the WebP above and download the PDF when it's ready. The image is decoded in your browser and placed on a single page, with no upload."
+      },
+      {
+        "question": "Can I convert several WebP files into one PDF?",
+        "answer": "No. Each file you select becomes its own PDF, and the converter never merges them. Use a PDF tool afterward to combine the separate files into one document."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "The page is cut to the picture itself, at one point per pixel, and carries no margins or standard paper size. A large image makes a large page, which can print bigger than a sheet of paper."
+      },
+      {
+        "question": "Does the PDF keep transparent areas?",
+        "answer": "Yes. Nothing is painted behind the picture, and transparent pixels stay transparent in the PDF as a soft mask."
+      },
+      {
+        "question": "Is the image compressed again inside the PDF?",
+        "answer": "No new lossy compression is applied. The decoded pixels are embedded as lossless PNG data, so there is no quality setting."
+      },
+      {
+        "question": "Why is the PDF bigger than my WebP?",
+        "answer": "WebP is often a compact lossy file, while the PDF stores the decoded pixels losslessly, so the file grows even though the picture is the same."
+      },
+      {
+        "question": "What happens to an animated WebP?",
+        "answer": "Only its first frame goes onto the PDF's single page, and the rest of the animation is left out."
+      },
+      {
+        "question": "Are the EXIF data and color profile kept?",
+        "answer": "No. Only the pixels are carried over, so the camera EXIF, any ICC profile and XMP are dropped, and extra bit depth is cut to 8 bits per channel."
+      },
+      {
+        "question": "Is the writing in my picture selectable in the PDF?",
+        "answer": "No. Lettering in a picture is still just pixels, and the converter runs no OCR, so the PDF shows the image without a text layer."
+      },
+      {
+        "question": "What is the PDF file called?",
+        "answer": "The download takes your WebP's name with a .pdf ending in place of .webp, so a file named photo.webp comes back as photo.pdf."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and PDF",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "fixed page layout",
+          "embedded fonts",
+          "vector and raster content"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WebP to PDF",
+      "points": [
+        "Each WebP becomes its own one-page PDF.",
+        "The page is the size of the image, one point per pixel.",
+        "Transparent pixels stay transparent.",
+        "An animated WebP gives its first frame only.",
+        "Metadata is dropped."
+      ]
+    },
+    "guide": {
+      "title": "About WebP files",
+      "markdown": "### What is a WebP file?\n\nGoogle created WebP for images on the web. The lossy mode is built on the VP8 video codec, and the format also covers lossless compression, alpha transparency and animation. A WebP image can't be larger than 16,383 pixels on either axis. The file is a RIFF container. Lossy files apply VP8 intra-frame coding, whereas lossless files rely on a distinct method that combines LZ77, prefix codes and a color cache. Its image/webp media type comes from RFC 9649, which describes the format. Room exists inside a file for Exif and XMP metadata and an ICC color profile.\n\nPDF has a different job. A form, a portal or a colleague may ask for a document when all you have is one image. Putting the WebP on a PDF page gives them something any PDF reader can open and print. The conversion does not recover the page the picture came from, and it adds no text. It also doesn't change the picture: you can still look at the WebP you started with, and the PDF is a second copy for the cases where a document is required.\n\n### Programs that open WebP files\n\n**Android**\n\n- Android: it decodes WebP from version 4.0, but lossless or transparent files wait until 4.2.1.\n\n**Mac and iPhone**\n\n- Safari: opens WebP from version 14, on macOS Big Sur and iOS 14 onward.\n\n**Windows**\n\n- File Explorer and Photos: Microsoft's WebP Image Extension has to be installed before they show WebP images.\n\n**Windows, Mac and Linux**\n\n- GIMP: native WebP import and export arrived in GIMP 2.10.\n- ImageMagick: reads WebP and writes PDF, which makes it a command-line route between the two.\n\n### WebP and PDF compared\n\n- **Extensions and media types**: .webp is image/webp, and .pdf is application/pdf.\n- **What they hold**: a WebP is one image, or an animation. A PDF is a document with pages, which can contain images, text and vector drawings. PDF is standardized as ISO 32000.\n- **Compression**: WebP is lossy or lossless. The PDF made here stores the decoded pixels as lossless PNG data.\n- **Transparency**: WebP has an alpha channel. The PDF keeps it as a soft mask, and no background is added behind the picture.\n- **Animation**: WebP can animate, and a PDF page can't. You get the first frame.\n- **Layout**: a PDF has fixed pages. This one has a single page sized to the image. It has no margins and isn't set to A4 or Letter.\n- **Text**: a picture inside a PDF stays a picture. Selectable text needs a separate OCR step.\n\nThe browser decodes the WebP, and the page embeds the pixels without a second lossy step. The pixels travel as 8-bit RGBA, which is why EXIF, ICC and XMP data don't make it into the PDF. Each file you pick is converted on its own.\n\n### Other ways to convert WebP to PDF\n\n- **GIMP (Windows, Mac, Linux):** load the WebP, pick File > Export As, and choose the .pdf extension or the PDF file type. In GIMP's PDF dialog, an option can replace transparent areas with the background color, so check it when transparency matters.\n- **ImageMagick (command line):** run `magick input.webp output.pdf`. On a 96 by 96 pixel test image it wrote a 96 by 96 point page.\n- **Pillow (Python):** run `python3 -c \"from PIL import Image; Image.open('input.webp').convert('RGB').save('output.pdf')\"`. Pillow writes an RGB image into a PDF with JPEG encoding, so the picture is compressed again and loses its transparency.\n\n### Problems with WebP files\n\n- **The PDF prints at a surprising size**: pixels are not paper. A page with one point per pixel can be much larger than Letter or A4.\n- **Several files downloaded**: each WebP you select makes its own PDF. Combine them afterward if you need one document.\n- **The text can't be selected**: lettering in the picture is still image pixels, and the PDF adds no text layer.\n- **A moving image became still**: only the first frame of an animated WebP is used. Keep the WebP for the animation.\n- **A picture over 16,383 pixels**: WebP cannot be larger than that on either axis, so such a file points to a broken download or another format. Fetch it again.\n- **The image won't load**: your browser decodes the WebP, so an old browser without WebP support can't open it.\n"
+    }
+  }
+}

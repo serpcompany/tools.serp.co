@@ -1,5 +1,5 @@
+import { JsonLd } from "@/components/JsonLd";
 import {
-  serializeJsonLd,
   structuredDataOrigin,
   toolStructuredData,
   type ToolPageText,
@@ -16,10 +16,5 @@ export function StructuredData(page: ToolPageText) {
   const data = toolStructuredData(page, origin);
   if (!data) return null;
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
-    />
-  );
+  return <JsonLd data={data} />;
 }

@@ -142,6 +142,55 @@ test("the OpenNext config wraps its whole incremental cache, regional layer incl
   assert.match(config, /incrementalCache:\s*withPageCacheFilter\(\s*withRegionalCache\(/);
 });
 
+// Without cache interception, an isolate that didn't render a [tool] page
+// itself answered its stored copy `x-nextjs-cache: STALE`, with no
+// cache-control, and rendered it again (issue #347).
+test("the OpenNext config answers a stored page before Next.js runs", () => {
+  const config = readFileSync(new URL("../open-next.config.ts", import.meta.url), "utf8");
+  assert.match(config, /^\s*enableCacheInterception:\s*true,/m);
+});
+
+// Interception gives a [tool] page a year's s-maxage because it finds the
+// entry of a page its dynamic route rendered at runtime (`fallback: null`) and
+// reads the lifetime stored in it (`revalidate: false`). If an upgrade changes
+// either, check on `cf:preview:production` that a stored [tool] page still
+// answers HIT on a fresh isolate (docs/runbooks/cloudflare.md).
+test("the installed OpenNext still answers a runtime-rendered page with its stored lifetime", () => {
+  const require = createRequire(import.meta.url);
+  const openNext = createRequire(require.resolve("@opennextjs/cloudflare"));
+  const interceptor = readFileSync(openNext.resolve("@opennextjs/aws/core/routing/cacheInterceptor.js"), "utf8");
+
+  assert.match(interceptor, /dynamicPrerender\.fallback !== null\) \{\s*return undefined;/);
+  assert.match(interceptor, /finalRevalidate = revalidate === false \? CACHE_ONE_YEAR : revalidate;/);
+});
+
+// A stored page keeps every per-request layer only because OpenNext runs
+// next.config redirects and middleware (canonical-host and slash 308s, 410s,
+// the /internal/ 401) before the cache, then puts middleware's and
+// next.config's headers (X-Robots-Tag on staging, x-tools-release) on the
+// cached answer. An upgrade that intercepted first would skip all of them.
+test("the installed OpenNext still runs redirects and middleware before answering from the cache", () => {
+  const require = createRequire(import.meta.url);
+  const openNext = createRequire(require.resolve("@opennextjs/cloudflare"));
+  const handler = readFileSync(openNext.resolve("@opennextjs/aws/core/routingHandler.js"), "utf8");
+
+  const steps = [
+    "handleRedirects(eventOrResult, RoutesManifest.redirects)",
+    "await handleMiddleware(eventOrResult",
+    "...middlewareEventOrResult.responseHeaders",
+    "eventOrResult = await cacheInterceptor(eventOrResult, resolvedRoutes)",
+  ];
+  const positions = steps.map((step) => handler.indexOf(step));
+  for (const [i, step] of steps.entries()) {
+    assert.notEqual(positions[i], -1, `routingHandler.js no longer has ${step}`);
+    if (i > 0) assert.ok(positions[i] > positions[i - 1], `${step} now runs before ${steps[i - 1]}`);
+  }
+  assert.match(
+    handler,
+    /eventOrResult = await cacheInterceptor\(eventOrResult, resolvedRoutes\);\s*if \(isInternalResult\(eventOrResult\)\) \{\s*applyMiddlewareHeaders\(eventOrResult, headers\);\s*return eventOrResult;/,
+  );
+});
+
 // The filter reads where Next.js writes the request's query. If an upgrade
 // moves it, every page would stop being stored (or, if this were relaxed, a
 // query could get through): re-check the payload, then update both.

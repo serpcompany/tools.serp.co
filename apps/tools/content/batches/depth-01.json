@@ -1,0 +1,923 @@
+{
+  "image-to-pdf": {
+    "seo": {
+      "title": "Convert Image to PDF Online (Free)",
+      "h1": "Image to PDF Converter",
+      "description": "Convert an image to PDF in your browser, or combine several images into one PDF, one page each. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn one image, or several in the order you choose, into a PDF in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an image to PDF?",
+        "answer": "Choose the image above and the PDF downloads when it is made. Choose several images and they become one PDF, with one page for each image."
+      },
+      {
+        "question": "In what order do the images appear in the PDF?",
+        "answer": "In the order of the list. Images join the list in the order you pick them, and the move up, move down and remove buttons change it before the PDF is made. The image at the top of the list is page one."
+      },
+      {
+        "question": "Is there a limit on how many images go into one PDF?",
+        "answer": "Yes. One PDF takes up to 100 images, 250 MB in all, and each image can be up to 50 megapixels. For more, make a second PDF."
+      },
+      {
+        "question": "What happens to a JPEG or a transparent image?",
+        "answer": "A JPEG goes into the PDF as it is, and its ICC profile is kept. Transparency in an image becomes a soft mask, so see-through areas stay see-through."
+      },
+      {
+        "question": "What size are the pages?",
+        "answer": "Each page takes its image's size, one point per pixel, with no margin. A side longer than 14,400 points, Acrobat's 200-inch maximum, is scaled down to fit and keeps all its pixels. Images of different sizes make pages of different sizes."
+      },
+      {
+        "question": "Can I turn iPhone HEIC photos or camera RAW files into a PDF?",
+        "answer": "Yes. Besides the web formats, the page reads HEIC and HEIF, TIFF, PSD, DNG and RAW files from Canon, Nikon, Sony, Fujifilm, Olympus and Panasonic cameras. An opaque photo in one of those formats goes in as a JPEG at quality 92."
+      },
+      {
+        "question": "Can I mix different image formats in one PDF?",
+        "answer": "Yes. A PNG screenshot, a HEIC photo and a scanned JPEG can sit in the same list, and each becomes a page in list order."
+      },
+      {
+        "question": "Will a sideways phone photo come out upright?",
+        "answer": "For a JPEG, yes. Phones often store a photo's rotation as an EXIF tag, and the page turns that photo's page to match, as a browser shows it."
+      },
+      {
+        "question": "Why is my PDF so large?",
+        "answer": "A PDF holds the pixels of every image in it, so many large images can make a large PDF. A JPEG's own image data goes in unchanged, other photos become JPEGs at quality 92, and PNG, GIF or BMP images are stored losslessly. One PDF stops at 250 MB."
+      },
+      {
+        "question": "Can I search or copy the text in the PDF?",
+        "answer": "No. Every page is a picture, and the page runs no text recognition, so words in a photographed document can't be selected or searched."
+      }
+    ],
+    "aboutSection": {
+      "title": "Images and PDF",
+      "fromFormat": {
+        "name": "Image",
+        "fullName": "Image file",
+        "description": "Any picture file this page reads: photos from phones and cameras, screenshots, scans and graphics.",
+        "details": [
+          "JPEG, PNG, GIF, WebP, BMP, AVIF and SVG",
+          "HEIC and HEIF from iPhone and iPad",
+          "TIFF, PSD and camera RAW",
+          "Different formats mix in one PDF"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting images to PDF",
+      "points": [
+        "Several images become one PDF, one page each, in the list's order, which you can change.",
+        "One PDF takes up to 100 images, 250 MB in all, and 50 megapixels per image.",
+        "A JPEG goes in as it is, with its ICC profile kept.",
+        "Transparency becomes a soft mask in the PDF.",
+        "The PDF is made in your browser, with no server involved."
+      ]
+    },
+    "guide": {
+      "title": "About images and PDF",
+      "markdown": "### What is an image file?\n\nImage files come in two kinds, and every image here ends up as a page, whether the image is a photo, a scan or a screenshot. Raster formats such as JPEG, PNG, HEIC and WebP store a grid of pixels. Vector formats such as SVG store shapes and redraw them at any size. A PDF is a third thing: it describes pages, and a picture is one thing a page can hold. People turn images into a PDF when a form or an office wants a document, when a stack of receipts or scans should travel as one file, or when pages must print the same way on every machine.\n\nThis page reads almost any image a phone, camera or computer makes:\n\n- **Web and everyday formats**: JPEG, PNG, GIF, WebP, BMP, AVIF, ICO and SVG.\n- **Apple photos**: HEIC and HEIF.\n- **Editing and print formats**: TIFF, PSD, TGA, JPEG XL and JPEG 2000.\n- **Camera RAW**: DNG, Canon CR2, CR3 and CRW, Nikon NEF, Sony ARW, Fujifilm RAF, Olympus ORF and Panasonic RW2.\n\nPDF itself comes from Adobe. John Warnock's Camelot project, begun in 1991, had become PDF by 1992, and it has been an ISO standard since 2008. The aim was one document that looks and prints alike on any device, so its imaging model ignores the device and its resolution. A single page may combine type, line art and bitmaps, along with links, bookmarks and form fields. Special-purpose variants include PDF/A for long-term archives, PDF/X for print production and PDF/UA for accessible documents.\n\n### Programs that open the PDF you make\n\nThe images go in as pages, so the programs that matter are the ones that open a PDF.\n\n- **Windows, Mac and web:** Mozilla Firefox displays PDFs with its own viewer.\n- **Windows:** GIMP opens each PDF page as an image and prompts for a password on a protected file.\n- **Mac:** Apple Preview lists the pages of a PDF as thumbnails.\n- **Linux:** Evince and Okular.\n- **Web:** Adobe Acrobat online opens an uploaded PDF for annotations; check its account requirements.\n- **Mobile:** Firefox for Android can open a PDF saved on the phone, and Adobe Acrobat Reader reads PDFs on Android and iOS.\n\n### Images and PDF compared\n\n- **Extensions and media types**: each image format has its own, such as .jpg or .heic. A PDF is .pdf with the media type application/pdf.\n- **What the file holds**: an image file holds one picture, or the frames of one animation. A PDF is built from pages, and a single page may combine text, vector shapes and pictures.\n- **Compression inside the PDF**: PDF stores pictures with lossless Flate or with JPEG. Here a JPEG keeps its own data. An opaque photo in another photo format (HEIC, AVIF, lossy WebP, JPEG XL, JPEG 2000 or RAW) is stored as a JPEG at quality 92. Everything else, a transparent photo or an SVG included, is stored losslessly as pixels.\n- **Transparency**: see-through pixels become a soft mask, so they stay see-through on the page.\n- **Page size**: one point per pixel. A 3,000 x 2,000 photo makes a page about 41.7 x 27.8 inches; viewers zoom to fit it on screen.\n- **Metadata**: a JPEG's orientation tag turns its page, and its ICC profile is kept. The rest of its Exif, GPS location included, and its XMP are left out.\n- **Fonts**: a PDF with text keeps its look elsewhere only if the fonts travel inside it. Pictures carry no fonts, so a PDF made from images has none to lose.\n- **Animation**: an animated GIF or WebP gives its first frame.\n\n### Other ways to put images in a PDF\n\n- **Finder (Mac):** highlight the images, hold Control while clicking, and use Quick Actions, then Create PDF. The selection order becomes the page order.\n- **Preview (Mac):** open one image, go to File > Export and set the Format menu to PDF.\n\n### Problems with images in a PDF\n\n- **More than 100 images**: one PDF made here stops at 100. Split the set and make two PDFs.\n- **Over 250 MB**: the page tells you how many images fit. Remove some, or make two PDFs.\n- **An image over 50 megapixels**: the page names the file. Scale it down in an editor first; a 48-megapixel phone photo fits.\n- **Pages in the wrong order**: use Move up and Move down before making the PDF. The order of the list is the order of the pages.\n- **Pages print huge or tiny**: page sizes follow the pixels, so scale the print to fit the paper.\n- **Text in a scan can't be searched**: this page runs no text recognition, so use a separate program that does.\n"
+    }
+  },
+  "webp-to-jpg": {
+    "seo": {
+      "title": "Convert WebP to JPG Online (Free)",
+      "h1": "WebP to JPG Converter",
+      "description": "Convert WebP images to JPG in your browser. Choose several WebP files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert WebP to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn WebP images into JPG files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a WebP to JPG?",
+        "answer": "Pick the WebP above, wait a moment and save the JPG that appears. A batch gives one JPG per WebP."
+      },
+      {
+        "question": "Can you convert WebP to JPG without losing quality?",
+        "answer": "Not entirely. JPG is a lossy format, and this page writes the JPG at quality 0.85, so some detail can be lost."
+      },
+      {
+        "question": "Why is there only one picture from my animated WebP?",
+        "answer": "A JPG holds a single still picture, so only the first frame of the animation is used."
+      },
+      {
+        "question": "Is the WebP's metadata copied into the JPG?",
+        "answer": "No. The JPG is made from decoded pixels alone, so EXIF data, ICC profiles and XMP are dropped."
+      },
+      {
+        "question": "What happens to a WebP's transparency?",
+        "answer": "JPG has no alpha transparency, so a JPG cannot hold see-through areas. Transparent WebP images are better converted to PNG, which keeps them."
+      },
+      {
+        "question": "Why do pictures I save from websites come out as WebP?",
+        "answer": "Google reports that WebP files are smaller than comparable JPEG or PNG files on average, so a site that wants small downloads may serve it."
+      },
+      {
+        "question": "Can I rename a .webp file to .jpg instead?",
+        "answer": "Renaming changes the label, not the data. The file is still WebP inside. Converting writes real JPEG data."
+      },
+      {
+        "question": "Can I convert a whole folder of WebP files in one go?",
+        "answer": "Yes. Select as many as you like together. Each WebP is converted separately and saved as its own JPG, and nothing is zipped."
+      },
+      {
+        "question": "Why does the page say my browser can't open the file?",
+        "answer": "The WebP is read by your browser's own decoder. If it can't open the format, the page shows \"This browser can't open … files\", and a current Chrome, Edge, Firefox or Safari is the way forward. If the decoder fails on the file's data, the message reads \"Image decode failed.\" instead."
+      },
+      {
+        "question": "Can I convert WebP to JPG on my phone?",
+        "answer": "Yes. Visit this page with your phone's browser, choose the WebP, and the JPG downloads like any other file."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and JPG",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google and released as open source. It supports lossy and lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Displays in every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "An animated WebP gives a JPG of its first frame only.",
+        "EXIF data, ICC profiles and XMP aren't copied to the JPG.",
+        "A JPG can't hold transparency, which WebP can.",
+        "Choose several WebP files at once and each JPG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About WebP files",
+      "markdown": "### What is a WebP file?\n\nWebP is a Google-made image format, open source from the start. The announcement came on 30 September 2010. In lossy mode, WebP applies the intra-frame coding of VP8, a video codec that began at On2 Technologies and that Google released as open source in May 2010. The VP8 specification, RFC 6386, is built around On2's own reference decoder. A lossless mode with its own method followed, and both modes can carry transparency and animation. Inside, a WebP is a RIFF container. RFC 9649, published in November 2024, documents the format and registers its media type, image/webp.\n\nYou mostly meet WebP on the web. Google reports lossy WebP files about 30% smaller than JPEG on average, and lossless WebP files about 26% smaller than PNG. Animated WebP turns up too: WhatsApp's animated stickers, for example, are WebP files.\n\n### Programs that open WebP files\n\n- **Windows:** File Explorer and Photos open WebP once Microsoft's WebP Image Extension is installed.\n- **Windows, Mac and Linux:** GIMP reads and writes WebP natively, since version 2.10. ImageMagick reads WebP, and its format list shows whether your installation can.\n- **Web and mobile:** Google Chrome displays WebP.\n- **Web:** Mozilla Firefox displays WebP, and so does Microsoft Edge.\n- **Mac and mobile:** Safari shows WebP from macOS Big Sur and iOS 14.\n- **Mobile:** On Android, WebP displays from version 4.0, with lossless and transparent files supported from 4.2.1.\n\nAdobe Photoshop handles WebP files natively as well, starting with version 23.2.\n\n### WebP and JPG compared\n\n- **Extensions and media types**: .webp and image/webp; .jpg or .jpeg and image/jpeg.\n- **Compression**: lossy WebP codes the picture as a VP8 key frame, and lossless WebP uses LZ77, prefix codes and a color cache. Baseline JPEG is always lossy: 8x8 blocks, a discrete cosine transform, then Huffman coding.\n- **Transparency**: WebP has an alpha channel in both modes. JPG has none.\n- **Animation**: WebP can hold timed frames. A JPG is one still picture.\n- **Color depth**: JPEG keeps 8 bits per channel. The page converts through 8-bit RGBA pixels, so a deeper source loses its extra bits.\n- **Largest image**: a WebP side tops out at 16,383 pixels.\n- **Quality setting**: Most programs ask for a JPEG quality from 0 to 100, but one value gives different results in different tools. This page has no setting and uses 0.85 for every file.\n- **Layers and progressive mode**: JPEG cannot store layers. A progressive JPEG shows a rough preview that sharpens as the rest arrives.\n- **Reach**: JPEG opens in all the major browsers, and cameras and scanners commonly save it. Safari 14, Firefox 65, Edge 18 and Chrome 17, along with later releases, show lossy WebP, and elsewhere WebP needs one of the programs above.\n- **Metadata**: WebP can carry an ICC profile, Exif and XMP. The JPG made here carries none of them.\n\nThe change here is the move to a format without transparency or animation. The page decodes the WebP to pixels and writes a JPG at quality 0.85. See-through areas can't stay see-through, an animation gives its first frame, and the Exif, ICC profile and XMP aren't copied.\n\n### Other ways to convert WebP to JPG\n\n- **GIMP (Windows, Mac and Linux):** open the WebP in GIMP 2.10 or later, then export it as a JPEG from File > Export As.\n- **ImageMagick (terminal):** run `magick input.webp output.jpg`, if the installation can read WebP.\n\n### Problems with WebP files\n\n- **Double-clicking does nothing on Windows**: install the WebP Image Extension from the Microsoft Store.\n- **An older browser shows nothing**: Edge 18, Chrome 17, Firefox 65 and Safari 14 were the first to show lossy WebP, so earlier releases can't display it.\n- **A site or form rejects it**: convert it to JPG here, or to PNG with the [WebP to PNG converter](/webp-to-png/) when transparency must survive.\n- **A renamed file still fails**: changing .webp to .jpg leaves WebP data inside. Convert the file instead.\n- **Only one frame came out**: a JPG can't animate, so an animated WebP gives its first frame. Keep the WebP if you need the motion.\n- **\"Image decode failed.\"**: the browser's decoder couldn't read the file. Download it again from where you found it.\n- **The JPG looks soft or blotchy**: a lossy WebP has already lost some detail, and the JPG is compressed again on top. Start from the largest, least compressed copy the site offers.\n"
+    }
+  },
+  "heic-to-jpg": {
+    "seo": {
+      "title": "Convert HEIC to JPG Online (Free)",
+      "h1": "HEIC to JPG Converter",
+      "description": "Convert iPhone HEIC photos to JPG in your browser. Choose several HEIC files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert HEIC to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn HEIC photos from an iPhone into JPG files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HEIC to JPG?",
+        "answer": "Pick your iPhone photos above and each JPG downloads once it is decoded. Several HEIC files run one after another."
+      },
+      {
+        "question": "How do I change a HEIC to JPG on a Windows PC?",
+        "answer": "Use this page in any browser on the PC and choose the HEIC file. The conversion runs in the browser, so you need no extra software or HEIF extension."
+      },
+      {
+        "question": "Does the JPG keep the HEIC's EXIF data?",
+        "answer": "No. The photo is decoded to 8-bit RGB pixels, and EXIF data and ICC profiles aren't carried over to the JPG."
+      },
+      {
+        "question": "Will the JPG look worse than the HEIC?",
+        "answer": "A little detail can be lost. JPG is lossy and this JPG is written at quality 0.85."
+      },
+      {
+        "question": "What if my HEIC holds more than one image?",
+        "answer": "Only the primary image is decoded, so you get one JPG. A file with no image inside stops with the error \"No images in HEIF\"."
+      },
+      {
+        "question": "Why are my iPhone photos HEIC and not JPG?",
+        "answer": "With the camera set to High Efficiency, an iPhone saves photos as HEIF. Apple's stated reason is that HEIF compresses photos better than JPEG does."
+      },
+      {
+        "question": "Can I make my iPhone take JPG photos instead?",
+        "answer": "Yes. In Settings > Camera > Formats, choose Most Compatible. New photos are then saved as JPEG; the HEIC photos already on the phone stay as they are, so convert those here."
+      },
+      {
+        "question": "Is HEIC the same as HEIF?",
+        "answer": "HEIF is the container format. HEIC is a HEIF file whose pictures are compressed with HEVC, which is what an iPhone saves."
+      },
+      {
+        "question": "Is my photo uploaded anywhere?",
+        "answer": "No. The HEIC is decoded in your browser with libheif, and the JPG is made on your device."
+      },
+      {
+        "question": "Does converting change my original HEIC?",
+        "answer": "No. Your original HEIC isn't touched; the page hands you a fresh JPG."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and JPG",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "HEIF images coded with HEVC, the photo format iPhones use. The heic brand is defined in ISO/IEC 23008-12.",
+        "details": [
+          "Lossy HEVC compression",
+          "Better compression than JPEG, says Apple",
+          "Can hold several images, high bit depths and an alpha channel",
+          "Opens in Preview on macOS and Apple Photos"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Displays in every major browser",
+          "Built into most digital cameras and scanners"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIC to JPG",
+      "points": [
+        "A HEIC with several images gives one JPG, from its primary image.",
+        "The photo is decoded to 8-bit RGB pixels.",
+        "EXIF data and ICC profiles aren't copied to the JPG.",
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "Choose several HEIC files at once and each JPG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About HEIC files",
+      "markdown": "### What is a HEIC file?\n\nA HEIC file is a photo stored in HEIF, the High Efficiency Image File Format, with its pictures compressed by HEVC, the H.265 video codec. HEIF is a container standard from MPEG, ISO/IEC 23008-12, first published in 2017. Apple made it the iPhone's photo format with iOS 11 and macOS High Sierra, and the iPhone 7 and later capture in it. Apple says HEIF compresses photos better than JPEG.\n\nOne HEIF file can hold more than one picture. It can carry several images or an image sequence, an alpha channel stored as an extra image, more than 8 bits per color channel, and Exif or XMP metadata.\n\nOn an iPhone set to High Efficiency, new photos are HEIC. Copied to a computer over USB, they can arrive as JPEG instead, unless Keep Originals is chosen in the Photos settings. Some Android phones can save HEIF too, from Android 10 on devices that support it.\n\n### Programs that open HEIC files\n\n- **Windows:** Microsoft Photos opens HEIC once both the HEIF Image Extension and the HEVC Video Extensions are installed from the Microsoft Store.\n- **Windows and Linux:** GIMP imports HEIC. ImageMagick reads it too, with the libheif delegate.\n- **Windows and Mac:** Adobe Photoshop opens HEIC on macOS 10.13 or later, and on Windows once both Microsoft codecs are installed.\n- **Mac:** Apple Preview opens HEIF and exports JPEG or PNG, from macOS High Sierra 10.13; Photos, on Mac and mobile, also opens HEIF and exports another format.\n- **Web and mobile:** Safari displays HEIC images from version 17.\n- **Web:** the signed-in OneDrive website previews uploaded HEIF.\n- **Mobile:** on Android, HEIF decoding starts at version 9.\n\n### HEIC and JPG compared\n\n- **Extensions and media types**: .heic or .heif, with image/heic and image/heif; .jpg or .jpeg, with image/jpeg.\n- **Compression**: HEIC pictures are coded with HEVC (H.265). Baseline JPEG cuts the picture into 8x8 tiles, applies a discrete cosine transform to each tile and Huffman-codes the result.\n- **What one file holds**: a HEIF can bundle several images and an alpha channel. A JPG holds one picture.\n- **Color depth**: HEIF allows high bit depths; JPEG stores 8 bits per channel. This page decodes to 8-bit pixels.\n- **Transparency**: a JPG has no alpha channel at all.\n- **Metadata**: a HEIF can carry Exif or XMP. The JPG made here doesn't get the HEIC's Exif data or ICC profile.\n- **Quality setting**: the same quality figure gives different output from one tool to the next. This page writes each JPG at 0.85, where 1 is the top of the scale.\n- **Where it opens**: JPEG displays in each major browser, and cameras and scanners tend to produce it. HEIC needs the support listed above.\n\nThe trade is reach for fidelity. Every major browser displays the JPG, and the page asks for no extension. It is lossy at quality 0.85, and it carries none of the HEIC's Exif tags. A HEIC that holds several images gives only its primary picture.\n\n### Other ways to convert HEIC to JPG\n\n- **Finder (Mac):** Control-click the photo, choose Quick Actions > Convert Image, then choose JPEG and a size.\n- **Preview (Mac):** open the photo, choose File > Export, and change Format to JPEG.\n- **Photos (Mac):** select the photos, choose File > Export > Export Photos, then set Photo Kind to JPEG.\n- **iPhone camera setting:** Settings > Camera > Formats > Most Compatible makes new photos JPEG. Photos you already took stay HEIC.\n\n### Problems with HEIC files\n\n- **Windows says it can't open the file**: add the two Microsoft Store codecs, the HEIF and HEVC extensions, or convert here instead.\n- **A website won't accept it**: convert it to JPG here, or use the [HEIC to PNG converter](/heic-to-png/) to get a PNG.\n- **The page says \"No images in HEIF\"**: the file contains nothing to decode. Copy the photo off the phone again and retry.\n- **HEIC on one computer, JPG on another**: a USB import from an iPhone can produce JPEG instead. Choose Keep Originals in the Photos settings to get the HEIC files.\n- **A whole album to convert**: choose all the photos at once. Each JPG downloads as soon as it's ready.\n- **The JPG shows less detail than the HEIC**: both formats are lossy, so a conversion can cost some detail. Convert from the original HEIC, not from a copy that was already converted.\n- **A HEIC from an Android phone**: some Android phones save HEIF, and this page converts those files the same way.\n"
+    }
+  },
+  "png-to-pdf": {
+    "seo": {
+      "title": "Convert PNG to PDF Online (Free)",
+      "h1": "PNG to PDF Converter",
+      "description": "Convert PNG images to PDF in your browser. Choose several PNG files at once and each downloads as its own PDF. Free, with no sign-up.",
+      "howToHeading": "How to convert PNG to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn PNG images, such as screenshots, into PDF files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to PDF?",
+        "answer": "Pick the PNG above and a PDF with the same picture downloads. Several PNG files give several PDFs, not one."
+      },
+      {
+        "question": "Can I put several PNG files into one PDF?",
+        "answer": "Not on this page, which gives one PDF for each PNG with no ZIP. The Image to PDF converter joins images into a single PDF, one page each."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "The PDF has one page, the same size as the image: 1 pixel is 1 point, with no margin and no A4 or Letter page."
+      },
+      {
+        "question": "What happens to a PNG's transparency?",
+        "answer": "It stays. Nothing paints a background, so see-through pixels stay see-through in the PDF."
+      },
+      {
+        "question": "Is the PNG compressed again in the PDF?",
+        "answer": "No. The picture is embedded losslessly, as PNG data, so the PDF adds no lossy compression and no quality setting applies."
+      },
+      {
+        "question": "Is the PNG's metadata kept in the PDF?",
+        "answer": "No. Since the picture is passed through as raw pixels, EXIF, ICC profiles and XMP are not carried into the PDF."
+      },
+      {
+        "question": "Does my PNG get uploaded anywhere?",
+        "answer": "No. Your browser makes the PDF on your device, so the PNG is not sent to a server."
+      },
+      {
+        "question": "Can someone select the text in my converted screenshot?",
+        "answer": "No. The screenshot sits in the PDF as a picture, so its words can't be selected, searched or edited unless a program runs text recognition on it."
+      },
+      {
+        "question": "What happens to an animated PNG?",
+        "answer": "Only its opening frame reaches the PDF. A PDF page is still, and the converter decodes just the first frame of an APNG."
+      },
+      {
+        "question": "Will my PNG look blurry in the PDF?",
+        "answer": "No blurrier than the PNG itself, since every pixel goes in losslessly and the page matches the image's size."
+      },
+      {
+        "question": "What happens to my original PNG?",
+        "answer": "Nothing. Your PNG is left unchanged and you download a new PDF."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and PDF",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "macOS saves screenshots as PNG",
+          "Displays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to PDF",
+      "points": [
+        "Each PNG you choose becomes its own PDF; the files are not joined.",
+        "To put several images in one PDF, use the Image to PDF converter.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "The picture is embedded losslessly, and transparent pixels stay transparent.",
+        "EXIF data, ICC profiles and XMP aren't copied to the PDF.",
+        "Your original PNG isn't changed.",
+        "Everything happens in your browser, so the PNG isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About PNG files",
+      "markdown": "### What is a PNG file?\n\nPNG was designed in the mid-1990s as a patent-free stand-in for GIF, whose LZW compression had started to draw license fees. The name is short for Portable Network Graphics. In October 1996 PNG was the first format to be a W3C Recommendation. Later came RFC 2083 and, from ISO/IEC, standard 15948:2004. A third edition, a W3C Recommendation since 24 June 2025, adds HDR color through the cICP chunk, allows Exif metadata in an eXIf chunk and covers animated PNG.\n\nPNG compression is always lossless, using DEFLATE, which is LZ77 plus Huffman coding, so every pixel survives. On a Mac, a screenshot you take is stored as a PNG unless you change the setting.\n\nAdobe created PDF out of Camelot, John Warnock's 1991 project, which had turned into PDF by 1992, so a document would look and print identically on any machine. For that, a PDF has to embed its fonts. Pages may combine type, line art and bitmaps, and the file can add links, bookmarks, form fields and annotations. The ISO versions are ISO 32000-1 (PDF 1.7, 2008) and ISO 32000-2 (PDF 2.0, 2017). Here each page holds one picture, your PNG.\n\n### Programs that open PNG files\n\n- **Mac:** Apple Preview opens a PNG and can export it as a PDF, JPEG, TIFF and more.\n- **Windows, Mac and Linux:** Edit PNG files in GIMP. ImageMagick reads PNG.\n- **Web and mobile:** Google Chrome displays PNG.\n- **Web:** Mozilla Firefox displays PNG.\n- **Mobile:** Safari displays PNG.\n\nPNG displays in every major browser, and no known patents requiring royalties cover it.\n\n### PNG and PDF compared\n\n- **File endings**: .png is image/png (image/apng once animated), and .pdf is application/pdf.\n- **Inside the file**: after its fixed signature, a PNG is a run of chunks, with the header in IHDR, the pixel data in IDAT and an IEND chunk to finish. A PDF describes pages, using an imaging model from PostScript that does not depend on the device or its resolution.\n- **Compression**: PNG always uses lossless DEFLATE. A PDF can store a picture with lossless Flate or with JPEG. This converter embeds the PNG losslessly.\n- **Color and transparency**: PNG supports indexed, grayscale and truecolor pictures, from 1 to 16 bits for each sample, and may add an alpha channel. In the PDF, the alpha becomes a soft mask.\n- **Pages**: a PNG has pixels but no page size. The PDF page takes the image's size, one point per pixel.\n- **Color depth**: a 16-bit PNG loses its extra precision, because the conversion goes through 8-bit RGBA.\n- **Animation**: the latest specification covers APNG, and a viewer without animation falls back to the default still image. This converter reads only the first frame.\n- **Metadata**: EXIF, ICC profiles and XMP don't come across, even though PNG's third edition allows an eXIf chunk for Exif data.\n\n### Other ways to convert PNG to PDF\n\n- **Finder (Mac):** select the PNGs, Control-click one of them and pick Quick Actions > Create PDF. Pages keep your selection order.\n- **Preview (Mac):** open the PNG, then use File > Export and set Format to PDF.\n\n### Problems with PNG files\n\n- **A PNG with 16 bits per channel**: 8-bit RGBA is the working format here, so the finer steps between shades are lost in the PDF.\n- **The PDF shows an unexpected background**: nothing paints a background, so transparent pixels stay see-through. Fill the PNG with a color in an editor first if you want a solid page.\n- **An animation turned into one picture**: an animated PNG gives its first frame.\n- **A screenshot shows private details**: the PDF keeps every pixel, so crop out names, addresses and notifications before converting.\n- **\"Image decode failed.\" appears**: the PNG's data could not be decoded by your browser. Save a fresh copy from the app that created it.\n- **A screenshot comes out large on paper**: the page follows the image's size at one point per pixel, so a large screenshot makes a large page. Scale the print to fit your paper.\n- **A page size such as A4 or Letter is wanted**: this page has no page-size setting, and the page always matches the image.\n- **Many PNGs, one PDF wanted**: this page makes one PDF per PNG. [Image to PDF](/image-to-pdf/) combines them, one page each.\n"
+    }
+  },
+  "jpeg-to-pdf": {
+    "seo": {
+      "title": "Convert JPEG to PDF Online (Free)",
+      "h1": "JPEG to PDF Converter",
+      "description": "Convert JPEG photos to PDF in your browser. Choose several JPEG files at once and each downloads as its own PDF. Free, with no sign-up.",
+      "howToHeading": "How to convert JPEG to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn JPEG photos into PDF files you can share or print, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I make a PDF from a JPEG?",
+        "answer": "Pick the JPEG above and the PDF is saved straight away. With several JPEG files you get a separate PDF for each."
+      },
+      {
+        "question": "Can I combine several JPEGs into one PDF here?",
+        "answer": "No. Every JPEG becomes a separate PDF on this page, without a ZIP. The Image to PDF converter builds one PDF from many photos."
+      },
+      {
+        "question": "Will the PDF be A4 or Letter size?",
+        "answer": "Neither. Your photo gets a single page cut to its own dimensions, at 1 point per pixel and with no margin."
+      },
+      {
+        "question": "Does the PDF lower the photo's quality?",
+        "answer": "No. The decoded photo is embedded losslessly as PNG data and no quality setting applies, so the PDF holds the decoded pixels of your JPEG."
+      },
+      {
+        "question": "How is this different from Image to PDF?",
+        "answer": "This page decodes the photo and embeds it losslessly as PNG data. The Image to PDF converter puts a JPEG's own image data into the PDF as it is, and joins many photos into one PDF."
+      },
+      {
+        "question": "Does the PDF keep the JPEG's EXIF data?",
+        "answer": "No. EXIF, ICC profiles and XMP are dropped, because the photo is rebuilt from raw pixels on the way."
+      },
+      {
+        "question": "Is the PDF editable?",
+        "answer": "It holds your photo as an image, not as text, so you can't edit words in it."
+      },
+      {
+        "question": "Do .jpg files work here as well as .jpeg?",
+        "answer": "Yes. They are one format with two spellings of the ending, and the file picker accepts both."
+      },
+      {
+        "question": "Does my JPEG leave my device?",
+        "answer": "No. The PDF is built by your browser, so the file stays on your device."
+      },
+      {
+        "question": "Can I turn iPhone photos into a PDF here?",
+        "answer": "If they are JPEGs, yes. Photos saved as HEIC need the HEIC to PDF converter, or Image to PDF, which reads HEIC too."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and PDF",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression with adjustable quality",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Built into most digital cameras and scanners"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to PDF",
+      "points": [
+        "Each JPEG you choose becomes its own PDF; the files are not joined.",
+        "To put several photos in one PDF, use the Image to PDF converter.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "The photo is embedded losslessly as a PNG, so no quality setting applies.",
+        "EXIF data, ICC profiles and XMP aren't copied to the PDF.",
+        "Your original JPEG isn't changed.",
+        "Everything happens in your browser, so the JPEG isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG files",
+      "markdown": "### What is a JPEG file?\n\nJPEG stands for Joint Photographic Experts Group, whose committee began the work in 1986. Its specification appeared in 1992 as ITU-T T.81 and in 1994 as ISO/IEC 10918-1, and the US patents behind it expired on 27 October 2006. It was built for photographs, and most digital cameras and scanners still write it.\n\nMost files called JPEG are JFIF files: a minimal wrapper, which Eric Hamilton of C-Cube Microsystems wrote down first, so the compressed picture can travel between programs and platforms. JFIF later became ITU-T T.871 and ISO/IEC 10918-5.\n\nA JPEG is already lossy, so turning it into a PDF improves nothing; it only wraps the picture in a document. People do it when they want a document rather than a picture, one that looks and prints the same on any machine.\n\nAdobe's PDF grew from Camelot, a 1991 project of John Warnock's, and existed by 1992. The goal was a document that appears and prints the same on any device. A page can combine text with drawings and bitmap pictures, and a PDF may also include bookmarks, links, annotations and fillable fields. Here, each page holds one picture.\n\n### Programs that open JPEG files\n\n- **Mac:** Apple Preview opens a JPEG and can save it in other formats, among them PDF.\n- **Windows, Mac and Linux:** JPEG files can be edited in GIMP. ImageMagick reads JPG files as well, and it is run from the command line with the magick program.\n- **Web and mobile:** Google Chrome shows JPEG images.\n- **Web:** Mozilla Firefox shows them as well.\n- **Mobile:** Safari opens JPEG too.\n\nEvery major browser displays JPEG.\n\n### JPEG and PDF compared\n\n- **File endings**: image/jpeg files end in .jpg or .jpeg, and JFIF files can also use .jpe, .jfi, .jfif or .jif, while application/pdf files end in .pdf.\n- **Compression**: JPEG discards fine detail in 8x8 blocks, and normal settings reduce a photo to between 1/10 and 1/20 of its uncompressed size. A PDF can carry JPEG data as it is or store pixels with lossless Flate. This converter does the second: it decodes the photo and embeds it as PNG data.\n- **Color**: JPEG stores 8 bits per channel and has no alpha channel, so there is no transparency to carry.\n- **Layout**: a JPEG has pixels but no page. The PDF page is cut to the photo's size at one point per pixel, margin-free.\n- **Layers and progressive loading**: a JPEG cannot store layers, but it can be saved in progressive mode, which shows a coarse picture first. A PDF made here has a single picture and no layers either.\n- **Text**: a PDF can hold real, searchable text, but one made from a photo holds only the picture.\n- **Metadata**: any Exif block, ICC profile or XMP in the JPEG stays behind, and none of them reach the PDF.\n\n### Other ways to convert JPEG to PDF\n\n- **Finder (Mac):** select the JPEGs in the order you want, Control-click the selection, then choose Quick Actions > Create PDF. That order sets the pages.\n- **Preview (Mac):** open the JPEG, then pick File > Export and choose PDF as the Format.\n\n### Problems with JPEG files\n\n- **The photo is sideways**: [Image to PDF](/image-to-pdf/) turns a JPEG's page to match its Exif orientation tag, so try the photo there.\n- **You want the JPEG's own data in the PDF**: this page re-encodes the photo as PNG data. Image to PDF keeps a JPEG's data as it is.\n- **A .jfif file doesn't show up**: the picker's list is .jpg and .jpeg. A .jfif file is a JPEG under another ending, so if it doesn't show up, rename it to .jpg.\n- **The message \"Image decode failed.\"**: your browser could not decode the JPEG data. Get a fresh copy from its source.\n- **Blocky edges or smeared text**: that's JPEG compression in the original, and the PDF shows the same pixels. Start from the sharpest copy you have.\n- **The page prints with wide white borders**: the PDF page matches the photo and has no margin, so any border comes from how it is printed.\n- **A scanned page is tilted or has dark edges**: the PDF holds the photo's pixels as they are. Crop and straighten the photo in an image editor before converting.\n"
+    }
+  },
+  "pdf-to-png": {
+    "seo": {
+      "title": "Convert PDF to PNG Online (Free)",
+      "h1": "PDF to PNG Converter",
+      "description": "Convert every page of a PDF to its own PNG image in your browser, on a white background. Free, with no sign-up.",
+      "howToHeading": "How to convert PDF to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn each page of a PDF into a PNG image in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PDF to PNG?",
+        "answer": "Choose the PDF above. Every page is drawn and downloads as its own PNG when it is ready."
+      },
+      {
+        "question": "How are the PNG files named?",
+        "answer": "Each file takes the PDF's name plus the page number, such as name_page1 and name_page2. There is no ZIP, so the pages download one by one."
+      },
+      {
+        "question": "Does every page of the PDF get converted?",
+        "answer": "Yes. Every page becomes its own PNG and there is no page limit."
+      },
+      {
+        "question": "How sharp are the PNG pages?",
+        "answer": "Pages are rendered at up to twice their size. A very large page is scaled down so it stays within 16,777,216 pixels, about 16.8 megapixels."
+      },
+      {
+        "question": "Will the PNG have a transparent background?",
+        "answer": "No. The background of each page is opaque white."
+      },
+      {
+        "question": "Can I convert just one page?",
+        "answer": "Every page of the PDF converts and downloads as its own file. Keep the PNG of the page you need and delete the rest."
+      },
+      {
+        "question": "Can I still select the text in the PNG?",
+        "answer": "No. A PNG holds a grid of pixels, so each page becomes a picture. Keep the PDF for anything you need to copy or click."
+      },
+      {
+        "question": "Is my PDF uploaded to a server?",
+        "answer": "No. The PDF is drawn page by page in your browser, and the PNG files are made on your device."
+      },
+      {
+        "question": "Can I convert several PDFs at once?",
+        "answer": "Yes: add several PDFs and each is processed in turn, its pages downloading under its own name so the sets stay apart."
+      },
+      {
+        "question": "How do I get larger PNG images than this page makes?",
+        "answer": "This page stops at twice the page size. GIMP's PDF Import dialog lets you set the resolution yourself, so you can ask for more pixels there."
+      }
+    ],
+    "aboutSection": {
+      "title": "PDF and PNG",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "macOS saves screenshots as PNG",
+          "Displays in every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to PNG",
+      "points": [
+        "Every page becomes its own PNG, named after the PDF with the page number.",
+        "There is no page limit and no ZIP; the images download one by one.",
+        "Pages are drawn at up to twice their size, within about 16.8 megapixels a page.",
+        "The background of each page is opaque white.",
+        "The PDF is read in your browser, so it isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About PDF files",
+      "markdown": "### What is a PDF file?\n\nPDF, the Portable Document Format, is Adobe's answer to an old office problem: a document should look and print the same whatever program made it and whatever device opens it. It began as John Warnock's Camelot project in 1991, which had become PDF by 1992. Its imaging model comes from PostScript and doesn't depend on the screen or printer. ISO took up PDF 1.7 in 2008 as ISO 32000-1; PDF 2.0, ISO 32000-2, followed in 2017. Profiles for narrower jobs include PDF/A for archives, PDF/X for print and PDF/UA for accessibility.\n\nPeople use PDF for forms and contracts, print-ready files and e-books.\n\nEach page leaves as a PNG, a format made as a patent-free successor to GIF. A PNG is a W3C Recommendation and ISO/IEC 15948:2004, and it never throws pixels away, so the page you see is the page you save. The newest specification, which the W3C finalized on 24 June 2025, covers animated PNG, though a PDF page is a still, and it adds HDR color through the cICP chunk.\n\n### Programs that open PDF files\n\n- **Linux:** Evince and Okular are the Linux viewers; Okular renders PDF with Poppler.\n- **Windows, Mac and web:** Mozilla Firefox opens PDFs in its own reader, which supports annotations.\n- **Windows:** GIMP imports a PDF's pages as images, asking for a password if the file needs one.\n- **Mac:** Apple Preview displays PDF pages and their thumbnails.\n- **Web:** Adobe Acrobat online takes an uploaded PDF for annotations, with account requirements to check.\n- **Mobile:** Firefox for Android shows PDFs kept on the device, and Adobe Acrobat Reader works with them on Android and iOS.\n\n### PDF and PNG compared\n\n- **Extensions and media types**: .pdf with application/pdf; .png with image/png.\n- **What the file holds**: a PDF contains pages where text, vector graphics, pictures, links, bookmarks, form fields and annotations can sit together. A PNG holds one grid of pixels.\n- **Resolution**: a PDF page doesn't depend on the device or its resolution, while a PNG has a fixed pixel count. Converting therefore fixes the resolution: here, at most twice the page's size.\n- **Fonts**: a PDF looks the same everywhere only when it embeds its fonts. A PNG has no fonts, only the drawn result.\n- **Compression**: pictures inside a PDF use Flate or JPEG. PNG is always lossless DEFLATE, so the drawn page is saved without further loss.\n- **Color**: a PNG may be palette-based, grayscale or truecolor, with a depth of 1 to 16 bits per sample.\n- **Transparency**: PNG supports an alpha channel, but pages from this converter get an opaque white background.\n- **Inside the file**: every PNG begins with a fixed signature; chunks follow: a header chunk (IHDR), the pixel data in IDAT chunks, and a closing IEND chunk.\n- **Pages**: one PDF, many pages; here every page gets its own PNG, called name_page1 for the first, name_page2 for the second and so on, with no page limit.\n\n### Other ways to convert PDF to PNG\n\n- **GIMP (Windows, Mac and Linux):** in the PDF Import dialog, choose the pages and resolution and set Open pages as to Images. Then use File > Export As to save a page as a PNG.\n- **ImageMagick (terminal):** `magick input.pdf output.png` does it. ImageMagick lists PDF as readable only when Ghostscript is installed.\n\n### Problems with PDF files\n\n- **A protected PDF**: GIMP's PDF import asks for the password when a file needs one, so open it there and export the pages.\n- **Fonts look different from the original**: ask the sender for a copy of the PDF with its fonts embedded.\n- **A poster or drawing comes out small**: pages are capped at about 16.8 megapixels, so a very large page gets less than twice its size. GIMP's import resolution gives more pixels.\n- **Wrong fonts or blank pages in a viewer**: Firefox can show some PDFs with the wrong fonts or blank pages. Save the PDF and try another viewer before converting.\n- **See-through areas came out white**: this page paints every page on white. GIMP keeps them see-through unless you tick its white-fill option.\n- **A long PDF floods your downloads**: every page is its own file, so a 100-page PDF gives 100 PNGs. Delete the pages you don't need afterwards.\n"
+    }
+  },
+  "avif-to-jpg": {
+    "seo": {
+      "title": "Convert AVIF to JPG Online (Free)",
+      "h1": "AVIF to JPG Converter",
+      "description": "Convert AVIF images to JPG in your browser. Choose several AVIF files at once and each downloads as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert AVIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn AVIF images into JPG files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to JPG?",
+        "answer": "Pick the AVIF above and the JPG downloads after it is decoded. A batch of AVIF files yields one JPG for each."
+      },
+      {
+        "question": "Can you convert AVIF to JPG without losing detail?",
+        "answer": "Some detail can go. The AVIF is decoded to pixels and saved again as a lossy JPG at quality 0.85."
+      },
+      {
+        "question": "What happens to an AVIF's HDR and wide color?",
+        "answer": "A JPG stores 8 bits per channel, so the extra bits an HDR AVIF can carry, up to 12, don't come along. The JPG is made from decoded pixels only, so the AVIF's ICC profile, EXIF and XMP are dropped too."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "You get a JPG of its first frame. The other frames are left out."
+      },
+      {
+        "question": "Why does the page say it can't open my file?",
+        "answer": "Your browser decodes the AVIF itself. So an older browser without AVIF support can't read it, and the page then says \"This browser can't open … files\". Switch to a current browser such as Chrome or Firefox."
+      },
+      {
+        "question": "Why won't AVIF files open on my Windows PC?",
+        "answer": "To show AVIF, Windows needs two Microsoft Store add-ons, the HEIF Image Extension and the AV1 Video Extension. Without them, open the file in a browser or convert it here."
+      },
+      {
+        "question": "Does a batch of AVIF files come out as one download?",
+        "answer": "No. Each AVIF becomes its own JPG download, and the page makes no ZIP."
+      },
+      {
+        "question": "Can I convert AVIF to JPG on my phone?",
+        "answer": "Yes, in a mobile browser that shows AVIF, such as Chrome on Android or Safari on iPhone. Each JPG downloads like any other file."
+      },
+      {
+        "question": "Is AVIF the same as HEIC?",
+        "answer": "No, though both use the HEIF container. AVIF compresses its pictures with AV1 and HEIC with HEVC, so each needs its own decoder."
+      },
+      {
+        "question": "Why do websites use AVIF?",
+        "answer": "It makes small files for web images and suits HDR and wide-gamut pictures, and it is royalty-free."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and JPG",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "HDR and wide color gamut",
+          "Up to 12 bits per channel"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Displays in every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so it is lossy.",
+        "An animated AVIF gives a JPG of its first frame only.",
+        "EXIF data, ICC profiles and XMP aren't copied to the JPG.",
+        "A JPG can't hold transparency, which AVIF can.",
+        "Your browser must be able to open AVIF files for this page to work."
+      ]
+    },
+    "guide": {
+      "title": "About AVIF files",
+      "markdown": "### What is an AVIF file?\n\nEach AVIF file is an AV1 Image File Format picture: compressed with the AV1 video codec and stored inside a HEIF container, the container family iPhone photos use. It comes from the Alliance for Open Media, a body formed in 2015 to build royalty-free media formats; it released AV1 in 2018. AVIF specification version 1.0.0 bears the date 19 February 2019.\n\nAVIF can be lossy or lossless, keep transparency, hold image sequences and store up to twelve bits per channel, which suits HDR and wide-gamut color. The cost is speed: AVIF images are slow to decode, encoding one can take several seconds, and they don't draw progressively while loading.\n\nIts uses are web pictures that need small files and HDR or wide-gamut images, and nobody owes royalties for it.\n\n### Programs that open AVIF files\n\n- **Windows:** before .avif files open, Windows needs two Microsoft add-ons: HEIF Image Extension alongside AV1 Video Extension.\n- **Windows, Mac and Linux:** GIMP handles AVIF import and export from version 2.10.22, released in October 2020. ImageMagick reads AVIF files from the command line.\n- **Web and mobile:** Google Chrome from version 85 and Safari from 16.1 display AVIF. Chrome's support is for the browser only; it doesn't mean every viewer on your system opens AVIF. This page relies on the browser's support, since your browser does the decoding.\n- **Web:** Firefox from version 93 and Edge from 121 display AVIF.\n- **Mobile:** Android decodes AVIF from version 12.\n\n### AVIF and JPG compared\n\n- **File endings**: .avif is image/avif, while .jpg and .jpeg are image/jpeg.\n- **Compression**: AVIF stores AV1-coded images, lossy or lossless. JPEG cuts the picture into 8x8 blocks, and its baseline mode is always lossy.\n- **Color depth**: AVIF goes up to 12 bits per channel, with HDR and wide gamut. JPEG stores 8 bits per channel.\n- **Transparency**: AVIF has an alpha channel. JPG has none.\n- **Sequences**: AVIF can hold an animation. A JPG holds one frame.\n- **Image size**: AVIF's Baseline profile caps one image item at 8,192 x 4,352 pixels; a bigger picture is split into a grid of items.\n- **Loading**: a progressive JPEG shows a coarse version first and sharpens. AVIF appears only once decoded.\n- **Layers**: a JPEG cannot store layers, and the JPG made here is one flat picture.\n- **Licensing**: AVIF is royalty-free, and JPEG's US patents expired in 2006.\n- **Metadata**: Exif, XMP and an ICC profile can sit in an AVIF, but none of them go into the JPG made here.\n\nJPEG's namesake is the Joint Photographic Experts Group, whose committee started work in 1986; its core standard reached ISO/IEC 10918-1 in 1994. Cameras and scanners widely write it. The JPG gives up AVIF's extra color precision and its transparency, and every major browser displays it. This page decodes the AVIF with your browser and writes the JPG at quality 0.85. Your AVIF stays untouched; the JPG is a new copy you download.\n\n### Other ways to convert AVIF to JPG\n\n- **GIMP (Windows, Mac and Linux):** version 2.10.22 or later opens the AVIF; export it as a JPEG with File > Export As.\n- **ImageMagick (terminal):** run `magick input.avif output.jpg`.\n- **avifdec from libavif (command line):** run `avifdec input.avif output.jpg`. The `-q` option sets the JPEG quality, 90 by default. With an image sequence, avifdec stops at the first frame unless `--index` asks for a different frame or for every frame.\n\n### Problems with AVIF files\n\n- **\"This browser can't open … files\"**: your browser has no AVIF decoder. Update it, or switch to Chrome 85+, Firefox 93+, Safari 16.1+ or Edge 121+.\n- **Windows can't show it**: add both Microsoft extensions, or open the file in a browser.\n- **A big image takes a while**: AVIF images are slow to decode, so give a large file a moment.\n- **GIMP won't open it**: versions older than 2.10.22 have no AVIF importer.\n- **See-through areas are lost**: JPG has no alpha channel. The [AVIF to PNG converter](/avif-to-png/) keeps transparency.\n- **An animation gives one picture**: a JPG holds a single frame, so only the first is kept.\n- **Changed the ending by hand**: an AVIF renamed to .jpg still holds AV1 data inside. Convert the file instead.\n- **An upload form doesn't accept AVIF**: convert the file here and upload the JPG.\n"
+    }
+  },
+  "jpg-to-png": {
+    "seo": {
+      "title": "Convert JPG to PNG Online (Free)",
+      "h1": "JPG to PNG Converter",
+      "description": "Convert JPG to PNG in your browser: the photo is decoded and saved as a lossless PNG, one file per image. Free, with no sign-up.",
+      "howToHeading": "How to convert JPG to PNG"
+    },
+    "tool": {
+      "subtitle": "Save a JPG photo as a lossless PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the PNG look better than the JPG?",
+        "answer": "No. The JPG's compression loss is already in the pixels, and PNG only stores them without losing more. The PNG matches the JPG."
+      },
+      {
+        "question": "Does the PNG get a transparent background?",
+        "answer": "No. A JPG has no alpha channel, so there is nothing transparent to carry over. PNG can hold transparency, but this conversion doesn't add any."
+      },
+      {
+        "question": "Is my EXIF data kept?",
+        "answer": "No. The JPG is decoded to raw pixels first, and only the pixels reach the PNG, so EXIF, ICC and XMP data stay behind. Keep the original JPG if you need that information."
+      },
+      {
+        "question": "Can I change several JPG files to PNG together?",
+        "answer": "Yes. Pick as many as you like. They convert one after another, and each PNG downloads as its own file, not in a ZIP."
+      },
+      {
+        "question": "Is my JPG uploaded to a server?",
+        "answer": "No. The JPG is decoded and the PNG is written in your browser, on your device."
+      },
+      {
+        "question": "When does converting JPG to PNG make sense?",
+        "answer": "When you'll edit the picture and save it many times, since each JPEG save loses a little more; when a site or app asks for PNG; or when you plan to add transparency in an editor, since a PNG can hold it and a JPG can't."
+      },
+      {
+        "question": "Can I turn the PNG back into a JPG later?",
+        "answer": "Yes, with the PNG to JPG converter, but that writes a new lossy JPEG, so some detail goes again. Keep the original JPG if you might need it."
+      },
+      {
+        "question": "Which suits screenshots, JPG or PNG?",
+        "answer": "PNG. Its lossless compression keeps every pixel, JPEG was built for photographs, and macOS saves screenshots as PNG files."
+      },
+      {
+        "question": "Can I convert JPG to PNG on an iPhone or Android phone?",
+        "answer": "Yes. Use the phone's browser to open this page, pick the JPG, and the PNG downloads like any other file."
+      },
+      {
+        "question": "How do I convert JPG to PNG on Windows without installing anything?",
+        "answer": "Load this page in your browser and choose the JPG; nothing needs installing. Paint on Windows can also save a copy in PNG format."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PNG",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Built into most digital cameras and scanners",
+          "Displays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "1 to 16 bits per sample",
+          "Displays in every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to PNG",
+      "points": [
+        "The PNG is lossless, but it can't restore detail the JPG already lost.",
+        "A JPG has no transparency, so the PNG has none either.",
+        "EXIF, ICC profile and XMP data are not carried over.",
+        "Each image downloads as its own PNG file."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nA JPG is a JPEG image, the lossy photo format standardized by the Joint Photographic Experts Group in the early 1990s. A .jpg file and a .jpeg file hold the same format, and JPEG has no layers.\n\nJPEG splits a picture into 8x8 pixel blocks, converts each block into frequencies with a discrete cosine transform, and then applies Huffman coding; the baseline mode is lossy. A quality number, usually 0 to 100, decides how much goes. GIMP starts at 85, and the same number gives different results in different programs. Because JPEG is lossy, saving an edited JPEG compresses it again. A progressive JPEG is stored in passes: a browser paints a rough version first and sharpens it as the remaining data comes in.\n\nDigital cameras and scanners mostly write JPEG, and all the major browsers display it. A PNG is lossless, so saving the picture as PNG again and again adds no further loss.\n\nPNG, the format you are saving to, began life as a GIF alternative free of patents. October 1996 brought W3C Recommendation status, a first for any format, and ISO followed with 15948 in 2004. Its compression is always lossless DEFLATE, a mix of LZ77 and Huffman coding, so it never discards pixels. The group behind JPEG, formed to write the photo format, began its work in 1986, and its patents ran out in 2006.\n\n### Programs that open JPG files\n\n- **Windows:** Paint lists PNG among the formats it saves, so it can write a copy of a JPG as PNG.\n- **Windows, Mac and Linux:** Open a JPG in GIMP to edit it. ImageMagick reads JPG.\n- **Mac:** Apple Preview opens a JPG and lists PNG as one of its export formats.\n- **Web and mobile:** Google Chrome shows JPG images.\n- **Web:** Mozilla Firefox shows them too.\n- **Mobile:** Safari opens JPG. An iPhone camera saves JPEG instead of HEIC when Settings > Camera > Formats is set to Most Compatible.\n\n### JPG and PNG compared\n\n- **File endings**: image/jpeg uses .jpg or .jpeg, and image/png uses .png.\n- **Compression**: JPEG is lossy, with a discrete cosine transform and Huffman coding. PNG is lossless DEFLATE: every pixel comes back exactly as stored.\n- **Color depth**: JPEG stores 8 bits per channel. PNG offers 1 to 16 bits for each sample, as grayscale, indexed or truecolor.\n- **Transparency**: an alpha channel is optional in PNG and absent from JPEG.\n- **Animation**: PNG can animate as APNG. JPEG is always a still.\n- **Metadata**: the third edition of PNG lets Exif travel in an eXIf chunk, but this converter carries no metadata across.\n- **Typical use**: photographs suit JPEG, which was designed for them, and a Mac saves its screenshots as PNG by default.\n\nConverting changes the container, not the picture. The PNG stores the pixels the JPG decodes to: no lost detail returns, no blockiness goes away, and nothing becomes transparent.\n\n### Other ways to convert JPG to PNG\n\n- **Preview (Mac):** open the JPG, pick File > Export, then select PNG as the Format.\n- **Finder (Mac):** Control-click the file, choose Quick Actions > Convert Image, then pick PNG and a size; on some macOS versions the command sits under Quick Actions > More.\n- **GIMP (Windows, Mac and Linux):** open the JPG, then use File > Export As to write a PNG.\n- **Paint (Windows):** open the JPG and save a copy with PNG as the file type.\n\n### Problems with JPG files\n\n- **Blocky patches or halos around text**: those are compression artifacts, and a PNG keeps them. Start from the original photo or a higher-quality export.\n- **You need a transparent background**: converting won't remove the background. Erase it in an editor, then save as PNG.\n- **Quality drops after repeated edits**: each JPEG save compresses again. Convert once to PNG, edit the PNG, and export a JPG only at the end.\n- **A JPG that used to be transparent**: transparent pixels can't survive JPEG export, so the PNG starts from the opaque picture.\n- **Camera details have gone**: Exif data isn't carried into the PNG, so keep the original if you need it.\n- **An \"Image decode failed.\" message**: the browser could not make sense of the JPG's data. Download the file again, and keep the original in case it is the only good copy.\n"
+    }
+  },
+  "jpeg-to-jpg": {
+    "seo": {
+      "title": "Convert JPEG to JPG Online (Free)",
+      "h1": "JPEG to JPG Converter",
+      "description": "Convert JPEG to JPG in your browser: each image is decoded and saved again as a .jpg file. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert JPEG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a .jpeg image into a .jpg file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is there a difference between JPEG and JPG?",
+        "answer": "No. They are the same format, and the two extensions are interchangeable. Only the name of the file differs."
+      },
+      {
+        "question": "Is the image re-compressed when I convert it?",
+        "answer": "Yes. The converter doesn't just rename the file. It decodes the image and writes a new JPG at quality 0.85, so a little more detail can be lost."
+      },
+      {
+        "question": "Are my EXIF and color profile kept?",
+        "answer": "No. The new JPG is built from decoded pixels alone, so the EXIF block, the ICC profile and any XMP are not in it."
+      },
+      {
+        "question": "Can I convert many JPEG files in one go?",
+        "answer": "Yes. Choose several files and each runs in turn; every JPG downloads on its own and nothing is zipped."
+      },
+      {
+        "question": "Does the new file keep my file's name?",
+        "answer": "Yes. Your file's name carries over and the new ending is .jpg, so photo.jpeg comes back as photo.jpg."
+      },
+      {
+        "question": "Can I just rename a .jpeg file to .jpg?",
+        "answer": "Yes. The data is identical either way, so renaming changes only the name and leaves the content as it is. Convert here when you want a freshly encoded file instead."
+      },
+      {
+        "question": "Does the new JPG have the same quality as my JPEG?",
+        "answer": "Not exactly. The image is decoded and written again at quality 0.85, so it is a new encode of the picture. Your original file stays as it is."
+      },
+      {
+        "question": "What is a .jfif file, and is it a JPEG?",
+        "answer": "Yes, it is. JFIF is the wrapper most JPEG files use, and .jfif is one of its endings. If the picker doesn't list a .jfif file, rename it to .jpeg and choose it again."
+      },
+      {
+        "question": "Can converting repair a JPEG that won't open?",
+        "answer": "No. Converting writes a freshly encoded file from whatever your browser can decode. If it can't read the data, the page shows the message \"Image decode failed.\"; get a fresh copy from its source."
+      },
+      {
+        "question": "Does the page accept .jpg files as well as .jpeg?",
+        "answer": "Yes. Both endings name the same format, so a .jpg file is decoded just like a .jpeg one, and the download always ends in .jpg."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and JPG",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The same lossy photo format as JPG, written with the longer .jpeg extension. It was defined by the Joint Photographic Experts Group (ISO/IEC 10918-1).",
+        "details": [
+          "Same format as JPG",
+          "Lossy compression",
+          "No alpha transparency",
+          "Displays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "Built into most digital cameras and scanners",
+          "Displays in every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to JPG",
+      "points": [
+        "JPEG and JPG are one format; only the extension differs.",
+        "The file is decoded and saved again at quality 0.85, not just renamed, so a little detail can be lost.",
+        "EXIF, ICC profile and XMP data are dropped.",
+        "Your original file isn't changed; you download a new copy."
+      ]
+    },
+    "guide": {
+      "title": "JPEG and JPG: one format, two endings",
+      "markdown": "### What is a JPEG file?\n\nJPEG is one image format with several file endings. The name comes from the Joint Photographic Experts Group, and ITU-T T.81 was the 1992 form of its core standard, ISO/IEC 10918-1 the 1994 one. Cameras and scanners usually write it, and all the major browsers display it.\n\nThe two endings are not two formats. Both extensions name one format, so a .jpg and a .jpeg file hold the same kind of data. JFIF, the wrapper most JPEG files use, allows .jpg and .jpeg plus .jpe, .jfi, .jfif and .jif, and every one is served as image/jpeg.\n\nThe first JFIF came from Eric Hamilton at C-Cube Microsystems; version 1.02 is dated 1992. JFIF became a standard twice over: in May 2011 as ITU-T T.871, and as ISO/IEC 10918-5. It can embed a small thumbnail of the picture. Such a file opens with the start-of-image marker, immediately followed by an APP0 segment that carries the JFIF label.\n\nWork on the standard began in 1986, and its United States patents ran out on 27 October 2006. Ordinary quality settings leave an image at one-tenth to one-twentieth of its uncompressed size. JPEG stores 8 bits per color channel, cannot hold transparency, and offers a progressive mode in which a rough picture shows first and clarifies as the rest downloads.\n\n### Programs that open JPEG files\n\n- **Windows:** the Photos app is listed among the programs that open JPEG.\n- **Mac:** Apple's Preview viewer can open a JPEG and export a fresh one.\n- **Windows, Mac and Linux:** GIMP opens JPEG for editing and can export a new one. ImageMagick reads JPG, and its `-list format` output names each format your installation reads.\n- **Web and mobile:** Google Chrome opens JPEG files.\n- **Web:** Mozilla Firefox opens them too.\n- **Mobile:** Safari handles JPEG as well.\n\n### JPEG and JPG compared\n\n- **Format**: identical. The same compression, the same data and the same media type, image/jpeg.\n- **Extension**: a .jpeg ending has four letters and .jpg has three, and the data inside is the same.\n- **Compression**: lossy, in 8x8 blocks with a discrete cosine transform and Huffman coding, with an optional progressive mode that loads a coarse picture first.\n- **Color**: 8 bits per channel; there is no alpha channel and there are no layers.\n- **Quality setting**: quality is usually set from 0 to 100, but the numbers aren't comparable between programs: GIMP, for one, starts at 85. This page writes every file at 0.85.\n- **Metadata**: renaming leaves the file untouched, so whatever it holds stays, while converting here drops Exif, the ICC profile and XMP.\n- **What this page changes**: it decodes the image and encodes it again at quality 0.85. You get a new file, not a renamed one, and your original stays as it is.\n\n### Other ways to turn a .jpeg into a .jpg\n\n- **Rename the file:** the two endings are one format, so renaming it in your file manager is enough, and it changes nothing inside.\n- **Preview (Mac):** open the file, use File > Export and set Format to JPEG. Re-exporting compresses the image again.\n- **GIMP (Windows, Mac and Linux):** open the file and choose File > Export As to save a new JPEG. Each JPEG save compresses the image once more.\n- **ImageMagick (command line):** `magick input.jpeg output.jpg` writes a new .jpg. It encodes the image again, so rename the file instead when you need an exact copy.\n\n### Problems with JPEG files\n\n- **An upload form wants .jpg**: if a form insists on .jpg, rename the file or convert it here.\n- **A .jfif file**: .jfif is one of the JFIF endings, and the data is ordinary JPEG. If the picker doesn't list it, rename it to .jpeg to pick it.\n- **The Exif data disappeared**: converting drops Exif. Rename instead when you need to keep it.\n- **A renamed file is still rejected**: if a form still refuses the file after a rename, convert it here to write a fresh one, remembering that it is encoded again.\n- **The picture looks slightly different**: the new encode at quality 0.85 can lose fine detail, so compare the two at full size before you delete the original file.\n- **Quality slips after repeated saves**: every encode loses a little, so don't convert the same file again and again.\n"
+    }
+  },
+  "mp4-to-gif": {
+    "seo": {
+      "title": "Convert MP4 to GIF Online (Free)",
+      "h1": "MP4 to GIF Converter",
+      "description": "Convert MP4 to GIF in your browser: a looping animation at 15 fps, up to 480 px on its longer side, with its own color palette. Free, with no sign-up.",
+      "howToHeading": "How to convert MP4 to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 video into a looping GIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What size and frame rate is the GIF?",
+        "answer": "The GIF runs at 15 frames per second, and its longer side is at most 480 pixels. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape stays the same."
+      },
+      {
+        "question": "Does the GIF loop and have sound?",
+        "answer": "It loops without end. GIF is an image format that holds simple animation, so the video's soundtrack is not part of it."
+      },
+      {
+        "question": "Why do the colors look different in the GIF?",
+        "answer": "A GIF frame can use only 256 colors. The converter builds one palette from your video first and maps every frame to it."
+      },
+      {
+        "question": "Can I make a GIF from a long MP4?",
+        "answer": "Yes. There is no length limit of its own, but FFmpeg runs on your device, so a long video takes as long as that device needs."
+      },
+      {
+        "question": "Can I make a larger or smoother GIF than this page does?",
+        "answer": "Not here: the size and frame rate are fixed at 480 px and 15 fps. FFmpeg on your own computer takes the settings you give it."
+      },
+      {
+        "question": "Is it possible to convert a batch of MP4 videos?",
+        "answer": "Selecting several works: each video becomes a GIF of its own, and nothing is zipped."
+      },
+      {
+        "question": "Can I convert only part of the video?",
+        "answer": "No. The whole video becomes the GIF, and there's no trim step. Cut the clip down to the moment you want first, then convert."
+      },
+      {
+        "question": "What happens to a vertical phone video?",
+        "answer": "It keeps its shape. A 1080 x 1920 portrait clip comes out 270 x 480 pixels, since the longer side is held to 480."
+      },
+      {
+        "question": "What happens to interlaced video?",
+        "answer": "It is deinterlaced first with FFmpeg's yadif filter, which is set to act only on frames marked as interlaced, so video that isn't interlaced is left alone."
+      },
+      {
+        "question": "Can I use a .mov file here?",
+        "answer": "This page takes .mp4 files. For a .mov file, use the MOV to GIF converter."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and GIF",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264 video with AAC audio is the common pairing",
+          "Video files use .mp4 or .m4v",
+          "Every major browser plays MP4"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to GIF",
+      "points": [
+        "The GIF is 15 fps and at most 480 px on its longer side.",
+        "A palette is generated from the video, because GIF allows 256 colors per frame.",
+        "The sound is not kept, and the GIF loops.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nMP4 follows MPEG-4 Part 14, numbered ISO/IEC 14496-14 and first issued in 2003. An MP4 is a container: it wraps video, audio and other tracks instead of setting how they are compressed. Its foundation, the ISO Base Media File Format, descends from Apple's QuickTime; everything is stored in nested boxes, called atoms in QuickTime.\n\nThe usual contents are H.264 video with AAC audio, though AV1, VP9 and HEVC video, and MP3 or Opus audio, fit too. The extensions are .mp4 and .m4v for video, with .m4a common for sound alone. Every major browser plays MP4. Unisys started charging license fees for GIF's LZW coding in 1994. The American patent lapsed in 2003; those in Europe and Japan followed a year later.\n\n### Programs that open MP4 files\n\n- **Web:** Firefox plays supported media directly, but AAC and H.264 availability can follow system codecs. Chrome plays the MP4 combinations it supports, though the codec inside still decides.\n- **Windows, Mac and Linux:** ffplay plays MP4. mpv, a desktop player, lets you pick the audio and subtitle tracks to play.\n- **Windows and Mac:** when a suitable decoder is installed, Adobe Premiere accepts MP4 files.\n- **Mobile:** VLC for Android is a free player, and VLC for iOS handles most video formats. Android can play HEVC in MP4 from version 5.0.\n\n### MP4 and GIF compared\n\n- **Extensions and media types**: .mp4, or .m4v for some video files, with video/mp4; .gif with image/gif.\n- **What's inside**: an MP4 holds video and audio tracks. A GIF is a series of palette images, each followed by a pause measured in hundredths of a second.\n- **Color**: no frame in a GIF can use more than 256 colors.\n- **Compression**: an MP4 keeps whatever its codec produced, such as H.264. A GIF squeezes every image separately and losslessly with LZW.\n- **Transparency**: a GIF can mark a single palette color as fully clear; there is no partial transparency.\n- **Sound**: an MP4 can carry audio. A GIF cannot.\n- **History**: CompuServe released GIF in 1987. With GIF89a in July 1990 came transparency, timing between frames and application data.\n\nWhat this converter does: it deinterlaces interlaced video, samples 15 frames per second, and scales the picture to fit within 480 pixels on its longer side, keeping both sides even. A single palette is then built from the clip, every frame is mapped to it, and the GIF is set to loop forever. The audio is left behind.\n\n### Other ways to convert MP4 to GIF\n\n- **Adobe Photoshop:** use File > Import > Video Frames to Layers, make a frame animation from the layers in Window > Timeline, then export through File > Export > Save for Web (Legacy) as a GIF set to loop Forever. A long video may not import in full.\n- **Microsoft Clipchamp:** put the video in a project, press Export at the top right and select GIF. The option is offered only for videos of 15 seconds or less.\n- **FFmpeg (command line):** run `ffmpeg -i input.mp4 output.gif`. A GIF frame delay can't be under a hundredth of a second, and the output loops forever unless `-loop` says otherwise. This page runs FFmpeg too, with a palette built from your clip.\n\n### Problems with MP4 files\n\n- **It won't play**: an MP4 may hold video or sound your player has no decoder for. Try another player, such as mpv.\n- **\"FFmpeg failed with exit code N\" appears**: the conversion didn't finish. Try another copy of the video.\n- **A cut-short video gives a short GIF**: a damaged or truncated video can still convert, and the GIF then holds what FFmpeg managed to read.\n- **The colors look coarse**: no frame can use more than 256 colors, so the palette built from your video can't keep every shade.\n- **The GIF holds the whole video**: there is no trim step, so cut the clip to the moment you want before converting.\n- **A long video takes ages**: everything runs on your device with no time limit, so a long clip needs more patience.\n- **The motion looks choppy**: the GIF samples 15 frames per second, so fast action moves in visible steps.\n- **The GIF is smaller than the video**: scaling stops at 480 pixels on the longer side, and a smaller video isn't scaled up.\n- **Your video is a .mov**: use the [MOV to GIF converter](/mov-to-gif/).\n"
+    }
+  }
+}
