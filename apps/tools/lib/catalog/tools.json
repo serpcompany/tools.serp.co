@@ -8143,7 +8143,7 @@
         "subtitle": "Turn AVCHD camcorder clips into MP4 files that play on phones and computers.",
         "from": "avchd",
         "to": "mp4",
-        "accept": ".avchd"
+        "accept": ".avchd,.m2ts"
       },
       "seo": {
         "title": "Convert AVCHD to MP4 Online (Free)",
@@ -76645,12 +76645,12 @@
           "answer": "Both codecs are lossless, so the audio samples carry from one to the other. The conversion decodes the FLAC and encodes the samples as ALAC. In a test, the decoded audio of a FLAC and of its ALAC copy matched exactly. It cannot improve a recording that was lossy before it became FLAC."
         },
         {
-          "question": "Why is my download named .alac and not .m4a?",
-          "answer": "The page names the file .alac, but FFmpeg writes it with its ipod muxer, an MPEG-4 audio container like the one .m4a files use. If your music app does not recognize .alac, rename a copy to .m4a."
+          "question": "Why is my download named .m4a and not .alac?",
+          "answer": "ALAC names the Apple Lossless codec, not a file type. This page writes it with FFmpeg's ipod muxer into an MPEG-4 audio container, the one .m4a files use, so the download is named .m4a."
         },
         {
           "question": "Will the ALAC file play in iTunes and Apple Music?",
-          "answer": "iTunes offers Apple Lossless encoding and playback, and the lossless listening in Apple Music relies on the same codec. This page does not test playback in those apps. If one does not pick up the .alac name, rename a copy to .m4a."
+          "answer": "iTunes offers Apple Lossless encoding and playback, and the lossless listening in Apple Music relies on the same codec. This page does not test playback in those apps."
         },
         {
           "question": "Will ALAC be smaller than FLAC?",
@@ -76705,14 +76705,14 @@
         "title": "Before converting FLAC to ALAC",
         "points": [
           "FLAC and ALAC are both lossless, so this changes the codec and container, not the sound.",
-          "The download is named .alac, but FFmpeg writes it as an MPEG-4 audio file; rename it to .m4a if your music app expects that.",
+          "The download is named .m4a: FFmpeg writes the Apple Lossless audio into an MPEG-4 audio file, the container .m4a files use.",
           "The command drops video streams, which is where FFmpeg keeps a FLAC's embedded cover art, so artwork is not carried over.",
           "The page has no sample-rate, bit-depth or channel settings."
         ]
       },
       "guide": {
         "title": "Understanding FLAC to ALAC",
-        "markdown": "### What is a FLAC file?\n\nNo sample information is thrown away when FLAC compresses integer PCM audio. The specification and the reference implementation are both open, and the IETF published the format as RFC 9639 in December 2024. Streams can have anywhere from one to eight channels at depths of four to 32 bits. A native FLAC stream uses the audio/flac media type, and the metadata blocks can hold seek points, cover pictures and Vorbis comments.\n\nThose metadata blocks are why a FLAC can carry artwork, and why the cover picture needs separate handling during conversion. Because FLAC is lossless, decoding gives back the samples that went in, which is the reason this conversion can keep the sound identical. A damaged frame can still fail its checksum, since lossless encoding does not prevent storage corruption.\n\n### Programs that open FLAC files\n\n- **Windows, Mac and Linux:** Audacity reads FLAC without an FFmpeg add-on. VLC accepts FLAC as input, and FFplay plays it using the decoders built into your FFmpeg.\n- **Web:** Mozilla Firefox decodes FLAC audio, and Google Chrome's FLAC decoding is listed in Mozilla's browser support comparison.\n- **Mobile:** VLC for Android brings over the desktop player's decoders, while VLC for iOS has its own player for local media.\n\n### FLAC and ALAC compared\n\nALAC is Apple's lossless audio codec. It is a codec, not a standalone file format, and it usually sits inside an MPEG-4 container. Apple's reference implementation supports 16-, 20-, 24- and 32-bit samples, one to eight channels and integer sample rates through 384,000 Hz, and Apple distributes source for both encoding and decoding. Lossless listening in Apple Music is built on Apple Lossless audio technology, and the lossless downloads need more device storage than compressed ones. Nondefault ALAC packet sizes are not guaranteed to work on every supporting hardware device, and some Mac playback setups need an external DAC for sample rates above 48 kHz, so test one converted track on the device that matters. Apple's alacconvert utility implements fewer channel and file-layout combinations than the codec itself, so it is no test of whether your file is valid.\n\nThis page runs FFmpeg compiled to WebAssembly in your browser. The `-acodec alac` setting selects the Apple Lossless encoder, and `-f ipod` writes an MPEG-4 audio container. The download is named .alac; the container is MPEG-4 audio, the family .m4a files belong to, so a copy renamed to .m4a carries the usual name for it. `-vn` leaves out video streams, and FFmpeg holds a FLAC's embedded cover picture as one, so artwork is not carried over.\n\nNo sample rate, bit depth or channel option is passed, so those follow your source. No `-map` is set either, so FFmpeg's defaults choose the streams, and the title and artist tags are normally carried across. Because both formats are lossless, the sound is the same, and the things that change are the codec, the container and the cover picture.\n\n### Other ways to convert FLAC to ALAC\n\n- **FFmpeg:** `ffmpeg -i album.flac -vn -c:a alac album.m4a` selects Apple Lossless and uses the usual MPEG-4 audio name, which avoids the .alac rename. FFmpeg's codec list shows encoding and decoding support for both FLAC and ALAC. Keep `-vn`: in a test, a FLAC with an embedded cover picture failed to convert without it, because FFmpeg treated the picture as a video stream the MPEG-4 audio file could not hold.\n\n### Problems with FLAC files\n\n**The file is damaged.** A corrupt frame can fail its checksum, and lossless encoding does not protect against storage corruption. Copy the file again or re-rip it before you decide ALAC cannot hold it.\n\n**The source was lossy.** A lossy file turned into FLAC has already lost its detail, and ALAC cannot bring it back. If a FLAC came from an MP3, keep expectations to that level and find the original if you can.\n\n**It does not play on Android.** Android's documented native FLAC support covers less than the format does: mono or stereo, with 16-bit samples recommended. A multichannel or high-depth file may need a different player.\n\n**The cover art is gone.** The conversion leaves out the embedded picture. Put the artwork back in your music app or tag editor, and keep the FLAC files until you have checked the migrated library.\n"
+        "markdown": "### What is a FLAC file?\n\nNo sample information is thrown away when FLAC compresses integer PCM audio. The specification and the reference implementation are both open, and the IETF published the format as RFC 9639 in December 2024. Streams can have anywhere from one to eight channels at depths of four to 32 bits. A native FLAC stream uses the audio/flac media type, and the metadata blocks can hold seek points, cover pictures and Vorbis comments.\n\nThose metadata blocks are why a FLAC can carry artwork, and why the cover picture needs separate handling during conversion. Because FLAC is lossless, decoding gives back the samples that went in, which is the reason this conversion can keep the sound identical. A damaged frame can still fail its checksum, since lossless encoding does not prevent storage corruption.\n\n### Programs that open FLAC files\n\n- **Windows, Mac and Linux:** Audacity reads FLAC without an FFmpeg add-on. VLC accepts FLAC as input, and FFplay plays it using the decoders built into your FFmpeg.\n- **Web:** Mozilla Firefox decodes FLAC audio, and Google Chrome's FLAC decoding is listed in Mozilla's browser support comparison.\n- **Mobile:** VLC for Android brings over the desktop player's decoders, while VLC for iOS has its own player for local media.\n\n### FLAC and ALAC compared\n\nALAC is Apple's lossless audio codec. It is a codec, not a standalone file format, and it usually sits inside an MPEG-4 container. Apple's reference implementation supports 16-, 20-, 24- and 32-bit samples, one to eight channels and integer sample rates through 384,000 Hz, and Apple distributes source for both encoding and decoding. Lossless listening in Apple Music is built on Apple Lossless audio technology, and the lossless downloads need more device storage than compressed ones. Nondefault ALAC packet sizes are not guaranteed to work on every supporting hardware device, and some Mac playback setups need an external DAC for sample rates above 48 kHz, so test one converted track on the device that matters. Apple's alacconvert utility implements fewer channel and file-layout combinations than the codec itself, so it is no test of whether your file is valid.\n\nThis page runs FFmpeg compiled to WebAssembly in your browser. The `-acodec alac` setting selects the Apple Lossless encoder, and `-f ipod` writes an MPEG-4 audio container. The container is MPEG-4 audio, the family .m4a files belong to, so the download is named .m4a. `-vn` leaves out video streams, and FFmpeg holds a FLAC's embedded cover picture as one, so artwork is not carried over.\n\nNo sample rate, bit depth or channel option is passed, so those follow your source. No `-map` is set either, so FFmpeg's defaults choose the streams, and the title and artist tags are normally carried across. Because both formats are lossless, the sound is the same, and the things that change are the codec, the container and the cover picture.\n\n### Other ways to convert FLAC to ALAC\n\n- **FFmpeg:** `ffmpeg -i album.flac -vn -c:a alac album.m4a` selects Apple Lossless and uses the usual MPEG-4 audio name, as this page does. FFmpeg's codec list shows encoding and decoding support for both FLAC and ALAC. Keep `-vn`: in a test, a FLAC with an embedded cover picture failed to convert without it, because FFmpeg treated the picture as a video stream the MPEG-4 audio file could not hold.\n\n### Problems with FLAC files\n\n**The file is damaged.** A corrupt frame can fail its checksum, and lossless encoding does not protect against storage corruption. Copy the file again or re-rip it before you decide ALAC cannot hold it.\n\n**The source was lossy.** A lossy file turned into FLAC has already lost its detail, and ALAC cannot bring it back. If a FLAC came from an MP3, keep expectations to that level and find the original if you can.\n\n**It does not play on Android.** Android's documented native FLAC support covers less than the format does: mono or stereo, with 16-bit samples recommended. A multichannel or high-depth file may need a different player.\n\n**The cover art is gone.** The conversion leaves out the embedded picture. Put the artwork back in your music app or tag editor, and keep the FLAC files until you have checked the migrated library.\n"
       }
     }
   },
@@ -99155,7 +99155,7 @@
         "subtitle": "Turn a Motion JPEG recording into an H.264 MP4 in your browser.",
         "from": "mjpeg",
         "to": "mp4",
-        "accept": ".mjpeg"
+        "accept": ".mjpeg,.avi"
       },
       "seo": {
         "title": "Convert MJPEG to MP4 Online (Free)",
@@ -102086,7 +102086,7 @@
       "faqs": [
         {
           "question": "How do I convert MOV to MJPEG?",
-          "answer": "Choose the .mov above and let the encode finish. With several files, each is handled in turn and returns its own download with the .mjpeg ending."
+          "answer": "Choose the .mov above and let the encode finish. With several files, each is handled in turn and returns its own download with the .avi ending, since the wrapper is AVI."
         },
         {
           "question": "Is the download a bare MJPEG stream?",
@@ -107725,7 +107725,7 @@
         },
         {
           "question": "What is inside the MJPEG download?",
-          "answer": "The file is named after your MP4 with the .mjpeg ending. Inside, every video frame is its own JPEG and the sound is 16-bit PCM, packed in an AVI wrapper."
+          "answer": "The file is named after your MP4 with the .avi ending, because its wrapper is AVI. Inside, every video frame is its own JPEG and the sound is 16-bit PCM."
         },
         {
           "question": "Why can the MJPEG file be bigger than my MP4?",
@@ -112048,7 +112048,7 @@
         "subtitle": "Re-encode MPEG-2 video as H.264 with AAC sound in an MP4.",
         "from": "mpeg2",
         "to": "mp4",
-        "accept": ".mpeg2"
+        "accept": ".mpeg2,.mpg"
       },
       "seo": {
         "title": "Convert MPEG2 to MP4 Online (Free)",

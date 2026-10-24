@@ -4,6 +4,7 @@ import { promises as fs, existsSync } from "node:fs";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import ffmpegPath from "ffmpeg-static";
+import { outputExtension } from "@/lib/convert/output-name";
 import {
   buildServerActionRateLimitResponse,
   createServerActionCooldownCookieCodec,
@@ -60,13 +61,12 @@ function buildSuccessResponse(args: {
   return new Response(body, { headers });
 }
 
+// FFmpeg picks the muxer from this extension: the download's (output-name.ts),
+// except where this route writes another container.
 function resolveOutputExtension(to: string) {
-  if (to === "hevc") return "mp4";
-  if (to === "divx" || to === "mjpeg") return "avi";
-  if (to === "mpeg2") return "mpg";
-  if (to === "av1") return "mp4";
-  if (to === "avchd") return "m2ts";
-  return to;
+  if (to === "hevc" || to === "av1") return "mp4";
+  if (to === "divx") return "avi";
+  return outputExtension(to);
 }
 
 function buildFfmpegArgs(from: string, to: string, inputPath: string, outputPath: string) {

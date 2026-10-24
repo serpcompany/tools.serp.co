@@ -1,6 +1,7 @@
 import type { FAQ, InfoArticleSectionData, HowToSectionData, Tool } from "@/types";
 
 import { howToHeading, onConverterPage, runsInBrowser } from "./metadata.ts";
+import { outputExtension } from "./convert/output-name.ts";
 
 // The template sections of a page without curated ones. Converter and
 // compressor pages say only what is true of every Tool they cover (#356):
@@ -105,13 +106,16 @@ export function buildHowToSection(tool: Tool): HowToSectionData {
 
 // The converter page's file filter for a Tool without curated content.
 // content:apply gives a Tool it adds content to the same one, so its page
-// keeps accepting the same files.
+// keeps accepting the same files. A format our converters save under another
+// extension (output-name.ts: .mpeg2 as .mpg) also accepts that one, so a
+// visitor can convert a file one of our Tools made.
 export function converterAccept(from: string): string {
   if (from === "pdf") return ".pdf";
   if (from === "jpg") return ".jpg,.jpeg";
   if (from === "jpeg") return ".jpeg,.jpg";
   if (from === "tiff") return ".tif,.tiff";
-  return `.${from}`;
+  const saved = outputExtension(from);
+  return saved === from ? `.${from}` : `.${from},.${saved}`;
 }
 
 // Where a converter page's file is converted, for its article and FAQs. A

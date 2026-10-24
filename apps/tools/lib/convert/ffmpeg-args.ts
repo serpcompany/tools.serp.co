@@ -2,6 +2,7 @@
 // the arguments each format needs can be tested without loading FFmpeg.
 import { AUDIO_FORMATS } from "../capabilities.ts";
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils.ts";
+import { outputExtension } from "./output-name.ts";
 
 // Video outputs keep the source's frame size and frame rate, up to 1920 px
 // and 30 fps (owner decision, #245). The size limit is on the longer side, so
@@ -69,10 +70,11 @@ function canRemux(fromFormat: string, toFormat: string) {
 }
 
 // AV1 and HEVC outputs are written by the browser's encoders (webcodecs.ts),
-// not here.
+// not here. The output file has the extension the download is saved with
+// (output-name.ts); a format FFmpeg can't tell from it is named with -f.
 export function buildConvertCommand(fromFormat: string, toFormat: string): FFmpegCommand {
   const inputName = `input.${fromFormat}`;
-  let outputName = `output.${toFormat}`;
+  const outputName = `output.${outputExtension(toFormat)}`;
   let prepass: string[] | undefined;
 
   const baseArgs = ['-y', '-nostdin'];
@@ -230,27 +232,25 @@ export function buildConvertCommand(fromFormat: string, toFormat: string): FFmpe
     args.push('-c:v', 'mpeg4', '-vtag', 'DIVX', '-q:v', '10');
     args.push('-c:a', 'mp3', '-b:a', '96k');
     args.push(...VIDEO_SIZE_AND_RATE);
-    outputName = outputName.replace('.divx', '.avi'); // Use AVI container
+    args.push('-f', 'avi');
   } else if (toFormat === 'avchd') {
-    // AVCHD-style transport stream
+    // AVCHD-style transport stream, saved as .m2ts
     args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '30', '-tune', 'zerolatency');
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push(...VIDEO_SIZE_AND_RATE);
     args.push('-f', 'mpegts');
-    outputName = outputName.replace('.avchd', '.m2ts'); // Use M2TS container
   } else if (toFormat === 'mjpeg') {
     // Motion JPEG. FFmpeg 5.1's default optimal Huffman tables crash or hang
     // FFmpeg.wasm on detailed 1080p frames; the standard tables don't.
     args.push('-c:v', 'mjpeg', '-q:v', '8', '-huffman', 'default');
     args.push('-c:a', 'pcm_s16le');
     args.push(...VIDEO_SIZE_AND_RATE);
-    outputName = outputName.replace('.mjpeg', '.avi'); // Use AVI container
+    args.push('-f', 'avi');
   } else if (toFormat === 'mpeg2') {
-    // MPEG-2 format
+    // MPEG-2 program stream, saved as .mpg
     args.push('-c:v', 'mpeg2video', '-q:v', '6');
     args.push('-c:a', 'mp2', '-b:a', '96k');
     args.push(...VIDEO_SIZE_AND_RATE);
-    outputName = outputName.replace('.mpeg2', '.mpg'); // Use MPG extension
   } else if (toFormat === 'asf') {
     // Windows Media format
     args.push('-c:v', 'wmv2', '-b:v', '500k');
@@ -378,7 +378,7 @@ function buildVideoCompressionArgs(format: string, crf: number, audioBitrate: st
 // `format` is a lowercase audio or video format.
 export function buildCompressionCommand(format: string, quality?: number): FFmpegCommand {
   const inputName = `input.${format}`;
-  const outputName = `output.${format}`;
+  const outputName = `output.${outputExtension(format)}`;
   const audioBitrate = mapQualityToAudioBitrate(quality);
   const crf = mapQualityToVideoCrf(quality);
   const specificArgs = AUDIO_FORMAT_SET.has(format)
