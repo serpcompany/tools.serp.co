@@ -65,7 +65,7 @@ function buildSuccessResponse(args: {
 // except where this route writes another container.
 function resolveOutputExtension(to: string) {
   if (to === "hevc" || to === "av1") return "mp4";
-  if (to === "divx" || to === "mjpeg") return "avi";
+  if (to === "divx") return "avi";
   return outputExtension(to);
 }
 

@@ -10,8 +10,14 @@ test("MPEG-2 downloads as .mpg and AVCHD as .m2ts, extensions players recognize 
   assert.equal(outputExtension("avchd"), "m2ts");
 });
 
+test("ALAC downloads as .m4a and Motion JPEG as .avi, the containers we write (owner, #373)", () => {
+  assert.equal(outputFileName("song.flac", "alac"), "song.m4a");
+  assert.equal(outputFileName("clip.mp4", "mjpeg"), "clip.avi");
+  assert.equal(outputExtension("ALAC"), "m4a");
+});
+
 test("every other target downloads under its own id", () => {
-  for (const to of ["png", "mp4", "mpg", "m2ts", "divx", "mjpeg", "cdda", "alac", "av1", "hevc"]) {
+  for (const to of ["png", "mp4", "mpg", "m2ts", "m4a", "avi", "divx", "cdda", "av1", "hevc"]) {
     assert.equal(outputExtension(to), to);
     assert.equal(outputFileName("clip.avi", to), `clip.${to}`);
   }

@@ -431,7 +431,7 @@
     "faqs": [
       {
         "question": "How do I convert MOV to MJPEG?",
-        "answer": "Choose the .mov above and let the encode finish. With several files, each is handled in turn and returns its own download with the .mjpeg ending."
+        "answer": "Choose the .mov above and let the encode finish. With several files, each is handled in turn and returns its own download with the .avi ending, since the wrapper is AVI."
       },
       {
         "question": "Is the download a bare MJPEG stream?",

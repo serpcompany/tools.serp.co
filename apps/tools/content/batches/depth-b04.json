@@ -513,7 +513,7 @@
       },
       {
         "question": "What is inside the MJPEG download?",
-        "answer": "The file is named after your MP4 with the .mjpeg ending. Inside, every video frame is its own JPEG and the sound is 16-bit PCM, packed in an AVI wrapper."
+        "answer": "The file is named after your MP4 with the .avi ending, because its wrapper is AVI. Inside, every video frame is its own JPEG and the sound is 16-bit PCM."
       },
       {
         "question": "Why can the MJPEG file be bigger than my MP4?",

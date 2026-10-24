@@ -1,12 +1,17 @@
 // The names converted files are saved under. A file takes its Tool's target
 // id as its extension, except where that id names a format no player knows as
-// an extension: MPEG-2 is saved as .mpg and AVCHD as .m2ts (owner decision,
-// #373). The download (components/HeroConverter.tsx), FFmpeg's output file
-// (lib/convert/ffmpeg-args.ts) and the content briefs
-// (scripts/lib/engine-facts.mjs) all read the extension here.
+// an extension, or a codec rather than the file we write (owner decisions,
+// #373): MPEG-2 is saved as .mpg, AVCHD as .m2ts, ALAC as .m4a (written with
+// -f ipod) and Motion JPEG as .avi (written with -f avi). The download
+// (components/HeroConverter.tsx), FFmpeg's output file
+// (lib/convert/ffmpeg-args.ts and app/api/video-convert/route.ts), the
+// converter pages' file filter (converterAccept in lib/tool-sections.ts) and
+// the content briefs (scripts/lib/engine-facts.mjs) all read the extension here.
 export const OUTPUT_EXTENSIONS: Readonly<Record<string, string>> = {
   mpeg2: "mpg",
   avchd: "m2ts",
+  alac: "m4a",
+  mjpeg: "avi",
 };
 
 export function outputExtension(to: string): string {

@@ -110,7 +110,7 @@ const MIME_MAP: Record<string, string> = {
   // Elementary streams: Annex B H.265, and AV1 in IVF.
   hevc: "video/h265",
   divx: "video/avi",
-  mjpeg: "video/x-motion-jpeg",
+  mjpeg: "video/avi",
   mpeg2: "video/mpeg",
   asf: "video/x-ms-asf",
   wmv: "video/x-ms-wmv",
