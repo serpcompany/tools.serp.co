@@ -51,7 +51,8 @@ and rollback; bindings; and safe D1 access. Read it before touching
 **Commands and tests.** [README.md](README.md) lists the commands and what
 `pnpm check` covers; [docs/runbooks/browser-smoke.md](docs/runbooks/browser-smoke.md)
 explains the Playwright smoke test that CI and the Deploy workflow run, and how
-to run it yourself.
+to run it yourself; [docs/runbooks/ci-runners.md](docs/runbooks/ci-runners.md)
+says which runners CI's jobs use and how to switch them.
 
 **Work tracking.** GitHub Issues is the only tracker.
 [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md) covers sub-issues,

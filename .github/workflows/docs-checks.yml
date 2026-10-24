@@ -14,7 +14,10 @@ permissions:
 
 jobs:
   check-docs:
-    runs-on: ubuntu-latest
+    # CI_RUNNER_LABELS picks the runner; a fork's pull request always runs on
+    # ubuntu-latest (docs/runbooks/ci-runners.md).
+    runs-on: ${{ github.event.pull_request && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-latest' || fromJSON(vars.CI_RUNNER_LABELS || '"ubuntu-latest"') }}
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4

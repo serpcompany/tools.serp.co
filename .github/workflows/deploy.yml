@@ -39,9 +39,13 @@ jobs:
           exit 1
 
       # Re-running an old run would deploy an older commit over a newer one.
+      # Asks with the job's own token: the repository is private, so an
+      # anonymous `git ls-remote` can't read it.
       - name: Only the branch's current commit deploys
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          head="$(git ls-remote "https://github.com/${GITHUB_REPOSITORY}.git" "refs/heads/${GITHUB_REF_NAME}" | cut -f1)"
+          head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha)"
           if [ "$head" != "$GITHUB_SHA" ]; then
             echo "::error::$GITHUB_SHA is no longer the head of ${GITHUB_REF_NAME} ($head). Push or re-run the newest commit instead."
             exit 1

@@ -61,9 +61,10 @@ artifact.
 
 ## Browser decoders
 
-Before it builds the Worker, the `smoke` job runs
+The `decoders` job of `.github/workflows/check.yml` runs
 `apps/tools/scripts/check-browser-decoders.mjs` in Playwright's Chromium,
-Firefox and WebKit (Safari's engine). It needs no Worker: it runs
+Firefox and WebKit (Safari's engine), on GitHub's runners
+([ci-runners.md](ci-runners.md)). It needs no Worker: it runs
 `lib/convert/decode.ts` in a page and checks what the converters assume.
 Each format some current browsers can't decode (AVIF, TIFF) has a 1 x 1
 sample there, which must decode in exactly the engines the script pins, so
