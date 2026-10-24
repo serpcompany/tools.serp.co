@@ -1,4 +1,5 @@
 import HtmlToMarkdownConverter from "@/components/HtmlToMarkdownConverter";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
@@ -6,13 +7,19 @@ import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 
 const toolId = "html-to-markdown";
+// The line under the H1, which the structured data repeats.
+const subtitle = "Paste HTML on the left and get clean Markdown on the right — instantly, in your browser.";
 
 export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
+  const heading = toolHeading(toolId);
+
   return (
     <main className="min-h-screen bg-background">
-      <HtmlToMarkdownConverter heading={toolHeading(toolId)} />
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
+
+      <HtmlToMarkdownConverter heading={heading} subtitle={subtitle} />
 
       <HowToSection
         title="How to convert HTML to Markdown"

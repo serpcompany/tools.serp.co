@@ -1,4 +1,5 @@
 import CharacterCounter from "@/components/CharacterCounter";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
@@ -16,15 +17,16 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
+  // The H1 and the line under it, which the structured data repeats.
+  const heading = toolHeading(toolId);
+  const subtitle = content.tool.subtitle;
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
+
       {/* Custom Character Counter Component */}
-      <CharacterCounter
-        heading={toolHeading(toolId)}
-        subtitle={content.tool.subtitle}
-       
-      />
+      <CharacterCounter heading={heading} subtitle={subtitle} />
 
       {/* Related Tools Section - Character counter doesn't have from/to formats */}
 

@@ -1,4 +1,5 @@
 import JsonToCsv from "@/components/JsonToCsv";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
@@ -17,16 +18,16 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
+  // The H1 and the line under it, which the structured data repeats.
+  const heading = toolHeading(toolId);
+  const subtitle = content.tool.subtitle;
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
+
       {/* Custom JSON to CSV Component */}
-      <JsonToCsv
-        toolId={toolId}
-        heading={toolHeading(toolId)}
-        subtitle={content.tool.subtitle}
-       
-      />
+      <JsonToCsv toolId={toolId} heading={heading} subtitle={subtitle} />
 
       {content.howTo && (
         <HowToSection title={content.howTo.title} intro={content.howTo.intro} steps={content.howTo.steps} />

@@ -1,4 +1,5 @@
 import TranscribeTool from "@/components/TranscribeTool";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
@@ -21,6 +22,8 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={content.tool.title} description={content.tool.subtitle} />
+
       <TranscribeTool
         toolId={toolId}
         title={content.tool.title}

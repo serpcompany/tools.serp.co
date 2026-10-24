@@ -1,8 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { registerHooks } from "node:module";
+import path from "node:path";
+import ts from "typescript";
 
+import {
+  appRoot as appDir,
+  isClientModule,
+  parse,
+  resolveImport,
+  routeFiles,
+} from "../scripts/lib/module-graph.mjs";
+import { dynamicRouteHandler, scanPageHandlers } from "../scripts/lib/tool-sweep.mjs";
 import { activeTools, allTools } from "./catalog/catalog.ts";
 import {
   breadcrumbListStructuredData,
@@ -77,14 +87,134 @@ const typesIn = (value, types = new Set()) => {
   return types;
 };
 
-// The pages ToolPageTemplate and DownloaderPageTemplate serve: converters and
-// compressors with both formats, and every downloader.
-const templatedTools = () =>
-  activeTools().filter(
-    (tool) =>
-      tool.operation === "download" ||
-      ((tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to),
+// Which page renders each Tool, and how many JSON-LD scripts it renders,
+// read from the source with the TypeScript parser. No page can be rendered
+// here, so the module graph stands in for it.
+
+const realPath = (...segments) => realpathSync(path.join(appDir, ...segments));
+const jsonLdFile = realPath("components", "JsonLd.tsx");
+const toolRoutePage = realPath("app", "(convert)", "[tool]", "page.tsx");
+
+// Every page under app/ by the path it serves: route groups such as
+// (convert) add nothing to it.
+const pageFiles = new Map(
+  routeFiles(path.join(appDir, "app"), ["page"]).map((file) => {
+    const segments = path
+      .relative(path.join(appDir, "app"), path.dirname(file))
+      .split(path.sep)
+      .filter((segment) => segment && !/^\(.*\)$/.test(segment));
+    return [`/${segments.join("/")}`, realpathSync(file)];
+  }),
+);
+const routeOf = (tool) => tool.route.replace(/\/+$/, "") || "/";
+
+// The components a module renders: one entry for each JSX element whose tag
+// is a name it imports from the repository, with the file it comes from and
+// the element's attributes. Cached by file: ~2,440 Tools share a few modules.
+const rendered = new Map();
+function renderedComponents(file) {
+  if (!rendered.has(file)) rendered.set(file, readRenderedComponents(file));
+  return rendered.get(file);
+}
+
+function readRenderedComponents(file) {
+  const sourceFile = parse(file);
+  const imported = new Map();
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+    const clause = statement.importClause;
+    const target = resolveImport(statement.moduleSpecifier.text, file);
+    if (!clause || clause.isTypeOnly || !target) continue;
+    if (clause.name) imported.set(clause.name.text, target);
+    if (clause.namedBindings && ts.isNamedImports(clause.namedBindings)) {
+      for (const element of clause.namedBindings.elements) imported.set(element.name.text, target);
+    }
+  }
+  const components = [];
+  const visit = (node) => {
+    if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && ts.isIdentifier(node.tagName)) {
+      const target = imported.get(node.tagName.text);
+      if (target) components.push({ name: node.tagName.text, file: target, attributes: node.attributes });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return components;
+}
+
+// How many JSON-LD scripts a module renders: each <JsonLd> element in it and
+// in the components it renders (StructuredData renders one), all branches
+// added up. A client module renders none: StructuredData reads the registry,
+// which must stay out of the browser (catalog/client-boundary.test.mjs).
+const mountCounts = new Map();
+function mounts(file) {
+  if (file === jsonLdFile) return 1;
+  if (!mountCounts.has(file)) {
+    mountCounts.set(file, 0); // a cycle adds nothing
+    const count = isClientModule(parse(file))
+      ? 0
+      : renderedComponents(file).reduce((sum, component) => sum + mounts(component.file), 0);
+    mountCounts.set(file, count);
+  }
+  return mountCounts.get(file);
+}
+
+// The components app/(convert)/[tool]/page.tsx renders, by name.
+const toolRouteComponents = new Map(
+  renderedComponents(toolRoutePage).map(({ name, file }) => [name, file]),
+);
+
+// The module that renders an active Tool's page: its folder's page, else the
+// component the [tool] route renders for it, by the tool sweep's copy of that
+// route's dispatch (its "not-found" is no component).
+const pageModuleOf = (tool) =>
+  pageFiles.get(routeOf(tool)) ?? toolRouteComponents.get(dynamicRouteHandler(tool));
+
+// The "coming soon" editors get ToolPlaceholder, which has no JSON-LD.
+const COMING_SOON = ["audio-editor", "image-editor", "video-editor"];
+const isComingSoon = (tool) => !pageFiles.has(routeOf(tool)) && dynamicRouteHandler(tool) === "ToolPlaceholder";
+const liveTools = () => activeTools().filter((tool) => !isComingSoon(tool));
+
+// The toolId an element gets: a string literal, or a top-level string
+// constant of the page named by it (`toolId={toolId}`).
+function toolIdProp(file, attributes) {
+  const attribute = attributes.properties.find(
+    (property) => ts.isJsxAttribute(property) && ts.isIdentifier(property.name) && property.name.text === "toolId",
   );
+  let value = attribute?.initializer;
+  if (value && ts.isJsxExpression(value)) value = value.expression;
+  if (!value) return undefined;
+  if (ts.isStringLiteral(value)) return value.text;
+  return ts.isIdentifier(value) ? stringConstants(file).get(value.text) : undefined;
+}
+
+// A page's top-level `const name = "value"` strings (`"csv" as const` too).
+function stringConstants(file) {
+  const constants = new Map();
+  for (const statement of parse(file).statements) {
+    if (!ts.isVariableStatement(statement)) continue;
+    for (const declaration of statement.declarationList.declarations) {
+      let value = declaration.initializer;
+      if (value && ts.isAsExpression(value)) value = value.expression;
+      if (ts.isIdentifier(declaration.name) && value && ts.isStringLiteral(value)) {
+        constants.set(declaration.name.text, value.text);
+      }
+    }
+  }
+  return constants;
+}
+
+// A table converter's page: the formats it passes TableConvertLanding, which
+// gives StructuredData the Tool id `${from}-to-${to}`, and the toolId its
+// generateMetadata reads (none on an uncatalogued page); null for a page that
+// isn't one.
+function tablePage(file) {
+  if (!renderedComponents(file).some(({ name }) => name === "TableConvertLanding")) return null;
+  const constants = stringConstants(file);
+  const page = { from: constants.get("fromFormat"), to: constants.get("toFormat") };
+  assert.ok(page.from && page.to, `${file} declares its formats`);
+  return { ...page, toolId: `${page.from}-to-${page.to}`, metadataToolId: constants.get("toolId") };
+}
 
 test("a converter page is a free WebApplication at its canonical URL", () => {
   const tool = byId("mp4-to-mp3");
@@ -115,9 +245,9 @@ test("a Lander and a compressor are at their routes", () => {
   assert.equal(parsed(byId("jpg-to-png")).applicationCategory, "UtilitiesApplication");
 });
 
-test("every templated Tool page: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
-  const tools = templatedTools();
-  assert.ok(tools.length > 2000, `${tools.length} templated Tools`);
+test("every live Tool page: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
+  const tools = liveTools();
+  assert.ok(tools.length > 2500, `${tools.length} Tool pages`);
 
   for (const tool of tools) {
     const data = parsed(tool);
@@ -178,10 +308,126 @@ test("page text can't end the script tag or change how HTML parses it", () => {
   assert.equal(html.toLowerCase().indexOf("</script"), html.length - "</script>".length);
 });
 
-test("each template mounts the one JSON-LD script once", () => {
-  for (const template of ["../components/ToolPageTemplate.tsx", "../components/DownloaderPageTemplate.tsx"]) {
-    assert.equal(source(template).match(/<StructuredData\b/g)?.length, 1, template);
+test("a table converter's markup is for the Tool its page's metadata is for", () => {
+  let pages = 0;
+  for (const tool of liveTools()) {
+    const page = tablePage(pageModuleOf(tool));
+    if (!page) continue;
+    pages += 1;
+
+    // TableConvertLanding's id, the id buildToolMetadata gets, and the route
+    // are one Tool, so the url (checked above) is this page's canonical.
+    assert.equal(page.toolId, tool.id, `${routeOf(tool)} is the page of ${page.toolId}`);
+    assert.equal(page.metadataToolId, tool.id, `${routeOf(tool)}'s generateMetadata`);
+    const data = toolStructuredData({ toolId: page.toolId, name: "H1", description: "line" }, ORIGIN);
+    assert.equal(data?.url, canonicalOf(tool), tool.id);
+    assert.equal(data.applicationCategory, "UtilitiesApplication", tool.id);
   }
+  // 86 TableConvertLanding pages; json-to-csv and html-to-markdown have their own.
+  assert.ok(pages >= 80, `${pages} table converter pages`);
+});
+
+test("the [tool] route renders a template, the PDF page or the placeholder, and nothing else", () => {
+  // A new branch there needs the sweep's dynamicRouteHandler to say which Tools get it.
+  assert.deepEqual(
+    [...toolRouteComponents.keys()].sort(),
+    ["DownloaderPageRenderer", "PdfToolPage", "ToolPageRenderer", "ToolPlaceholder"],
+  );
+});
+
+test("every live Tool page renders one JSON-LD script; the coming-soon editors none", () => {
+  const counts = activeTools().map((tool) => {
+    const page = pageModuleOf(tool);
+    assert.ok(page, `${tool.id}: a page renders it`);
+    return { tool, count: mounts(page) };
+  });
+
+  const wrong = counts.filter(({ tool, count }) => count !== (isComingSoon(tool) ? 0 : 1));
+  assert.deepEqual(wrong.map(({ tool, count }) => `${tool.id}: ${count}`), []);
+  assert.ok(counts.length > 2500, `${counts.length} active Tools`);
+  assert.deepEqual(
+    counts.filter(({ count }) => count === 0).map(({ tool }) => tool.operation).sort(),
+    COMING_SOON,
+  );
+
+  // A folder page gives the element that renders its JSON-LD its own Tool's
+  // id. (A table page's id comes from its formats, checked above.)
+  let folderPages = 0;
+  for (const { tool } of counts) {
+    const file = pageFiles.get(routeOf(tool));
+    if (!file || tablePage(file)) continue;
+    folderPages += 1;
+    const passed = renderedComponents(file)
+      .filter((component) => mounts(component.file) > 0)
+      .map((component) => ({ component: component.name, toolId: toolIdProp(file, component.attributes) }));
+    assert.equal(passed.length, 1, file);
+    assert.equal(passed[0].toolId, tool.id, `${file}: ${passed[0].component}`);
+  }
+  assert.ok(folderPages > 100, `${folderPages} folder pages`);
+});
+
+// The tool sweep files a folder page under its first @/components import
+// outside sections/ (scripts/lib/tool-sweep.mjs, pageComponent), so a page
+// imports StructuredData after its own component. The pages that render
+// <StructuredData> themselves, with the component the sweep filed each under
+// before they did.
+const SWEEP_HANDLERS = {
+  "/audio-to-text": "TranscribeTool",
+  "/audio-to-transcript": "TranscribeTool",
+  "/batch-compress-png": "BatchHeroConverter",
+  "/character-counter": "CharacterCounter",
+  "/csv-combiner": "CsvCombiner",
+  "/html-to-markdown": "HtmlToMarkdownConverter",
+  "/json-to-csv": "JsonToCsv",
+  "/mp3-to-transcript": "TranscribeTool",
+  "/mp4-to-transcript": "TranscribeTool",
+  "/tiktok-to-transcript": "TranscribeTool",
+  "/video-to-transcript": "TranscribeTool",
+  "/youtube-to-transcript": "TranscribeTool",
+  "/youtube-to-transcript-generator": "TranscribeTool",
+};
+
+test("the tool sweep files each page under its own component, never StructuredData", () => {
+  const handlers = scanPageHandlers(path.join(appDir, "app"));
+
+  const mounting = [...pageFiles]
+    .filter(([, file]) => renderedComponents(file).some(({ name }) => name === "StructuredData"))
+    .map(([route]) => route)
+    .sort();
+  assert.deepEqual(mounting, Object.keys(SWEEP_HANDLERS).sort(), "pages that render <StructuredData>");
+  assert.deepEqual(Object.fromEntries(mounting.map((route) => [route, handlers.get(route)])), SWEEP_HANDLERS);
+
+  const misfiled = [...handlers].filter(([, handler]) => handler === "StructuredData").map(([route]) => route);
+  assert.deepEqual(misfiled, []);
+});
+
+// The pages with JSON-LD of their own, about videos, not a Tool (#376).
+const VIDEO_PAGES = ["/videos", "/watch/[tool]/[video]"];
+
+test("pages that aren't a live Tool's render no Tool JSON-LD; the video pages their one script", () => {
+  const toolPages = new Set(liveTools().map((tool) => pageFiles.get(routeOf(tool))));
+  let pages = 0;
+  for (const [route, file] of pageFiles) {
+    if (toolPages.has(file) || file === toolRoutePage) continue;
+    pages += 1;
+    // The uncatalogued table pages (#221) mount it, but no Tool has their id.
+    const table = tablePage(file);
+    if (table) {
+      assert.equal(table.metadataToolId, undefined, route);
+      assert.equal(toolStructuredData({ toolId: table.toolId, name: "x", description: "y" }, ORIGIN), null, route);
+    } else {
+      assert.equal(mounts(file), VIDEO_PAGES.includes(route) ? 1 : 0, route);
+      if (VIDEO_PAGES.includes(route)) {
+        assert.ok(!renderedComponents(file).some(({ name }) => name === "StructuredData"), route);
+      }
+    }
+  }
+  for (const route of VIDEO_PAGES) assert.ok(pageFiles.has(route), route);
+  // The homepage, /categories/, the category pages, /brands/ and the others.
+  assert.ok(pageFiles.has("/") && pages > 5, `${pages} other pages`);
+});
+
+test("the component renders one script tag, escaped", () => {
   const component = source("../components/StructuredData.tsx");
   assert.equal(component.match(/<JsonLd\b/g)?.length, 1);
   const script = source("../components/JsonLd.tsx");
