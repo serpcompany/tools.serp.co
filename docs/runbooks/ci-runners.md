@@ -24,10 +24,10 @@ it is cancelled and re-run. A fork's pull request always runs on
 `ubuntu-latest`, whatever the variable says, so SERP's runners never run a
 fork's code.
 
-| Follows `CI_RUNNER_LABELS` | Always `ubuntu-latest` |
-| --- | --- |
+| Follows `CI_RUNNER_LABELS`         | Always `ubuntu-latest`       |
+| ---------------------------------- | ---------------------------- |
 | Repository Check: `check`, `smoke` | Repository Check: `decoders` |
-| Docs Checks, Docs Links, PR Title | Deploy |
+| Docs Checks, Docs Links, PR Title  | Deploy                       |
 
 - **Deploy** holds the Cloudflare and Sentry keys, so it stays on GitHub's
   short-lived VMs, and no key, D1 data or Wrangler session lands on SERP's
@@ -48,7 +48,9 @@ secret or installs with root.
 Each job gets a throwaway container that is deleted after it, with its own
 network and process namespaces, so a fixed port such as `smoke`'s Worker on
 8787 can't collide with a neighbour's. A slot has 6 threads and 24 GB of
-memory; single-threaded work runs about 27% slower than on GitHub's runners.
+memory. CPU-bound tests take about twice as long as on a public repository's
+4-vCPU `ubuntu-latest` (serpcompany/serp-server#7), so routed jobs have room in
+their timeouts.
 The checkout and `node_modules` sit on a 12 GB in-memory disk, and `/tmp` holds
 4 GB. Jobs get no Docker, no sudo and no secrets beyond their own
 `GITHUB_TOKEN`. The image has `gh`, git, curl, jq and Chromium's system
@@ -58,5 +60,6 @@ Node.
 ## Required checks
 
 The `staging` ruleset requires `check`, `check-docs`, `smoke`,
-`validate-links`, `conventional-title` and `decoders`. A moved job keeps its id,
-so its check keeps its name on either runner.
+`validate-links` and `conventional-title`, and `decoders` once the owner adds
+it (#385). A moved job keeps its id, so its check keeps its name on either
+runner.

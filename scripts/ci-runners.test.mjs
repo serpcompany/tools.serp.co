@@ -11,7 +11,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workflowDir = path.join(root, '.github/workflows');
-const workflowFiles = readdirSync(workflowDir).filter((file) => file.endsWith('.yml')).sort();
+const workflowFiles = readdirSync(workflowDir)
+  .filter((file) => /\.ya?ml$/.test(file))
+  .sort();
 
 const GITHUB_HOSTED = 'ubuntu-latest';
 const ROUTED =
@@ -30,19 +32,25 @@ const ROUTED_JOBS = [
 const CREDENTIALED_WORKFLOWS = ['deploy.yml'];
 
 // Each job of a workflow, by its id under `jobs:`, with its `runs-on` values
-// and its lines. Comments are left out, so a job's text is only its own.
-function jobsOf(file) {
+// and its text: its own lines, then the workflow's lines outside `jobs:` (a
+// workflow-level `env:` reaches every job). Comments are left out.
+function jobsOf(file, source) {
   const jobs = [];
+  let workflowText = '';
   let inJobs = false;
   let job;
-  for (const line of readFileSync(path.join(workflowDir, file), 'utf8').split('\n')) {
+  for (const line of source.split('\n')) {
     if (/^\s*(#|$)/.test(line)) continue;
     if (/^\S/.test(line)) {
       inJobs = /^jobs:\s*$/.test(line);
       job = undefined;
+      if (!inJobs) workflowText += `${line}\n`;
       continue;
     }
-    if (!inJobs) continue;
+    if (!inJobs) {
+      workflowText += `${line}\n`;
+      continue;
+    }
     const id = /^ {2}([\w-]+):\s*$/.exec(line)?.[1];
     if (id) {
       job = { id: `${file}:${id}`, runsOn: [], text: '' };
@@ -53,10 +61,19 @@ function jobsOf(file) {
     if (runsOn) job.runsOn.push(runsOn);
     job.text += `${line}\n`;
   }
+  for (const each of jobs) each.text += workflowText;
   return jobs;
 }
 
-const allJobs = workflowFiles.flatMap(jobsOf);
+// Any expression that reads `secrets` other than secrets.GITHUB_TOKEN
+// (`secrets.X`, `secrets['X']`, `toJSON(secrets)`), and a `secrets:` key, as in
+// a reusable workflow's `secrets: inherit`.
+const holdsSecret = (text) =>
+  /\$\{\{(?:(?!\}\})[\s\S])*\bsecrets\b(?!\.GITHUB_TOKEN\b)/.test(text) || /^\s+secrets:/m.test(text);
+// Playwright's `--with-deps` and `install-deps` run apt as root.
+const installsAsRoot = (text) => /\bsudo\b|apt-get|\bapt install\b|--with-deps|install-deps/.test(text);
+
+const allJobs = workflowFiles.flatMap((file) => jobsOf(file, readFileSync(path.join(workflowDir, file), 'utf8')));
 
 // Evaluates the GitHub expression subset `runs-on` uses (string literals,
 // context paths, ==, !=, &&, ||, parentheses, fromJSON) with GitHub's
@@ -152,17 +169,35 @@ test('names no self-hosted runner label in a workflow', () => {
 test('keeps every job with a secret or a root install on GitHub-hosted runners', () => {
   for (const job of allJobs) {
     const credentialed =
-      /secrets\.(?!GITHUB_TOKEN\b)/.test(job.text) ||
+      holdsSecret(job.text) ||
       /^ {4}environment:/m.test(job.text) ||
       CREDENTIALED_WORKFLOWS.includes(job.id.split(':')[0]);
-    // Playwright's `--with-deps` and `install-deps` run apt as root.
-    const privileged = /\bsudo\b|apt-get|\bapt install\b|--with-deps|install-deps/.test(job.text);
-    if (credentialed || privileged) {
+    if (credentialed || installsAsRoot(job.text)) {
       assert.equal(job.runsOn[0], GITHUB_HOSTED, job.id);
       assert.ok(!ROUTED_JOBS.includes(job.id), job.id);
     }
   }
   for (const file of CREDENTIALED_WORKFLOWS) assert.ok(workflowFiles.includes(file), file);
+});
+
+test('finds a secret however a job reads it', () => {
+  const textOf = (source) => jobsOf('fixture.yml', source)[0].text;
+  const job = (steps) => `jobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n${steps}`;
+  const run = (expression) => job(`      - run: echo "${expression}"\n`);
+  for (const source of [
+    run('${{ secrets.CLOUDFLARE_API_TOKEN }}'),
+    run("${{ secrets['CLOUDFLARE_API_TOKEN'] }}"),
+    run('${{ toJSON(secrets) }}'),
+    `env:\n  TOKEN: \${{ secrets.SENTRY_AUTH_TOKEN }}\n${job('      - run: ./deploy\n')}`,
+    'jobs:\n  call:\n    uses: ./.github/workflows/deploy.yml\n    secrets: inherit\n',
+  ]) {
+    assert.ok(holdsSecret(textOf(source)), source);
+  }
+  for (const source of [run('${{ secrets.GITHUB_TOKEN }}'), run('${{ github.token }}'), run('no secrets here')]) {
+    assert.ok(!holdsSecret(textOf(source)), source);
+  }
+  assert.ok(installsAsRoot(textOf(job('      - run: pnpm exec playwright install --with-deps chromium\n'))));
+  assert.ok(!installsAsRoot(textOf(job('      - run: pnpm exec playwright install chromium\n'))));
 });
 
 test('sends routed jobs to the variable, and a fork pull request to ubuntu-latest', () => {

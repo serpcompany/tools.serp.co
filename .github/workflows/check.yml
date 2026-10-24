@@ -81,8 +81,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # A download from GitHub's apt mirror sometimes stalls until the job times
+      # out (#385): each try gets 3 minutes (it takes about one), then one retry.
       - name: Install pinned browser runtimes
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
+        run: |
+          for try in 1 2; do
+            if timeout --kill-after=15s 180 pnpm exec playwright install --with-deps chromium firefox webkit; then
+              exit 0
+            fi
+            echo "::warning::Browser install try $try failed or stalled."
+            sudo dpkg --configure -a || true
+          done
+          exit 1
 
       - name: Check the browsers' image decoders
         run: pnpm -C apps/tools smoke:decoders
